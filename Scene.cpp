@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Navigator.h"
+#include "RendererManager.h"
 #include <stdio.h>
 
 // Attributes
@@ -9,6 +10,7 @@ Uint16 Scene::lastGameObjectID = 0;
 
 Scene::Scene()
 {
+	renderer = RendererManager::renderer;
 }
 
 Scene::Scene(Scene::SceneMode mode)

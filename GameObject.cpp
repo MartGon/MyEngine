@@ -40,7 +40,7 @@ void GameObject::update()
 
 void GameObject::setRelativePosition(Vector2<float> pos)
 {
-
+	// TODO
 }
 
 void GameObject::setScale(Vector2<float> scale)

@@ -37,5 +37,7 @@ public:
 	Uint8 getAlpha();
 	void free();
 	std::string getPathFromResourceFolder(const char* localPath);
+	bool isValid();
+	bool load(const char* path, SDL_Renderer *renderer);
 };
 

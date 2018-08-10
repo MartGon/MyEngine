@@ -7,7 +7,6 @@ Texture::Texture()
 Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
 {
 	path = getPathFromResourceFolder(resourcePath).c_str();
-	printf("%s\n", path);
 	SDL_Surface *imgSurface = IMG_Load(path);
 	if (!imgSurface)
 	{
@@ -28,31 +27,9 @@ Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
 
 Texture::Texture(const char* resourcePath, SDL_Renderer* renderer)
 {
-	const std::string& tempRet = getPathFromResourceFolder(resourcePath).c_str();
-	path = tempRet.c_str();
-	printf("%s\n", path);
-	SDL_Surface *imgSurface = IMG_Load(path);
-	if (!imgSurface)
+	if (!load(resourcePath, renderer))
 	{
-		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
-	}
-	else
-	{
-		mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
-
-		if (!mTexture)
-		{
-			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
-		}
-		else
-		{
-			mWidth = imgSurface->w;
-			mHeight = imgSurface->h;
-			mRenderer = renderer;
-			scale = Vector2<float>(1, 1);
-		}
-
-		SDL_FreeSurface(imgSurface);
+		throw - 1;
 	}
 }
 
@@ -106,4 +83,48 @@ std::string Texture::getPathFromResourceFolder(const char* localPath)
 	std::string strResourcePath(localPath);
 	std::string lFolder(folder);
 	return lFolder + strResourcePath;
+}
+
+bool Texture::isValid()
+{
+	return mTexture;
+}
+
+bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
+{
+	bool correct = false;
+	const std::string& tempRet = getPathFromResourceFolder(resourcePath).c_str();
+	path = tempRet.c_str();
+
+	SDL_Surface *imgSurface = IMG_Load(path);
+	if (!imgSurface)
+	{
+		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
+	}
+	else
+	{
+		mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
+
+		if (!mTexture)
+		{
+			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
+		}
+		else
+		{
+			// Dimensions
+			mWidth = imgSurface->w;
+			mHeight = imgSurface->h;
+			scale = Vector2<float>(1, 1);
+
+			// Set renderer
+			mRenderer = renderer;
+
+			// Flag
+			correct = true;
+		}
+
+		SDL_FreeSurface(imgSurface);
+	}
+
+	return correct;
 }
