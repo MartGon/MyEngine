@@ -55,6 +55,14 @@ public:
 
 		return Vector2<L>(sX, sY);
 	}
+
+	friend Vector2<T>& operator*(const Vector2<T> &x1, const Vector2<T> &x2)
+	{
+		T sX = x1.x * x2.x;
+		T sY = x1.y * x2.y;
+
+		return Vector2<T>(sX, sY);
+	}
 };
 
 // Operators

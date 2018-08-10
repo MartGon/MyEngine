@@ -66,6 +66,7 @@ public:
 	}
 
 	// Position
+	// Take the object's center as its positions, instead of upper left corner
 	void setRelativePosition(Vector2<float> pos);
 
 	// Update

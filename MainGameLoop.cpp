@@ -2,9 +2,10 @@
 #include "RendererManager.h"
 #include "SceneManager.h"
 
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 480;
 Scene *gFirstScene = nullptr;
+
+int WINDOW_WIDTH = 640;
+int WINDOW_HEIGHT = 480;
 
 bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 {
@@ -36,6 +37,12 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 	}
 
 	return true;
+}
+
+void setWindowResolution(int width, int height)
+{
+	WINDOW_WIDTH = width;
+	WINDOW_HEIGHT = height;
 }
 
 int engine_main()

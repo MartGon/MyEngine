@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "SceneManager.h"
 #include "TextureRenderer.h"
+#include "RendererManager.h"
 
 // Constructors
 
@@ -27,6 +28,15 @@ GameObject::GameObject(Texture texture) : GameObject()
 	name = texture.path;
 }
 
+// Behaviour
+
+void GameObject::start()
+{
+	onStart();
+
+	isInitialized = true;
+}
+
 void GameObject::update()
 {
 	// Update every component
@@ -38,9 +48,28 @@ void GameObject::update()
 	onUpdate();
 }
 
+// Setters
+
 void GameObject::setRelativePosition(Vector2<float> pos)
 {
-	// TODO
+	if (TextureRenderer *tRenderer = getComponent<TextureRenderer>())
+	{	
+		float xOffset = tRenderer->texture.mWidth / 2 * transform.scale.x;
+		float yOffset = tRenderer->texture.mHeight / 2 * transform.scale.y;
+		
+		// Check if position will be valid
+		if (pos.x - xOffset >= 0)
+			pos.x -= xOffset;
+		else
+			pos.x = 0;
+
+		if (pos.y - yOffset >= 0)
+			pos.y -= yOffset;
+		else
+			pos.y = 0;
+
+		transform.position = pos;
+	}
 }
 
 void GameObject::setScale(Vector2<float> scale)
@@ -48,12 +77,7 @@ void GameObject::setScale(Vector2<float> scale)
 	transform.scale = scale;
 }
 
-void GameObject::start()
-{
-	onStart();
-
-	isInitialized = true;
-}
+// Behaviour hooks
 
 void GameObject::onStart()
 {
@@ -74,10 +98,14 @@ void GameObject::destroy()
 	this->~GameObject();
 }
 
+// Collider hooks
+
 void GameObject::onColliderEnter(Collider *collider)
 {
 
 }
+
+// Navigator hooks
 
 void GameObject::beforeMove()
 {

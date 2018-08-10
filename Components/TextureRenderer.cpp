@@ -21,10 +21,12 @@ TextureRenderer::TextureRenderer(Texture texture) : Component()
 
 void TextureRenderer::update()
 {
-	int x = gameObject->transform.position.x;
-	int y = gameObject->transform.position.y;
+	Vector2<float> scaler = RendererManager::getScaler();
 
-	texture.scale = gameObject->transform.scale;
+	int x = gameObject->transform.position.x * scaler.x;
+	int y = gameObject->transform.position.y * scaler.y;
+
+	texture.scale = gameObject->transform.scale * scaler;
 
 	texture.render(x, y);
 }
