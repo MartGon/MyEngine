@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene.h"
 
-static class SceneManager
+class SceneManager
 {
 public:
 	SceneManager();

@@ -36,7 +36,19 @@ public:
 	virtual void onStart();
 
 	// setComponent
-	void setComponent(Component *component);
+	template <typename T>
+	T* setComponent(T *component)
+	{
+		if (Component *cComponent = dynamic_cast<Component*>(component))
+		{
+			component->gameObject = this;
+			components.push_back(component);
+
+			return component;
+		}
+
+		return nullptr;
+	}
 
 	// getComponent
 	template <typename T>

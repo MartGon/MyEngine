@@ -74,12 +74,6 @@ void GameObject::destroy()
 	this->~GameObject();
 }
 
-void GameObject::setComponent(Component *component)
-{
-	component->gameObject = this;
-	components.push_back(component);
-}
-
 void GameObject::onColliderEnter(Collider *collider)
 {
 
