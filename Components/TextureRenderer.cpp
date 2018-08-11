@@ -4,10 +4,10 @@
 
 TextureRenderer::TextureRenderer() : Component()
 {
-	texture = Texture();
+	renderer = RendererManager::renderer;
 }
 
-TextureRenderer::TextureRenderer(const char* path) : Component() 
+TextureRenderer::TextureRenderer(const char* path) : TextureRenderer() 
 {
 	texture = Texture(path, RendererManager::renderer);
 	tPath = std::string(path);

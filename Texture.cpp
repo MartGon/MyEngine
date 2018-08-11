@@ -1,8 +1,12 @@
 #include "Texture.h"
 #include "RendererManager.h"
 
+const char* Texture::folder = "resources/";
+
 Texture::Texture()
 {
+	mRenderer = RendererManager::renderer;
+	mTexture = RendererManager::nullTexture.mTexture;
 }
 
 Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
@@ -91,7 +95,7 @@ bool Texture::isValid()
 bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
 {
 	bool correct = false;
-	const std::string& tempRet = getPathFromResourceFolder(resourcePath).c_str();
+	std::string tempRet = getPathFromResourceFolder(resourcePath).c_str();
 
 	// Set must values
 	path = tempRet.c_str();

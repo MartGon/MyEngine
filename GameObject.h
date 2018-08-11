@@ -41,8 +41,11 @@ public:
 	{
 		if (Component *cComponent = dynamic_cast<Component*>(component))
 		{
-			component->gameObject = this;
-			components.push_back(component);
+			cComponent->gameObject = this;
+			components.push_back(cComponent);
+
+			// Init once set
+			cComponent->start();
 
 			return component;
 		}

@@ -27,7 +27,7 @@ public:
 	Vector2<float> scale;
 
 	// Other
-	const char* folder = "resources/";
+	static const char* folder;
 	const char* path = nullptr;
 
 	// Methods

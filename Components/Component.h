@@ -15,6 +15,7 @@ public:
 	GameObject *gameObject = nullptr;
 
 	// Methods
+	virtual void start() {};
 	virtual void update() override {};
 	virtual void destroy() {};
 };
