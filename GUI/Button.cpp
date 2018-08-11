@@ -3,11 +3,11 @@
 
 // Constructors
 
-Button::Button() : EventHandler()
+Button::Button()
 {
 }
 
-Button::Button(Texture texture) : GameObject(texture), EventHandler()
+Button::Button(Texture texture) : GameObject(texture)
 {
 	collider = setComponent(new Collider(texture));
 }

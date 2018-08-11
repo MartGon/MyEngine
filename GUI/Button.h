@@ -1,10 +1,9 @@
 #pragma once
 #include "GameObject.h"
 #include "TextureRenderer.h"
-#include "EventHandler.h"
 #include <functional>
 
-class Button : public GameObject, EventHandler
+class Button : public GameObject
 {
 public:
 	// Constructors

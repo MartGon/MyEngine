@@ -116,3 +116,10 @@ void GameObject::afterMove()
 {
 
 }
+
+// Event hooks
+
+void GameObject::handleEvent(const SDL_Event &event)
+{
+
+}

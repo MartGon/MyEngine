@@ -70,8 +70,8 @@ void Scene::destroy()
 
 void Scene::handleEvent(const SDL_Event& event) 
 {
-	for (auto handlers : eventHandlers)
-		handlers->handleEvent(event);
+	for (auto gameObjectPair : gameObjectMap)
+		gameObjectPair.second->handleEvent(event);
 }
 
 // Methods
@@ -87,11 +87,6 @@ void Scene::initGameObject(GameObject *gameObject)
 
 	gameObjectsToInitialize.erase(gameObjectsToInitialize.begin());
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
-}
-
-void Scene::addEventHandler(EventHandler *eHandler)
-{
-	eventHandlers.push_back(eHandler);
 }
 
 void Scene::update()

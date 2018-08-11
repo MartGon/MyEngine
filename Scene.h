@@ -2,7 +2,6 @@
 #include "GameObject.h"
 #include "NetworkServer.h"
 #include "NetworkClient.h"
-#include "EventHandler.h"
 #include <SDL_thread.h>
 #include <SDL.h>
 #include <vector>
@@ -54,9 +53,6 @@ public:
 	// GameObjects to initialize
 	std::vector<GameObject*> gameObjectsToInitialize;
 
-	// Event Handlers
-	std::vector<EventHandler*> eventHandlers;
-
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();
@@ -76,7 +72,6 @@ public:
 
 	void addGameObject(GameObject *gameObject);
 	void initGameObject(GameObject *gameObject);
-	void addEventHandler(EventHandler *eHandler);
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();

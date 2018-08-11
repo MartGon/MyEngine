@@ -85,6 +85,8 @@ public:
 		// Movement
 	virtual void beforeMove();
 	virtual void afterMove();
+		// Events
+	virtual void handleEvent(const SDL_Event& event);
 
 private:
 
