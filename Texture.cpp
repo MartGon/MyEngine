@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "RendererManager.h"
 
 Texture::Texture()
 {
@@ -27,10 +28,7 @@ Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
 
 Texture::Texture(const char* resourcePath, SDL_Renderer* renderer)
 {
-	if (!load(resourcePath, renderer))
-	{
-		throw - 1;
-	}
+	load(resourcePath, renderer);
 }
 
 Texture::~Texture()
@@ -94,12 +92,16 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
 {
 	bool correct = false;
 	const std::string& tempRet = getPathFromResourceFolder(resourcePath).c_str();
+
+	// Set must values
 	path = tempRet.c_str();
+	mRenderer = renderer;
 
 	SDL_Surface *imgSurface = IMG_Load(path);
 	if (!imgSurface)
 	{
 		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
+		mTexture = RendererManager::nullTexture.mTexture;
 	}
 	else
 	{
@@ -108,6 +110,7 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
 		if (!mTexture)
 		{
 			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
+			mTexture = RendererManager::nullTexture.mTexture;
 		}
 		else
 		{
@@ -115,9 +118,6 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
 			mWidth = imgSurface->w;
 			mHeight = imgSurface->h;
 			scale = Vector2<float>(1, 1);
-
-			// Set renderer
-			mRenderer = renderer;
 
 			// Flag
 			correct = true;

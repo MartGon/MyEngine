@@ -59,6 +59,7 @@ int engine_main()
 	{
 		// Game initialization
 		RendererManager::renderer = renderer;
+		RendererManager::init();
 
 		Scene *scene = gFirstScene;
 		gFirstScene->renderer = renderer;

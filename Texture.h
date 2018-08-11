@@ -20,8 +20,8 @@ public:
 	SDL_Renderer *mRenderer = nullptr;
 
 	// Dimensions
-	int mWidth = 0;
-	int mHeight = 0;
+	int mWidth = 10;
+	int mHeight = 10;
 
 	// Scale
 	Vector2<float> scale;

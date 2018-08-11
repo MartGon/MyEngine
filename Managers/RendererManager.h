@@ -6,7 +6,10 @@
 class RendererManager
 {
 public:
+	static Texture nullTexture;
 	static SDL_Renderer* renderer;
+
+	static void init();
 	static void setNativeResolution(int width, int height);
 	static Vector2<float> getScaler();
 	static Vector2<int> getNativeResolution();

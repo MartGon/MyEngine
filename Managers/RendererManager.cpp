@@ -1,5 +1,7 @@
 #include "RendererManager.h"
 
+Texture RendererManager::nullTexture;
+
 SDL_Renderer* RendererManager::renderer = nullptr;
 
 // GBA Res: 240 x 160
@@ -22,4 +24,15 @@ Vector2<float> RendererManager::getScaler()
 Vector2<int> RendererManager::getNativeResolution()
 {
 	return Vector2<int>(nativeWidthResolution, nativeHeightResolution);
+}
+
+void RendererManager::init()
+{
+	if (!renderer)
+	{
+		printf("Renderer was not set before initialization\n");
+		return;
+	}
+
+	nullTexture = Texture("null.png", renderer);
 }
