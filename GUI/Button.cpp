@@ -1,15 +1,15 @@
 #include "Button.h"
-
+#include "RendererManager.h"
 
 // Constructors
 
-Button::Button()
+Button::Button() : EventHandler()
 {
 }
 
-Button::Button(Texture texture) : GameObject(texture)
+Button::Button(Texture texture) : GameObject(texture), EventHandler()
 {
-	setComponent(new Collider(texture));
+	collider = setComponent(new Collider(texture));
 }
 
 Button::~Button()
@@ -18,15 +18,25 @@ Button::~Button()
 
 // Methods
 
-void Button::handleEvent(SDL_Event *e)
+void Button::handleEvent(const SDL_Event& event)
 {
-	switch (e->type)
+	// Get Mouse coordinates
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+
+	// Check if it affects this button
+	if (!isWithinBoundaries(x, y))
+		return;
+
+	// Handle event
+	switch (event.type)
 	{
 		case SDL_MOUSEMOTION:
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			break;
 		case SDL_MOUSEBUTTONUP:
+			onClick();
 			break;
 		default:
 			break;
@@ -36,18 +46,20 @@ void Button::handleEvent(SDL_Event *e)
 
 const bool Button::isWithinBoundaries(int mousePosX, int mousePosY)
 {
+	// In case native res does not match window res
+	Vector2<float> scaler = RendererManager::getScaler();
 	bool inside = false;
 
 	int x = mousePosX;
 	int y = mousePosY;
 
-	if (x < collider->cLeft)
+	if (x < collider->cLeft * scaler.x)
 		return false;
-	else if (x > collider->cRight)
+	else if (x > collider->cRight * scaler.x)
 		return false;
-	else if (y < collider->cTop)
+	else if (y < collider->cTop * scaler.y)
 		return false;
-	else if (y > collider->cBottom)
+	else if (y > collider->cBottom * scaler.y)
 		return false;
 	else
 		return true;

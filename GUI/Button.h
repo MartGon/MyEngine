@@ -1,9 +1,10 @@
 #pragma once
 #include "GameObject.h"
 #include "TextureRenderer.h"
+#include "EventHandler.h"
 #include <functional>
 
-class Button : public GameObject
+class Button : public GameObject, EventHandler
 {
 public:
 	// Constructors
@@ -18,7 +19,7 @@ public:
 	TextureRenderer *tRenderer = nullptr;
 
 	// Methods
-	void handleEvent(SDL_Event* e);
+	void handleEvent(const SDL_Event& event) override;
 	const bool isWithinBoundaries(int mousePosX, int mousePosY);
 	void onStart() override;
 
