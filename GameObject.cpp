@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "TextureRenderer.h"
 #include "RendererManager.h"
+#include "Animator.h"
 
 // Constructors
 
@@ -122,4 +123,11 @@ void GameObject::afterMove()
 void GameObject::handleEvent(const SDL_Event &event)
 {
 
+}
+
+// Animation hooks
+
+void GameObject::onAnimationFinished(Animation* anim)
+{
+	printf("Animation %i has finished\n", anim->id);
 }

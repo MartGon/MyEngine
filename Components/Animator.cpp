@@ -4,29 +4,72 @@
 
 const int Animator::FPS = 60;
 
-Animator::Animator(const char* prefixPath, int frameAmount)
+Animator::Animator()
 {
-	this->prefixPath = prefixPath;
-	this->frameAmount = frameAmount;
+
 }
 
-Animator::Animator(const char* prefixPath, int frameAmount, MapRGB* colorKey, TextureRenderer* tRenderer) : Animator(prefixPath, frameAmount)
+Animator::Animator(const char* prefixPath, MapRGB* colorKey, TextureRenderer* tRenderer, int lastFrame, int firstFrame, Uint8 id)
 {
-	this->tRenderer = tRenderer;
-	this->colorKey = colorKey;
+	addAnimation(prefixPath, colorKey, tRenderer, lastFrame, firstFrame, id);
+	if (!currentAnimation)
+		setCurrentAnimation(animations.front());
 }
 
-void Animator::loadFrames()
+Animation* Animator::addAnimation(const char* prefixPath, MapRGB* colorKey, TextureRenderer* tRenderer, int lastFrame, int firstFrame, Uint8 id)
+{
+	Animation *animation = new Animation();
+
+	animation->name = prefixPath;
+	animation->frames = loadFrames(prefixPath, colorKey, tRenderer, lastFrame, firstFrame);
+	animation->tRenderer = tRenderer;
+	setAnimationID(animation, id);
+
+	animations.push_back(animation);
+
+	return animation;
+}
+
+void Animator::setCurrentAnimation(Animation *animation)
+{
+	currentAnimation = animation;
+	
+	// Init current animation
+	currentAnimation->tRenderer->texture = currentAnimation->frames.front()->texture;
+
+	// Reset
+	reset();
+}
+
+std::vector<Frame*> Animator::loadFrames(const char* prefixPath, MapRGB* colorKey, TextureRenderer *tRenderer, int lastFrame, int firstFrame)
 {
 	std::string path;
-	for (int i = 1; i <= frameAmount; i++)
+	std::vector<Frame*> frames;
+	Frame *frame = nullptr;
+
+	int frameAmount = lastFrame - firstFrame;
+
+	if (frameAmount <= 0)
 	{
-		path = getNextFramePath(i);
-		frames.push_back(Texture(path.c_str(), tRenderer->renderer, colorKey));
+		printf("LastFrame bigger than first frame\n");
+		return frames;
 	}
+
+	int frameDuration = calculateFrameDuration(frameAmount);
+
+	for (int i = firstFrame; i <= lastFrame; i++)
+	{
+		frame = new Frame();
+		path = getNextFramePath(prefixPath, i);
+		frame->texture = Texture(path.c_str(), tRenderer->renderer, colorKey);
+		frame->duration = frameDuration;
+		frames.push_back(frame);
+	}
+
+	return frames;
 }
 
-std::string Animator::getNextFramePath(int frameNumber)
+std::string Animator::getNextFramePath(const char* prefixPath, int frameNumber)
 {
 	std::string prefix(prefixPath);
 	std::string suffix(".png");
@@ -35,39 +78,72 @@ std::string Animator::getNextFramePath(int frameNumber)
 	return path;
 }
 
-int Animator::calculateFrameDuration()
+int Animator::calculateFrameDuration(int frameAmount)
 {
 	return FPS / frameAmount;
 }
 
 void Animator::start()
 {
-	tRenderer = gameObject->getComponent<TextureRenderer>();
 
-	if (!tRenderer)
-	{
-		printf("Animator: %s doesn't have a TextureRenderer component, creating one\n", gameObject->name.c_str());
-		tRenderer = gameObject->setComponent(new TextureRenderer());
-	}
-
-	frameDuration = calculateFrameDuration();
-	loadFrames();
-	tRenderer->texture = frames.front();
 }
 
 void Animator::update()
 {
-	frameCount++;
+	// If there's no animation, return
+	if (!currentAnimation)
+		return;
 
-	if (frameCount >= frameDuration)
+	// If the animation is finished, there's nothing to update
+	if (isAnimationFinished)
+		return;
+
+	frameCount++;
+	if (frameCount >= currentAnimation->frames.at(currentIndex)->duration)
 	{
 		frameCount = 0;
 
-		if (currentIndex == (frames.size() - 1))
-			currentIndex = 0;
+		// Check if this is last frame
+		if (currentIndex == (currentAnimation->frames.size() - 1))
+		{
+			// Check if it can loop
+			if (currentAnimation->loop)
+				// Restar
+				currentIndex = 0;
+			// Notify that animation has finished otherwise
+			else
+			{
+				// Finish
+				finishCurrentAnimation();
+				return;
+			}
+		}
+		// Choose next frame
 		else
 			currentIndex++;
-		
-		tRenderer->texture = frames.at(currentIndex);
+
+		// Update frame to play
+		currentAnimation->tRenderer->texture = currentAnimation->frames.at(currentIndex)->texture;
 	}
+}
+
+void Animator::setAnimationID(Animation *anim, Uint8 id)
+{
+	if (id)
+		anim->id = id;
+	else
+		anim->id = lastID++;
+}
+
+void Animator::finishCurrentAnimation()
+{
+	isAnimationFinished = true;
+	gameObject->onAnimationFinished(currentAnimation);
+}
+
+void Animator::reset()
+{
+	frameCount = 0;
+	currentIndex = 0;
+	isAnimationFinished = false;
 }

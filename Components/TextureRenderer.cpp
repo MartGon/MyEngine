@@ -13,7 +13,7 @@ TextureRenderer::TextureRenderer(const char* path, MapRGB *colorKey) : TextureRe
 	tPath = std::string(path);
 }
 
-TextureRenderer::TextureRenderer(Texture texture) : Component()
+TextureRenderer::TextureRenderer(Texture texture) : TextureRenderer()
 {
 	this->texture = texture;
 	tPath = std::string(texture.path);

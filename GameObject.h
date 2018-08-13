@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Transform.h"
 #include "Collider.h"
+#include "Animator.h"
 #include <string>
 #include <vector>
 
@@ -57,14 +58,16 @@ public:
 	template <typename T>
 	T* getComponent()
 	{
-		for (auto component : components)
+		if (!components.empty())
 		{
-			if (T* subComponent = dynamic_cast<T*>(component))
+			for (auto component : components)
 			{
-				return subComponent;
+				if (T* subComponent = dynamic_cast<T*>(component))
+				{
+					return subComponent;
+				}
 			}
 		}
-
 		return nullptr;
 	}
 
@@ -90,6 +93,8 @@ public:
 	virtual void afterMove();
 		// Events
 	virtual void handleEvent(const SDL_Event& event);
+		// Animation
+	virtual void onAnimationFinished(Animation* anim);
 
 private:
 
