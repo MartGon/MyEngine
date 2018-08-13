@@ -11,6 +11,7 @@ public:
 
 	// Constructors
 	Animator(const char* prefixPath, int frameAmount);
+	Animator(const char* prefixPath, int frameAmount, MapRGB* colorKey, TextureRenderer* tRenderer = nullptr);
 
 	// Attributes
 	const char* prefixPath = nullptr;
@@ -27,6 +28,10 @@ public:
 	void update() override;
 
 private:
+
+	// MapRGB
+	MapRGB *colorKey = nullptr;
+
 	void loadFrames();
 	int calculateFrameDuration();
 	std::string getNextFramePath(int frameNumber);

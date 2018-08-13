@@ -9,7 +9,7 @@ public:
 	
 	TextureRenderer();
 	TextureRenderer(Texture texture);
-	TextureRenderer(const char* path);
+	TextureRenderer(const char* path, MapRGB *colorKey = nullptr);
 
 	// Attributes
 	Texture texture;

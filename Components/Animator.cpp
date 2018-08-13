@@ -10,13 +10,19 @@ Animator::Animator(const char* prefixPath, int frameAmount)
 	this->frameAmount = frameAmount;
 }
 
+Animator::Animator(const char* prefixPath, int frameAmount, MapRGB* colorKey, TextureRenderer* tRenderer) : Animator(prefixPath, frameAmount)
+{
+	this->tRenderer = tRenderer;
+	this->colorKey = colorKey;
+}
+
 void Animator::loadFrames()
 {
 	std::string path;
 	for (int i = 1; i <= frameAmount; i++)
 	{
 		path = getNextFramePath(i);
-		frames.push_back(Texture(path.c_str(), tRenderer->renderer));
+		frames.push_back(Texture(path.c_str(), tRenderer->renderer, colorKey));
 	}
 }
 

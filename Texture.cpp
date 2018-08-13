@@ -35,6 +35,11 @@ Texture::Texture(const char* resourcePath, SDL_Renderer* renderer)
 	load(resourcePath, renderer);
 }
 
+Texture::Texture(const char* resourcePath, SDL_Renderer* renderer, MapRGB *colorKey)
+{
+	load(resourcePath, renderer, colorKey);
+}
+
 Texture::~Texture()
 {
 	//free();
@@ -92,7 +97,7 @@ bool Texture::isValid()
 	return mTexture;
 }
 
-bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
+bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *colorKey)
 {
 	bool correct = false;
 	std::string tempRet = getPathFromResourceFolder(resourcePath).c_str();
@@ -109,6 +114,11 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer)
 	}
 	else
 	{
+		if (colorKey)
+		{
+			SDL_SetColorKey(imgSurface, SDL_TRUE, SDL_MapRGB(imgSurface->format, colorKey->red, colorKey->green, colorKey->blue));
+		}
+
 		mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
 
 		if (!mTexture)

@@ -5,6 +5,13 @@
 #include <string>
 #include "Vector2.h"
 
+extern struct MapRGB
+{
+	Uint8 red = 0;
+	Uint8 green = 0;
+	Uint8 blue = 0;
+};
+
 class Texture
 {
 public:
@@ -12,6 +19,7 @@ public:
 	Texture();
 	Texture(const char* resourcePath, SDL_Surface* screenSurface);
 	Texture(const char* resourcePath, SDL_Renderer* renderer);
+	Texture(const char* resourcePath, SDL_Renderer* renderer, MapRGB *colorKey);
 	~Texture();
 	
 	// SDL Stuff
@@ -38,6 +46,6 @@ public:
 	void free();
 	std::string getPathFromResourceFolder(const char* localPath);
 	bool isValid();
-	bool load(const char* path, SDL_Renderer *renderer);
+	bool load(const char* path, SDL_Renderer *renderer, MapRGB *colorKey = nullptr);
 };
 

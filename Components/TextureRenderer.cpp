@@ -7,9 +7,9 @@ TextureRenderer::TextureRenderer() : Component()
 	renderer = RendererManager::renderer;
 }
 
-TextureRenderer::TextureRenderer(const char* path) : TextureRenderer() 
+TextureRenderer::TextureRenderer(const char* path, MapRGB *colorKey) : TextureRenderer() 
 {
-	texture = Texture(path, RendererManager::renderer);
+	texture = Texture(path, RendererManager::renderer, colorKey);
 	tPath = std::string(path);
 }
 
