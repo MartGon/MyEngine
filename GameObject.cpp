@@ -131,3 +131,8 @@ void GameObject::onAnimationFinished(Animation* anim)
 {
 	printf("Animation %i has finished\n", anim->id);
 }
+
+void GameObject::beforeAnimationFrame(Animation* anim, int frameNumber)
+{
+	printf("Animation %i frame %i has finished\n", anim->id, frameNumber);
+}

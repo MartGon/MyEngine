@@ -95,6 +95,7 @@ public:
 	virtual void handleEvent(const SDL_Event& event);
 		// Animation
 	virtual void onAnimationFinished(Animation* anim);
+	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);
 
 private:
 

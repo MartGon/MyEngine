@@ -122,6 +122,9 @@ void Animator::update()
 		else
 			currentIndex++;
 
+		// Notify frame change
+		gameObject->beforeAnimationFrame(currentAnimation, currentIndex);
+
 		// Update frame to play
 		currentAnimation->tRenderer->texture = currentAnimation->frames.at(currentIndex)->texture;
 	}
