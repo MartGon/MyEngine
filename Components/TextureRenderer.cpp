@@ -28,5 +28,22 @@ void TextureRenderer::update()
 
 	texture.scale = gameObject->transform.scale * scaler;
 
-	texture.render(x, y);
+	// Rotation stuff
+	double angle = gameObject->transform.zRotation;
+	Vector2<int> cCenter;
+	cCenter.x = center.x * scaler.x;
+	cCenter.y = center.y * scaler.y;
+
+	SDL_Point* fCenter = getSDLPointFromVector(cCenter);
+
+	texture.render(x, y, angle, fCenter);
+}
+
+SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)
+{
+	SDL_Point* point = new SDL_Point();
+	point->x = center.x;
+	point->y = center.y;
+
+	return point;
 }

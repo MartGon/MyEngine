@@ -47,13 +47,13 @@ Texture::~Texture()
 
 // Methods
 
-void Texture::render(int x, int y)
+void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 	renderQuad.w *= scale.x;
 	renderQuad.h *= scale.y;
 
-	if (0 > SDL_RenderCopy(mRenderer, mTexture, NULL, &renderQuad))
+	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, SDL_FLIP_NONE))
 	{
 		printf("SDL_RenderCopy: %s\n", SDL_GetError());
 		return;

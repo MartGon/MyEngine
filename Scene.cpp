@@ -68,6 +68,7 @@ void Scene::destroy()
 	this->~Scene();
 }
 
+// TODO - OnHandleEvent
 void Scene::handleEvent(const SDL_Event& event) 
 {
 	for (auto gameObjectPair : gameObjectMap)

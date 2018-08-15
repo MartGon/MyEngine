@@ -17,6 +17,12 @@ public:
 
 	SDL_Renderer *renderer = nullptr;
 
+	// Rotation center
+	Vector2<int> center;
+
 	// methods
 	void update() override;
+
+private:
+	SDL_Point* getSDLPointFromVector(Vector2<int> center);
 };

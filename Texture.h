@@ -40,7 +40,7 @@ public:
 
 	// Methods
 
-	void render(int x, int y);
+	void render(int x, int y, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void setAlpha(Uint8 alpha);
 	Uint8 getAlpha();
 	void free();
