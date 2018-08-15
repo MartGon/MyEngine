@@ -47,6 +47,14 @@ public:
 		return Vector2(fX, fY);
 	}
 
+	friend Vector2<T>& operator-(const Vector2<T> &v1, const Vector2<T> &v2)
+	{
+		T fX = v1.x - v2.x;
+		T fY = v1.y - v2.y;
+
+		return Vector2(fX, fY);
+	}
+
 	template <typename L>
 	friend Vector2<L>& operator*(const Vector2<L> &vector, const T &value)
 	{
@@ -56,10 +64,27 @@ public:
 		return Vector2<L>(sX, sY);
 	}
 
+	template <typename L>
+	friend Vector2<L>& operator/(const Vector2<L> &vector, const T &value)
+	{
+		L sX = vector.x / value;
+		L sY = vector.y / value;
+
+		return Vector2<L>(sX, sY);
+	}
+
 	friend Vector2<T>& operator*(const Vector2<T> &x1, const Vector2<T> &x2)
 	{
 		T sX = x1.x * x2.x;
 		T sY = x1.y * x2.y;
+
+		return Vector2<T>(sX, sY);
+	}
+
+	friend Vector2<T>& operator/(const Vector2<T> &x1, const Vector2<T> &x2)
+	{
+		T sX = x1.x / x2.x;
+		T sY = x1.y / x2.y;
 
 		return Vector2<T>(sX, sY);
 	}
