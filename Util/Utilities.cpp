@@ -1,5 +1,6 @@
 #include "Utilities.h"
 
+const double Utilities::PI = 3.14159265;
 
 Utilities::Utilities()
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include "Utilities.h"
 
 template <typename T>
 class Vector2
@@ -15,6 +16,12 @@ public:
 	{
 		this->x = x;
 		this->y = y;
+	}
+
+	Vector2(double angle)
+	{
+		this->x = cos(angle * Utilities::PI / 180);
+		this->y = sin(angle * Utilities::PI / 180);
 	}
 
 	~Vector2()
@@ -87,6 +94,18 @@ public:
 		T sY = x1.y / x2.y;
 
 		return Vector2<T>(sX, sY);
+	}
+
+	double getAngle(bool rads = false)
+	{
+		double angle = atan(y / x);
+
+		// If x is negative, we need to add 180 degrees in order to get the rigth angle
+		if (x < 0)
+			angle += 3.14159265;
+
+
+		return rads ? angle : angle * 180 / 3.14159265;
 	}
 };
 

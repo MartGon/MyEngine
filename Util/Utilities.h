@@ -9,5 +9,6 @@ public:
 
 	static int getNumberOfDigits(int number);
 	static std::vector<int> getDigitsFromNumber(int number);
+	static const double PI;
 };
 
