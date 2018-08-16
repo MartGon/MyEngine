@@ -30,11 +30,18 @@ void TextureRenderer::update()
 
 	// Rotation stuff
 	double angle = gameObject->transform.zRotation;
-	Vector2<int> cCenter;
-	cCenter.x = center.x * scaler.x;
-	cCenter.y = center.y * scaler.y;
 
-	SDL_Point* fCenter = getSDLPointFromVector(cCenter);
+	SDL_Point* fCenter = NULL;
+
+	// If center is not set, pass NULL so width/2, height/2 is taken
+	if (center)
+	{
+		Vector2<int> cCenter;
+		cCenter.x = center->x * scaler.x;
+		cCenter.y = center->y * scaler.y;
+
+		fCenter = getSDLPointFromVector(cCenter);
+	}
 
 	texture.render(x, y, angle, fCenter);
 }
