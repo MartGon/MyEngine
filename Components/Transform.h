@@ -11,6 +11,7 @@ public:
 	Vector2<float> position;
 	Vector2<float> scale;
 	double zRotation;
+	Vector2<int>* rotationCenter;
 	
 	void update() override {};
 };

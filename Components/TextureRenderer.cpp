@@ -34,7 +34,7 @@ void TextureRenderer::update()
 	SDL_Point* fCenter = NULL;
 
 	// If center is not set, pass NULL so width/2, height/2 is taken
-	if (center)
+	if (Vector2<int>* center = gameObject->transform.rotationCenter)
 	{
 		Vector2<int> cCenter;
 		cCenter.x = center->x * scaler.x;

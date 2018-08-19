@@ -17,9 +17,6 @@ public:
 
 	SDL_Renderer *renderer = nullptr;
 
-	// Rotation center
-	Vector2<int> *center = nullptr;
-
 	// methods
 	void update() override;
 
