@@ -44,6 +44,7 @@ void TextureRenderer::update()
 	}
 
 	// Camera stuff
+	// TODO - Check if texture has to be rendered (inside camera)
 	Vector2<int> cam_pos = RendererManager::getCameraPosition();
 
 	x -= cam_pos.x * scaler.x;

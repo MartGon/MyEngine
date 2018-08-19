@@ -25,6 +25,15 @@ void Navigator::update()
 	Vector2<float> newPos = pos + displacement;
 	gameObject->transform.position = newPos;
 
+	// Is Affected by acceleration ?
+	if (isKinematic)
+	{
+		direction.x += acceleration.x;
+
+		// Y axis is inverted on SDL
+		direction.y -= acceleration.y;
+	}
+
 	// Hook
 	gameObject->afterMove();
 }

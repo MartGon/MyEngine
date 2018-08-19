@@ -14,6 +14,10 @@ public:
 	// Attributes
 	int speed;
 
+	// Kinematics
+	bool isKinematic = false;
+	Vector2<float> acceleration;
+
 	// Methods
 	void update() override;
 
