@@ -1,4 +1,5 @@
 #include "RendererManager.h"
+#include "SceneManager.h"
 
 Texture RendererManager::nullTexture;
 
@@ -8,6 +9,9 @@ SDL_Renderer* RendererManager::renderer = nullptr;
 
 int RendererManager::nativeWidthResolution = 240;
 int RendererManager::nativeHeightResolution = 160;
+
+// Cam position
+Vector2<int> RendererManager::camera_position = Vector2<int>(120, 80);
 
 void RendererManager::setNativeResolution(int width, int height)
 {
@@ -35,4 +39,28 @@ void RendererManager::init()
 	}
 
 	nullTexture = Texture("null.png", renderer);
+}
+
+void RendererManager::setCameraPosition(Vector2<int> camera_pos, Vector2<int> level_boundaries)
+{
+	if (camera_pos.x < 0)
+		camera_position.x = 0;
+	else if (camera_pos.x > (level_boundaries.x - nativeWidthResolution))
+		camera_position.x = (level_boundaries.x - nativeWidthResolution);
+	else
+		camera_position.x = camera_pos.x;
+
+	if (camera_pos.y < 0)
+		camera_position.y = 0;
+	else if (camera_pos.y > (level_boundaries.y - nativeHeightResolution))
+		camera_position.y = (level_boundaries.y - nativeHeightResolution);
+	else
+		camera_position.y = camera_pos.y;
+
+	// Set
+}
+
+Vector2<int> RendererManager::getCameraPosition()
+{
+	return camera_position;
 }

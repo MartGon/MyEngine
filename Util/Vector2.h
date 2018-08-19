@@ -107,6 +107,16 @@ public:
 
 		return rads ? angle : angle * 180 / 3.14159265;
 	}
+
+	template <typename L>
+	operator Vector2<L>()
+	{
+		Vector2<L> v;
+		v.x = (L)x;
+		v.y = (L)y;
+
+		return v;
+	}
 };
 
 // Operators

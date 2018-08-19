@@ -43,6 +43,12 @@ void TextureRenderer::update()
 		fCenter = getSDLPointFromVector(cCenter);
 	}
 
+	// Camera stuff
+	Vector2<int> cam_pos = RendererManager::getCameraPosition();
+
+	x -= cam_pos.x * scaler.x;
+	y -= cam_pos.y * scaler.y;
+
 	texture.render(x, y, angle, fCenter);
 }
 
