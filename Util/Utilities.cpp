@@ -45,3 +45,13 @@ std::vector<int> Utilities::getDigitsFromNumber(int number)
 
 	return retVector;
 }
+
+double Utilities::toRads(double deg_angle)
+{
+	return deg_angle * Utilities::PI / 180;
+}
+
+double Utilities::toDegs(double rad_angle)
+{
+	return rad_angle *  180 / Utilities::PI;
+}

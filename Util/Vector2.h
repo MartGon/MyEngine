@@ -1,6 +1,7 @@
- #pragma once
+#pragma once
 #include <math.h>
 #include "Utilities.h"
+#include <string>
 
 template <typename T>
 class Vector2
@@ -20,8 +21,8 @@ public:
 
 	Vector2(double angle)
 	{
-		this->x = cos(angle * Utilities::PI / 180);
-		this->y = sin(angle * Utilities::PI / 180);
+		this->x = cos(Utilities::toRads(angle));
+		this->y = sin(Utilities::toRads(angle));
 	}
 
 	~Vector2()
@@ -46,6 +47,24 @@ public:
 		return sqrt(x * x + y * y);
 	}
 
+	double getAngle(bool rads = false)
+	{
+		double angle = atan(y / x);
+
+		// If x is negative, we need to add 180 degrees in order to get the rigth angle
+		if (x < 0)
+			angle += 3.14159265;
+
+
+		return rads ? angle : Utilities::toDegs(angle);
+	}
+
+	std::string toStr()
+	{
+		return std::string("(") + std::to_string(x) + std::string(", ") + std::to_string(y) + std::string(")");
+	}
+
+	// Operators
 	friend Vector2<T>& operator+(const Vector2<T> &v1, const Vector2<T> &v2)
 	{
 		T fX = v1.x + v2.x;
@@ -96,18 +115,6 @@ public:
 		return Vector2<T>(sX, sY);
 	}
 
-	double getAngle(bool rads = false)
-	{
-		double angle = atan(y / x);
-
-		// If x is negative, we need to add 180 degrees in order to get the rigth angle
-		if (x < 0)
-			angle += 3.14159265;
-
-
-		return rads ? angle : angle * 180 / 3.14159265;
-	}
-
 	template <typename L>
 	operator Vector2<L>()
 	{
@@ -118,5 +125,3 @@ public:
 		return v;
 	}
 };
-
-// Operators
