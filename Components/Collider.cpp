@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "GameObject.h"
+#include "RendererManager.h"
 #include <algorithm>
 
 // Attributes
@@ -81,11 +82,14 @@ bool Collider::isCollidingWith(Collider *collider)
 
 void Collider::drawCollisionBoundaries(SDL_Renderer *renderer)
 {
+	Vector2<float> scaler = RendererManager::getScaler();
+	Vector2<int> cam_pos = RendererManager::getCameraPosition();
+
 	SDL_Rect rect;
-	rect.x = cLeft;
-	rect.w = cRight - cLeft;
-	rect.y = cBottom;
-	rect.h = cTop - cBottom;
+	rect.x = (cLeft - cam_pos.x) * scaler.x ;
+	rect.w = (cRight - cLeft) * scaler.x ;
+	rect.y = (cBottom - cam_pos.y) * scaler.y ;
+	rect.h = (cTop - cBottom) * scaler.y;
 	SDL_RenderDrawRect(renderer, &rect);
 }
 
