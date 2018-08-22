@@ -5,7 +5,7 @@
 #include <string>
 #include "Vector2.h"
 
-extern struct MapRGB
+struct MapRGB
 {
 	Uint8 red = 0;
 	Uint8 green = 0;

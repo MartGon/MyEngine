@@ -3,13 +3,13 @@
 #include <vector>
 #include <string>
 
-extern struct Frame
+struct Frame
 {
 	Texture texture;
 	Uint32 duration = 1;
 };
 
-extern struct Animation
+struct Animation
 {
 	TextureRenderer *tRenderer;
 	Uint8 id = 0;
@@ -35,7 +35,7 @@ public:
 	Animation *currentAnimation = nullptr;
 
 	// Time Tracking
-	int frameCount = 0;
+	Uint32 frameCount = 0;
 	int currentIndex = 0;
 	bool isAnimationFinished = false;
 
