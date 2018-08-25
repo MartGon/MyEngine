@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "Vector2.h"
 #include <string>
+#include <array>
 
 class RotatableBoxCollider : public Component
 {
@@ -14,7 +15,7 @@ public:
 	Vector2<float> offset;
 
 	// Vertex to apply logic
-	Vector2<float> vertex[4];
+	std::array<Vector2<float>, 4> vertex;
 
 	// Dir vectors
 	// A = V1 -> V2
@@ -25,6 +26,8 @@ public:
 
 	// Methods
 	void setRotation(Vector2<int> rotationCenter, double angle);
+
+    bool checkCollision(RotatableBoxCollider collider);
 
 	// Debug
 	std::string vertexValuesToStr();
@@ -37,7 +40,7 @@ private:
 	// v3 - v1 - v0
 	// v0 - v2 - v3
 	// v2 - v3 - v1
-	Vector2<float> roVertex[4];	
+    std::array<Vector2<float>, 4> roVertex;
 
 	Vector2<float> rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex);
 };

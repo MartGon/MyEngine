@@ -20,8 +20,8 @@ RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vec
 	vertex[3] = v3;
 
 	// Setting dir vectors
-	A = v2 - v1;
-	B = v3 - v1;
+	A = v1 - v0;
+	B = v0 - v2;
 }
 
 Vector2<float> RotatableBoxCollider::rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex)
@@ -44,6 +44,44 @@ void RotatableBoxCollider::setRotation(Vector2<int> rotationCenter, double angle
 	for(int i = 0; i < 4; i++)
 		vertex[i] = rotateVertex(rotationCenter, angle, roVertex[i]);
 }
+
+// Checkers
+
+bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
+{
+    std::array<Vector2<float>, 4> o_vertex = collider.vertex;
+    std::array<Vector2<float>, 2> sides;
+    sides[0] = vertex[1] - vertex[0];
+    sides[1] = vertex[2] - vertex[0];
+
+    for (Uint8 i = 0; i < 4; i++)
+    {
+        for (Uint8 j = 0; j < 2; j++)
+        {
+            // Origin to other collider vertex vector
+            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position);
+            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position);
+            Vector2<float> op = point - axisCenter;
+
+            // Project op onto side
+            float proj = op.project(sides[j]);
+            float sideLength = sides[j].getModule();
+
+            // Check if this vertex is not inside the box
+            if (proj > sideLength || proj < 0)
+                break;
+
+            // If we have checked both sides, and it is in both of them,
+            // then the point is inside the box
+            if (j)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+// Debug
 
 std::string RotatableBoxCollider::vertexValuesToStr()
 {

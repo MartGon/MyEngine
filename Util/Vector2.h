@@ -64,8 +64,20 @@ public:
 		return std::string("(") + std::to_string(x) + std::string(", ") + std::to_string(y) + std::string(")");
 	}
 
+    float dot(Vector2<T> vector)
+    {
+        return x * vector.x + y * vector.y;
+    }
+
+    // This projected onto b
+    float project(Vector2<T> b)
+    {
+        // Projected module = (vector to be projected) · (vector to be porjected onto) / mod(vector to be porjected onto)
+        return dot(b) / b.getModule();
+    }
+
 	// Operators
-	friend Vector2<T>& operator+(const Vector2<T> &v1, const Vector2<T> &v2)
+	friend Vector2<T> operator+(const Vector2<T> &v1, const Vector2<T> &v2)
 	{
 		T fX = v1.x + v2.x;
 		T fY = v1.y + v2.y;
@@ -73,7 +85,7 @@ public:
 		return Vector2(fX, fY);
 	}
 
-	friend Vector2<T>& operator-(const Vector2<T> &v1, const Vector2<T> &v2)
+	friend Vector2<T> operator-(const Vector2<T> &v1, const Vector2<T> &v2)
 	{
 		T fX = v1.x - v2.x;
 		T fY = v1.y - v2.y;
@@ -82,7 +94,7 @@ public:
 	}
 
 	template <typename L>
-	friend Vector2<L>& operator*(const Vector2<L> &vector, const T &value)
+	friend Vector2<L> operator*(const Vector2<L> &vector, const T &value)
 	{
 		L sX = vector.x * value;
 		L sY = vector.y * value;
@@ -91,7 +103,7 @@ public:
 	}
 
 	template <typename L>
-	friend Vector2<L>& operator/(const Vector2<L> &vector, const T &value)
+	friend Vector2<L> operator/(const Vector2<L> &vector, const T &value)
 	{
 		L sX = vector.x / value;
 		L sY = vector.y / value;
@@ -99,7 +111,7 @@ public:
 		return Vector2<L>(sX, sY);
 	}
 
-	friend Vector2<T>& operator*(const Vector2<T> &x1, const Vector2<T> &x2)
+	friend Vector2<T> operator*(const Vector2<T> &x1, const Vector2<T> &x2)
 	{
 		T sX = x1.x * x2.x;
 		T sY = x1.y * x2.y;
@@ -107,7 +119,7 @@ public:
 		return Vector2<T>(sX, sY);
 	}
 
-	friend Vector2<T>& operator/(const Vector2<T> &x1, const Vector2<T> &x2)
+	friend Vector2<T> operator/(const Vector2<T> &x1, const Vector2<T> &x2)
 	{
 		T sX = x1.x / x2.x;
 		T sY = x1.y / x2.y;
