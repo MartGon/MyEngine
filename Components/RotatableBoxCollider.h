@@ -1,28 +1,20 @@
 #pragma once
-#include "Component.h"
+#include "BoxCollider.h"
 #include "Vector2.h"
 #include <string>
 #include <array>
 
-class RotatableBoxCollider : public Component
+class RotatableBoxCollider : public Collider
 {
 public:
 
 	// Constructors
 	RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vector2<int> v2, Vector2<int> v3);
-
-	// Offset from transform position
-	Vector2<float> offset;
+	RotatableBoxCollider(BoxCollider* collider);
+	~RotatableBoxCollider();
 
 	// Vertex to apply logic
 	std::array<Vector2<float>, 4> vertex;
-
-	// Dir vectors
-	// A = V1 -> V2
-	Vector2<float> A;
-
-	// B = V1 -> V3
-	Vector2<float> B;
 
 	// Methods
 	void setRotation(Vector2<int> rotationCenter, double angle);
@@ -31,15 +23,19 @@ public:
 
 	// Debug
 	std::string vertexValuesToStr();
-	void draw();
+	void drawCollisionBoundaries() override;
+
+	// Upper
+	void update() override;
+	bool isCollidingWith(Collider* collider) override;
 
 private:
 
 	// Square Vertex - Read Only
-	// v1 - v0 - v2
-	// v3 - v1 - v0
-	// v0 - v2 - v3
-	// v2 - v3 - v1
+	// v1 - v0 - v2				v1----v3
+	// v3 - v1 - v0				|	   |
+	// v0 - v2 - v3				|	   |
+	// v2 - v3 - v1				v0----v2
     std::array<Vector2<float>, 4> roVertex;
 
 	Vector2<float> rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex);

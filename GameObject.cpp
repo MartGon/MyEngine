@@ -103,11 +103,6 @@ void GameObject::destroy()
 
 void GameObject::onColliderEnter(Collider *collider)
 {
-
-}
-
-void GameObject::onColliderEnter(RotatableBoxCollider *collider)
-{
 	printf("%i: Collision detectada con %i\n", id, collider->gameObject->id);
 }
 

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <math.h>
 
-RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vector2<int> v2, Vector2<int> v3)
+RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vector2<int> v2, Vector2<int> v3) : Collider()
 {
 	// Read Only
 	roVertex[0] = v0;
@@ -15,17 +15,19 @@ RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vec
 	roVertex[3] = v3;
 
 	// Logic values
-	vertex[0] = v0;
-	vertex[1] = v1;
-	vertex[2] = v2;
-	vertex[3] = v3;
+	vertex = roVertex;
+}
 
-	// Setting dir vectors
-	A = v1 - v0;
-	B = v0 - v2;
+RotatableBoxCollider::RotatableBoxCollider(BoxCollider *collider) : 
+	RotatableBoxCollider(Vector2<int>(0, 0), Vector2<int>(0, collider->cHeight),
+		Vector2<int>(collider->cWidth, 0), Vector2<int>(collider->cWidth, collider->cHeight))
+{
 
-	// Adding to collider list
-	SceneManager::scene->addComponentToManager(this);
+}
+
+RotatableBoxCollider::~RotatableBoxCollider()
+{
+	destroy();
 }
 
 Vector2<float> RotatableBoxCollider::rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex)
@@ -85,6 +87,32 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
     return false;
 }
 
+// TODO - Needs overhaul
+bool RotatableBoxCollider::isCollidingWith(Collider* collider)
+{
+	if (RotatableBoxCollider* c2 = dynamic_cast<RotatableBoxCollider*>(collider))
+	{
+		return checkCollision(*c2);
+	}
+	else if (BoxCollider* col = dynamic_cast<BoxCollider*>(collider))
+	{
+		RotatableBoxCollider c2(col);
+		c2.gameObject = col->gameObject;
+		return checkCollision(c2);
+	}
+
+	return false;
+}
+
+// Upper
+
+void RotatableBoxCollider::update()
+{
+	if(gameObject)
+		if(Vector2<int> *rotation = gameObject->transform.rotationCenter)
+			setRotation(*rotation, gameObject->transform.zRotation);
+}
+
 // Debug
 
 std::string RotatableBoxCollider::vertexValuesToStr()
@@ -97,7 +125,7 @@ std::string RotatableBoxCollider::vertexValuesToStr()
 	return str;
 }
 
-void RotatableBoxCollider::draw()
+void RotatableBoxCollider::drawCollisionBoundaries()
 {
 	SDL_Renderer *renderer = RendererManager::renderer;
 	Vector2<float> scaler = RendererManager::getScaler();

@@ -14,7 +14,7 @@ public:
 	// Attributes
 	Uint8 layer = 0;
 
-	Collider *collider = nullptr;
+	BoxCollider *collider = nullptr;
 	TextureRenderer *tRenderer = nullptr;
 
 	// Methods

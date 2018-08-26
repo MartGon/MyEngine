@@ -1,115 +1,13 @@
 #include "Collider.h"
-#include "GameObject.h"
-#include "RendererManager.h"
-#include <algorithm>
-
-// Attributes
-std::vector<Collider*> Collider::gColliders = std::vector<Collider*>();
+#include "SceneManager.h"
 
 Collider::Collider() : Component()
 {
-
+	// Adding to collider list
+	SceneManager::scene->addComponentToManager(this);
 }
 
-Collider::Collider(Texture texture) : Collider(texture.mWidth, texture.mHeight)
+void Collider::destroy() 
 {
-}
-
-Collider::Collider(int width, int height) : Component()
-{
-	// Set values
-	cWidth = width;
-	cHeight = height;
-
-	// Add to static list
-	gColliders.push_back(this);
-}
-
-void Collider::calculateColliderBoundaries()
-{
-	Vector2<float> position = gameObject->transform.position;
-	Vector2<float> dimensions = getDimensions();
-	Vector2<float> offsetVector = getOffsetVector();
-
-	int fWidth = dimensions.x;
-	int fHeight = dimensions.y;
-	int xOffset = offsetVector.x;
-	int yOffset = offsetVector.y;
-
-	cLeft = position.x + xOffset;
-	cRight = position.x + fWidth + xOffset;
-	cTop = position.y + yOffset;
-	cBottom = position.y + fHeight + yOffset;
-}
-
-Vector2<float> Collider::getCollisionCenter()
-{
-	int x = (float)(cLeft + cRight) / 2;
-	int y = (float)(cTop + cBottom) / 2;
-
-	return Vector2<float>(x, y);
-}
-
-void Collider::update()
-{
-	calculateColliderBoundaries();
-
-	for (auto const& collider : gColliders)
-	{
-		if (this->gameObject == collider->gameObject)
-			continue;
-		else if (isCollidingWith(collider))
-			gameObject->onColliderEnter(collider);
-	}
-}
-
-bool Collider::isCollidingWith(Collider *collider)
-{
-	if (cRight <= collider->cLeft)
-		return false;
-
-	if (cLeft >= collider->cRight)
-		return false;
-
-	if (cBottom <= collider->cTop)
-		return false;
-
-	if (cTop >= collider->cBottom)
-		return false;
-
-	return true;
-}
-
-void Collider::drawCollisionBoundaries(SDL_Renderer *renderer)
-{
-	Vector2<float> scaler = RendererManager::getScaler();
-	Vector2<int> cam_pos = RendererManager::getCameraPosition();
-
-	SDL_Rect rect;
-	rect.x = (cLeft - cam_pos.x) * scaler.x ;
-	rect.w = (cRight - cLeft) * scaler.x ;
-	rect.y = (cBottom - cam_pos.y) * scaler.y ;
-	rect.h = (cTop - cBottom) * scaler.y;
-	SDL_RenderDrawRect(renderer, &rect);
-}
-
-void Collider::destroy()
-{
-	gColliders.erase(std::remove(gColliders.begin(), gColliders.end(), this), gColliders.end());
-}
-
-Vector2<float> Collider::getDimensions()
-{
-	int fWidth = cWidth * gameObject->transform.scale.x;
-	int fHeight = cHeight * gameObject->transform.scale.y;
-
-	return Vector2<float>(fWidth, fHeight);
-}
-
-Vector2<float> Collider::getOffsetVector()
-{
-	int xOffset = offset.x * gameObject->transform.scale.x;
-	int yOffset = offset.y * gameObject->transform.scale.y;
-
-	return Vector2<float>(xOffset, yOffset);
+	SceneManager::scene->collisionManager->removeCollider(this);
 }

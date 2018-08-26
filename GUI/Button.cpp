@@ -9,7 +9,7 @@ Button::Button()
 
 Button::Button(Texture texture) : GameObject(texture)
 {
-	collider = setComponent(new Collider(texture));
+	collider = setComponent(new BoxCollider(texture));
 }
 
 Button::~Button()
@@ -72,5 +72,5 @@ void Button::setOnClickListener(std::function<void()> callback)
 
 void Button::onStart()
 {
-	collider = getComponent<Collider>();
+	collider = getComponent<BoxCollider>();
 }

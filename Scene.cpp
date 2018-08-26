@@ -93,7 +93,7 @@ void Scene::initGameObject(GameObject *gameObject)
 
 void Scene::addComponentToManager(Component *component)
 {
-	if (RotatableBoxCollider* collider = dynamic_cast<RotatableBoxCollider*>(component))
+	if (Collider* collider = dynamic_cast<Collider*>(component))
 	{
 		collisionManager->addCollider(collider);
 	}

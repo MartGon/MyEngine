@@ -1,5 +1,5 @@
 #pragma once
-#include "RotatableBoxCollider.h"
+#include "Collider.h"
 #include <vector>
 
 class CollisionManager
@@ -8,12 +8,15 @@ public:
 	CollisionManager();
 
 	// Methods
-	bool checkCollisionsBetweenColliders(RotatableBoxCollider* c1, RotatableBoxCollider* c2);
+	bool checkCollisionsBetweenColliders(Collider* c1, Collider* c2);
 	void manage();
-	void addCollider(RotatableBoxCollider* collider);
+
+	// Modify list
+	void addCollider(Collider* collider);
+	void removeCollider(Collider* collider);
 
 private:
-	std::vector<RotatableBoxCollider*> colliders;
+	std::vector<Collider*> colliders;
 
-	std::vector<RotatableBoxCollider*> removeColliderFromVector(RotatableBoxCollider* collider, std::vector<RotatableBoxCollider*> &vector);
+	std::vector<Collider*> removeColliderFromVector(Collider* collider, std::vector<Collider*> &vector);
 };

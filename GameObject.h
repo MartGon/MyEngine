@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "Vector2.h"
 #include "Transform.h"
-#include "Collider.h"
+#include "BoxCollider.h"
 #include "Animator.h"
 #include "RotatableBoxCollider.h"
 #include <string>
@@ -89,7 +89,7 @@ public:
 	// Hooks
 		// Collisions
 	virtual void onColliderEnter(Collider *collider);
-	virtual void onColliderEnter(RotatableBoxCollider* collider);
+	//virtual void onColliderEnter(RotatableBoxCollider* collider);
 
 		// Movement
 	virtual void beforeMove();
