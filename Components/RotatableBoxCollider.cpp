@@ -2,6 +2,7 @@
 #include "Utilities.h"
 #include "RendererManager.h"
 #include "GameObject.h"
+#include "SceneManager.h"
 #include <cmath>
 #include <math.h>
 
@@ -22,6 +23,9 @@ RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vec
 	// Setting dir vectors
 	A = v1 - v0;
 	B = v0 - v2;
+
+	// Adding to collider list
+	SceneManager::scene->addComponentToManager(this);
 }
 
 Vector2<float> RotatableBoxCollider::rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex)

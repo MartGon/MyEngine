@@ -11,6 +11,7 @@ Uint16 Scene::lastGameObjectID = 0;
 Scene::Scene()
 {
 	renderer = RendererManager::renderer;
+	collisionManager = new CollisionManager();
 }
 
 Scene::Scene(Scene::SceneMode mode)
@@ -90,6 +91,14 @@ void Scene::initGameObject(GameObject *gameObject)
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
 }
 
+void Scene::addComponentToManager(Component *component)
+{
+	if (RotatableBoxCollider* collider = dynamic_cast<RotatableBoxCollider*>(component))
+	{
+		collisionManager->addCollider(collider);
+	}
+}
+
 void Scene::update()
 {
 	// Return if paused
@@ -114,6 +123,9 @@ void Scene::update()
 
 	// Update hook
 	onUpdate();
+
+	// Update Managers
+	collisionManager->manage();
 
     // Update every object
     for (auto &gameObjectPair : gameObjectMap)

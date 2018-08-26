@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "Collider.h"
 #include "Animator.h"
+#include "RotatableBoxCollider.h"
 #include <string>
 #include <vector>
 
@@ -88,6 +89,8 @@ public:
 	// Hooks
 		// Collisions
 	virtual void onColliderEnter(Collider *collider);
+	virtual void onColliderEnter(RotatableBoxCollider* collider);
+
 		// Movement
 	virtual void beforeMove();
 	virtual void afterMove();

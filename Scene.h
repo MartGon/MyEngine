@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "CollisionManager.h"
 #include "NetworkServer.h"
 #include "NetworkClient.h"
 #include <SDL_thread.h>
@@ -53,6 +54,9 @@ public:
 	// GameObjects to initialize
 	std::vector<GameObject*> gameObjectsToInitialize;
 
+	// Managers
+	CollisionManager* collisionManager = nullptr;
+
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();
@@ -75,6 +79,8 @@ public:
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
+
+	void addComponentToManager(Component *component);
 
 protected:
 
