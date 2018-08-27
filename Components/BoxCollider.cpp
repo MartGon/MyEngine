@@ -79,7 +79,7 @@ bool BoxCollider::isCollidingWith(Collider* collider)
 	{
 		RotatableBoxCollider c1(this);
 		c1.gameObject = this->gameObject;
-		return c1.isCollidingWith(rot_collider);
+		return c1.checkCollision(*rot_collider);
 	}
 
 	return false;

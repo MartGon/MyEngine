@@ -33,9 +33,9 @@ private:
 
 	// Square Vertex - Read Only
 	// v1 - v0 - v2				v1----v3
-	// v3 - v1 - v0				|	   |
+	// v0 - v1 - v3				|	   |
 	// v0 - v2 - v3				|	   |
-	// v2 - v3 - v1				v0----v2
+	// v1 - v3 - v2				v0----v2
     std::array<Vector2<float>, 4> roVertex;
 
 	Vector2<float> rotateVertex(Vector2<int> rotationCenter, double angle, Vector2<float> vertex);

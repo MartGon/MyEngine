@@ -91,9 +91,7 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
 bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 {
 	if (RotatableBoxCollider* c2 = dynamic_cast<RotatableBoxCollider*>(collider))
-	{
 		return checkCollision(*c2);
-	}
 	else if (BoxCollider* col = dynamic_cast<BoxCollider*>(collider))
 	{
 		RotatableBoxCollider c2(col);
