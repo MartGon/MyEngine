@@ -1,25 +1,34 @@
 #include "TextureRenderer.h"
 #include "GameObject.h"
 #include "RendererManager.h"
+#include "SceneManager.h"
 
 TextureRenderer::TextureRenderer() : Component()
 {
 	renderer = RendererManager::renderer;
+
+	// Add to renderer list
+	SceneManager::scene->addComponentToManager(this);
 }
 
-TextureRenderer::TextureRenderer(const char* path, MapRGB *colorKey) : TextureRenderer() 
+TextureRenderer::TextureRenderer(const char* path, MapRGB *colorKey, Uint8 layer) : TextureRenderer(Texture(path, RendererManager::renderer, colorKey), layer)
 {
-	texture = Texture(path, RendererManager::renderer, colorKey);
-	tPath = std::string(path);
+
 }
 
-TextureRenderer::TextureRenderer(Texture texture) : TextureRenderer()
+TextureRenderer::TextureRenderer(Texture texture, Uint8 layer) : TextureRenderer()
 {
 	this->texture = texture;
+	this->layer = layer;
 	tPath = std::string(texture.path);
 }
 
-void TextureRenderer::update()
+TextureRenderer::~TextureRenderer()
+{
+	destroy();
+}
+
+void TextureRenderer::render()
 {
 	Vector2<float> scaler = RendererManager::getScaler();
 
@@ -60,4 +69,14 @@ SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)
 	point->y = center.y;
 
 	return point;
+}
+
+void TextureRenderer::update()
+{
+
+}
+
+void TextureRenderer::destroy()
+{
+	SceneManager::scene->rendererManager->removeTextureRenderer(this);
 }

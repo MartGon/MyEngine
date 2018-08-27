@@ -11,15 +11,18 @@ Uint16 Scene::lastGameObjectID = 0;
 Scene::Scene()
 {
 	renderer = RendererManager::renderer;
+
+	// Setting Managers
 	collisionManager = new CollisionManager();
+	rendererManager = new RendererManager();
 }
 
-Scene::Scene(Scene::SceneMode mode)
+Scene::Scene(Scene::SceneMode mode) : Scene()
 {
 	setSceneMode(mode);
 }
 
-Scene::Scene(SDL_Renderer* renderer)
+Scene::Scene(SDL_Renderer* renderer) : Scene()
 {
 
 }
@@ -94,9 +97,9 @@ void Scene::initGameObject(GameObject *gameObject)
 void Scene::addComponentToManager(Component *component)
 {
 	if (Collider* collider = dynamic_cast<Collider*>(component))
-	{
 		collisionManager->addCollider(collider);
-	}
+	else if (TextureRenderer* tRenderer = dynamic_cast<TextureRenderer*>(component))
+		rendererManager->addTextureRenderer(tRenderer);
 }
 
 void Scene::update()
@@ -125,6 +128,8 @@ void Scene::update()
 	onUpdate();
 
 	// Update Managers
+	rendererManager->manage();
+	// Update collision manager later to allow drawing collider boundaries
 	collisionManager->manage();
 
     // Update every object

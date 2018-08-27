@@ -13,6 +13,11 @@ int RendererManager::nativeHeightResolution = 160;
 // Cam position
 Vector2<int> RendererManager::camera_position = Vector2<int>(120, 80);
 
+RendererManager::RendererManager()
+{
+
+}
+
 void RendererManager::setNativeResolution(int width, int height)
 {
 	nativeHeightResolution = width;
@@ -63,4 +68,25 @@ void RendererManager::setCameraPosition(Vector2<int> camera_pos, Vector2<int> le
 Vector2<int> RendererManager::getCameraPosition()
 {
 	return camera_position;
+}
+
+// Non-static methods
+
+void RendererManager::addTextureRenderer(TextureRenderer* tRenderer)
+{
+	texture_renderers.push_back(tRenderer);
+	std::sort(texture_renderers.begin(), texture_renderers.end());
+}
+
+void RendererManager::removeTextureRenderer(TextureRenderer* tRenderer)
+{
+	Utilities::removeFromVector(tRenderer, texture_renderers);
+}
+
+void RendererManager::manage()
+{
+	for (int i = 0; i < texture_renderers.size(); i++)
+	{
+		texture_renderers[i]->render();
+	}
 }

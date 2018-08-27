@@ -56,6 +56,7 @@ public:
 
 	// Managers
 	CollisionManager* collisionManager = nullptr;
+	RendererManager* rendererManager = nullptr;
 
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);

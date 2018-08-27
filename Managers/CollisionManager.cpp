@@ -56,6 +56,5 @@ void CollisionManager::removeCollider(Collider *collider)
 
 std::vector<Collider*> CollisionManager::removeColliderFromVector(Collider* collider, std::vector<Collider*> &vector)
 {
-	vector.erase(std::remove(vector.begin(), vector.end(), collider), vector.end());
-	return vector;
+	return Utilities::removeFromVector(collider, vector);
 }

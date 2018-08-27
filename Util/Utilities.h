@@ -14,5 +14,13 @@ public:
 	static double toDegs(double rad_angle);
 
 	static const double PI;
+
+	// Utilities
+	template <typename T>
+	static std::vector<T> removeFromVector(T pointer, std::vector<T>& vector)
+	{
+		vector.erase(std::remove(vector.begin(), vector.end(), pointer), vector.end());
+		return vector;
+	}
 };
 
