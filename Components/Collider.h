@@ -16,6 +16,7 @@ public:
 	virtual bool isCollidingWith(Collider* collider) { return false; };
 
 	// Debug
+	bool debug = false;
 	virtual void drawCollisionBoundaries() {};
 
 	// Upper methods
