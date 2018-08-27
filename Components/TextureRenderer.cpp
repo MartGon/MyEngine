@@ -56,8 +56,8 @@ void TextureRenderer::render()
 	// TODO - Check if texture has to be rendered (inside camera)
 	Vector2<int> cam_pos = RendererManager::getCameraPosition();
 
-	x -= cam_pos.x * scaler.x;
-	y -= cam_pos.y * scaler.y;
+	x -= (cam_pos.x * scaler.x);
+	y -= (cam_pos.y * scaler.y);
 
 	texture.render(x, y, angle, fCenter);
 }

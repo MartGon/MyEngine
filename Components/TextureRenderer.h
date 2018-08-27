@@ -15,7 +15,7 @@ public:
 	// Attributes
 	Texture texture;
 	std::string tPath;
-	Uint8 layer = 0;
+	Uint8 layer = 127;
 
 	SDL_Renderer *renderer = nullptr;
 
@@ -23,12 +23,6 @@ public:
 	void update() override;
 	void destroy() override;
 	void render();
-
-	// Operators
-	bool operator < (const TextureRenderer& tRenderer) const
-	{
-		return (layer < tRenderer.layer);
-	}
 
 private:
 	SDL_Point* getSDLPointFromVector(Vector2<int> center);

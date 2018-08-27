@@ -19,6 +19,7 @@ public:
 	static void setNativeResolution(int width, int height);
 	static Vector2<float> getScaler();
 	static Vector2<int> getNativeResolution();
+	static bool lesser(const TextureRenderer* tr1, const TextureRenderer* tr2);
 
 	// Camera
 	static void setCameraPosition(Vector2<int> camera_pos, Vector2<int> level_boundaries);

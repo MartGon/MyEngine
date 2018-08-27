@@ -35,6 +35,11 @@ Vector2<int> RendererManager::getNativeResolution()
 	return Vector2<int>(nativeWidthResolution, nativeHeightResolution);
 }
 
+bool RendererManager::lesser(const TextureRenderer* tr1, const TextureRenderer* tr2)
+{
+	return (tr1->layer < tr2->layer);
+}
+
 void RendererManager::init()
 {
 	if (!renderer)
@@ -45,6 +50,8 @@ void RendererManager::init()
 
 	nullTexture = Texture("null.png", renderer);
 }
+
+// Camera
 
 void RendererManager::setCameraPosition(Vector2<int> camera_pos, Vector2<int> level_boundaries)
 {
@@ -75,7 +82,7 @@ Vector2<int> RendererManager::getCameraPosition()
 void RendererManager::addTextureRenderer(TextureRenderer* tRenderer)
 {
 	texture_renderers.push_back(tRenderer);
-	std::sort(texture_renderers.begin(), texture_renderers.end());
+	std::sort(texture_renderers.begin(), texture_renderers.end(), lesser);
 }
 
 void RendererManager::removeTextureRenderer(TextureRenderer* tRenderer)
