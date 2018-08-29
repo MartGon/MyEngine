@@ -2,13 +2,12 @@
 #include "Component.h"
 #include "Utilities.h"
 #include <vector>
+#include "ManagerBase.h"
 
 template <class T>
-class Manager
+class Manager : public ManagerBase
 {
 public:
-	virtual void manage() {};
-
 	void addComponent(T component)
 	{
 		components.push_back(component);

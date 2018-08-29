@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "RendererManager.h"
 #include "CollisionManager.h"
 #include "NetworkServer.h"
 #include "NetworkClient.h"
@@ -55,11 +56,52 @@ public:
 	std::vector<GameObject*> gameObjectsToInitialize;
 
 	// Managers
-	CollisionManager* collisionManager = nullptr;
-	RendererManager* rendererManager = nullptr;
+    std::vector<ManagerBase*> managers;
 
-	//template <class T>
-	//std::vector<Manager<T>*> managers;
+    template <class T>
+    Manager<T>* getManager()
+    {
+        for (auto manager : managers)
+        {
+            if (Manager<T>* man = dynamic_cast<Manager<T>*>(manager))
+            {
+                return man;
+            }
+        }
+
+        return nullptr;
+    }
+
+    template <class T>
+    T* setManager(T* manager)
+    {
+        managers.push_back(manager);
+        return manager;
+    }
+
+    template <class T>
+    void addComponentToManager(T component)
+    {
+            if (Manager<T>* lower_manager = getManager<T>())
+            {
+                lower_manager->addComponent(component);
+                return;
+            }
+    }
+
+    template <class T>
+    void removeComponentFromManager(T component)
+    {
+        for (auto manager : managers)
+        {
+            if (Manager<T>* lower_manager = dynamic_cast<Manager<T>*>(manager))
+            {
+                lower_manager->removeComponent(component);
+            }
+        }
+        
+    }
+
 
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
@@ -83,8 +125,6 @@ public:
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
-
-	void addComponentToManager(Component *component);
 
 protected:
 

@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "Navigator.h"
-#include "RendererManager.h"
 #include <stdio.h>
 
 // Attributes
@@ -11,10 +10,6 @@ Uint16 Scene::lastGameObjectID = 0;
 Scene::Scene()
 {
 	renderer = RendererManager::renderer;
-
-	// Setting Managers
-	collisionManager = new CollisionManager();
-	rendererManager = new RendererManager();
 }
 
 Scene::Scene(Scene::SceneMode mode) : Scene()
@@ -94,6 +89,7 @@ void Scene::initGameObject(GameObject *gameObject)
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
 }
 
+/*
 void Scene::addComponentToManager(Component *component)
 {
 	if (Collider* collider = dynamic_cast<Collider*>(component))
@@ -101,6 +97,7 @@ void Scene::addComponentToManager(Component *component)
 	else if (TextureRenderer* tRenderer = dynamic_cast<TextureRenderer*>(component))
 		rendererManager->addComponent(tRenderer);
 }
+*/
 
 void Scene::update()
 {
@@ -128,9 +125,8 @@ void Scene::update()
 	onUpdate();
 
 	// Update Managers
-	rendererManager->manage();
-	// Update collision manager later to allow drawing collider boundaries
-	collisionManager->manage();
+    for (auto manager : managers)
+        manager->manage();
 
     // Update every object
     for (auto &gameObjectPair : gameObjectMap)
