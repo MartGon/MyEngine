@@ -58,6 +58,9 @@ public:
 	CollisionManager* collisionManager = nullptr;
 	RendererManager* rendererManager = nullptr;
 
+	//template <class T>
+	//std::vector<Manager<T>*> managers;
+
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();

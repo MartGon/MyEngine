@@ -16,12 +16,12 @@ bool CollisionManager::checkCollisionsBetweenColliders(Collider* c1, Collider* c
 void CollisionManager::manage()
 {
 	// Already checked Colliders will be removed from this vector
-	std::vector<Collider*> resizableColliderVector = colliders;
+	std::vector<Collider*> resizableColliderVector = components;
 
-	for (int i = 0; i < colliders.size(); i++)
+	for (int i = 0; i < components.size(); i++)
 	{
 		// Remove this collider from resizable list
-		Collider *c1 = colliders[i];
+		Collider *c1 = components[i];
 		removeColliderFromVector(c1, resizableColliderVector);
 
 		// If debug enabled, draw collisions
@@ -46,16 +46,6 @@ void CollisionManager::manage()
 			}
 		}
 	}
-}
-
-void CollisionManager::addCollider(Collider *collider)
-{
-	colliders.push_back(collider);
-}
-
-void CollisionManager::removeCollider(Collider *collider)
-{
-	removeColliderFromVector(collider, colliders);
 }
 
 std::vector<Collider*> CollisionManager::removeColliderFromVector(Collider* collider, std::vector<Collider*> &vector)

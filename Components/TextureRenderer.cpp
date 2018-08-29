@@ -78,5 +78,5 @@ void TextureRenderer::update()
 
 void TextureRenderer::destroy()
 {
-	SceneManager::scene->rendererManager->removeTextureRenderer(this);
+	SceneManager::scene->rendererManager->removeComponent(this);
 }

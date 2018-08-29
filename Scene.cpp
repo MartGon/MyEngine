@@ -97,9 +97,9 @@ void Scene::initGameObject(GameObject *gameObject)
 void Scene::addComponentToManager(Component *component)
 {
 	if (Collider* collider = dynamic_cast<Collider*>(component))
-		collisionManager->addCollider(collider);
+		collisionManager->addComponent(collider);
 	else if (TextureRenderer* tRenderer = dynamic_cast<TextureRenderer*>(component))
-		rendererManager->addTextureRenderer(tRenderer);
+		rendererManager->addComponent(tRenderer);
 }
 
 void Scene::update()

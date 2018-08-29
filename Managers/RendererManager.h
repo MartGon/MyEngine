@@ -3,8 +3,9 @@
 #include "MainGameLoop.h"
 #include "Vector2.h"
 #include "TextureRenderer.h"
+#include "Manager.h"
 
-class RendererManager
+class RendererManager : public Manager<TextureRenderer*>
 {
 public:
 	// Constructor
@@ -26,8 +27,7 @@ public:
 	static Vector2<int> getCameraPosition();
 
 	// Non-static methods
-	void addTextureRenderer(TextureRenderer* tRenderer);
-	void removeTextureRenderer(TextureRenderer* tRenderer);
+	void onAddComponent(TextureRenderer* tRenderer) override;
 	void manage();
 
 private:
@@ -35,7 +35,4 @@ private:
 	static int nativeHeightResolution;
 	// Camera
 	static Vector2<int> camera_position;
-
-	// Object dependent
-	std::vector<TextureRenderer*> texture_renderers;
 };

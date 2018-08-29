@@ -9,5 +9,5 @@ Collider::Collider() : Component()
 
 void Collider::destroy() 
 {
-	SceneManager::scene->collisionManager->removeCollider(this);
+	SceneManager::scene->collisionManager->removeComponent(this);
 }

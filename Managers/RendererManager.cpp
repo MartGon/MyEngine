@@ -79,21 +79,15 @@ Vector2<int> RendererManager::getCameraPosition()
 
 // Non-static methods
 
-void RendererManager::addTextureRenderer(TextureRenderer* tRenderer)
+void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 {
-	texture_renderers.push_back(tRenderer);
-	std::sort(texture_renderers.begin(), texture_renderers.end(), lesser);
-}
-
-void RendererManager::removeTextureRenderer(TextureRenderer* tRenderer)
-{
-	Utilities::removeFromVector(tRenderer, texture_renderers);
+	std::sort(components.begin(), components.end(), lesser);
 }
 
 void RendererManager::manage()
 {
-	for (int i = 0; i < texture_renderers.size(); i++)
+	for (int i = 0; i < components.size(); i++)
 	{
-		texture_renderers[i]->render();
+		components[i]->render();
 	}
 }
