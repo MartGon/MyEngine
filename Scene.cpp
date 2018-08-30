@@ -89,16 +89,6 @@ void Scene::initGameObject(GameObject *gameObject)
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
 }
 
-/*
-void Scene::addComponentToManager(Component *component)
-{
-	if (Collider* collider = dynamic_cast<Collider*>(component))
-		collisionManager->addComponent(collider);
-	else if (TextureRenderer* tRenderer = dynamic_cast<TextureRenderer*>(component))
-		rendererManager->addComponent(tRenderer);
-}
-*/
-
 void Scene::update()
 {
 	// Return if paused

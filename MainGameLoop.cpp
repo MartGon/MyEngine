@@ -83,7 +83,7 @@ int engine_main()
 					SceneManager::scene->handleEvent(e);
 			}
 
-			// Update scener
+			// Update scene
 			SceneManager::scene->update();
 
 			// Render buffer
