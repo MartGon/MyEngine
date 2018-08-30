@@ -15,6 +15,7 @@ public:
 	// Attributes
 	Texture texture;
 	std::string tPath;
+	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	Uint8 layer = 127;
 
 	SDL_Renderer *renderer = nullptr;

@@ -28,6 +28,10 @@ void CollisionManager::manage()
 		if (c1->debug)
 			c1->drawCollisionBoundaries();
 
+		// Don't check collisions if collider is not active
+		if (!c1->isEnabled)
+			continue;
+
 		// Don't check collisions if object is not active
 		if (!c1->gameObject->isActive)
 			continue;

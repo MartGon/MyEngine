@@ -54,7 +54,7 @@ void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_Renderer
 	renderQuad.h *= scale.y;
 
 	// Rotation center is taken the texture width and height as reference
-	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, SDL_FLIP_NONE))
+	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
 	{
 		printf("SDL_RenderCopy: %s\n", SDL_GetError());
 		return;

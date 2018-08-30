@@ -59,7 +59,7 @@ void TextureRenderer::render()
 	x -= (cam_pos.x * scaler.x);
 	y -= (cam_pos.y * scaler.y);
 
-	texture.render(x, y, angle, fCenter);
+	texture.render(x, y, angle, fCenter, flip);
 }
 
 SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)

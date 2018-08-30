@@ -22,7 +22,8 @@ RotatableBoxCollider::RotatableBoxCollider(BoxCollider *collider) :
 	RotatableBoxCollider(Vector2<int>(0, 0), Vector2<int>(0, collider->cHeight),
 		Vector2<int>(collider->cWidth, 0), Vector2<int>(collider->cWidth, collider->cHeight))
 {
-
+	offset = collider->offset;
+	
 }
 
 RotatableBoxCollider::~RotatableBoxCollider()
@@ -65,8 +66,8 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
         for (Uint8 j = 0; j < 2; j++)
         {
             // Origin to other collider vertex vector
-            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position);
-            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position);
+            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position + collider.offset);
+            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position + offset);
             Vector2<float> op = point - axisCenter;
 
             // Project op onto side
