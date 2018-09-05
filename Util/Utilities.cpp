@@ -55,3 +55,19 @@ double Utilities::toDegs(double rad_angle)
 {
 	return rad_angle *  180 / Utilities::PI;
 }
+
+
+Vector2<float> Utilities::rotatePointFromCenter(Vector2<float> rotation_center, double angle, Vector2<float> point)
+{
+    Vector2<float> rotationVector = point - rotation_center;
+    double rad_angle = Utilities::toRads(angle);
+
+    double x = cos(rad_angle) * rotationVector.x - sin(rad_angle) * rotationVector.y;
+    double y = sin(rad_angle) * rotationVector.x + cos(rad_angle) * rotationVector.y;
+
+    Vector2<float> rotatedVector((float)x, (float)y);
+
+    Vector2<float> rotatedPoint = rotatedVector + rotation_center;
+
+    return  rotatedPoint;
+}

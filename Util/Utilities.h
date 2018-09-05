@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Vector2.h"
 
 class Utilities
 {
@@ -16,6 +17,8 @@ public:
 	static const double PI;
 
 	// Utilities
+    static Vector2<float> rotatePointFromCenter(Vector2<float> rotation_center, double angle, Vector2<float> point);
+
 	template <typename T>
 	static std::vector<T> removeFromVector(T pointer, std::vector<T>& vector)
 	{

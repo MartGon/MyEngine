@@ -19,11 +19,11 @@ RotatableBoxCollider::RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vec
 }
 
 RotatableBoxCollider::RotatableBoxCollider(BoxCollider *collider) : 
-	RotatableBoxCollider(Vector2<int>(0, 0), Vector2<int>(0, collider->cHeight),
-		Vector2<int>(collider->cWidth, 0), Vector2<int>(collider->cWidth, collider->cHeight))
+	RotatableBoxCollider(Vector2<int>(0, 0), Vector2<int>(0, collider->getDimensions().y),
+		Vector2<int>(collider->getDimensions().x, 0), collider->getDimensions())
 {
 	offset = collider->offset;
-	
+    debug = collider->debug;
 }
 
 RotatableBoxCollider::~RotatableBoxCollider()
@@ -66,8 +66,8 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
         for (Uint8 j = 0; j < 2; j++)
         {
             // Origin to other collider vertex vector
-            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position + collider.offset);
-            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position + offset);
+            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position + collider.offset * collider.gameObject->transform.scale);
+            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position + offset * gameObject->transform.scale);
             Vector2<float> op = point - axisCenter;
 
             // Project op onto side
@@ -107,6 +107,7 @@ bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 
 void RotatableBoxCollider::update()
 {
+    // TODO - Take box center as rotation center when rotation == nullptr
 	if(gameObject)
 		if(Vector2<int> *rotation = gameObject->transform.rotationCenter)
 			setRotation(*rotation, gameObject->transform.zRotation);

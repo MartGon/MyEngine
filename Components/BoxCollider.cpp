@@ -96,6 +96,8 @@ void BoxCollider::drawCollisionBoundaries()
 	rect.w = (cRight - cLeft) * scaler.x ;
 	rect.y = (cBottom - cam_pos.y) * scaler.y ;
 	rect.h = (cTop - cBottom) * scaler.y;
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawRect(renderer, &rect);
 }
 

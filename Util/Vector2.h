@@ -1,7 +1,8 @@
 #pragma once
 #include <math.h>
-#include "Utilities.h"
 #include <string>
+
+class Utilities;
 
 template <typename T>
 class Vector2

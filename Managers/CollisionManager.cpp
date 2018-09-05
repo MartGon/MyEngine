@@ -24,10 +24,6 @@ void CollisionManager::manage()
 		Collider *c1 = components[i];
 		removeColliderFromVector(c1, resizableColliderVector);
 
-		// If debug enabled, draw collisions
-		if (c1->debug)
-			c1->drawCollisionBoundaries();
-
 		// Don't check collisions if collider is not active
 		if (!c1->isEnabled)
 			continue;
@@ -35,6 +31,10 @@ void CollisionManager::manage()
 		// Don't check collisions if object is not active
 		if (!c1->gameObject->isActive)
 			continue;
+
+        // If debug enabled, draw collisions
+        if (c1->debug)
+            c1->drawCollisionBoundaries();
 
 		// Iterate with the rest of them
 		for (int j = 0; j < resizableColliderVector.size(); j++)
