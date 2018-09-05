@@ -18,7 +18,7 @@ public:
 
 	// Methods
 	void setRotation(Vector2<int> rotationCenter, double angle);
-
+    Vector2<int> getColliderCenter();
     bool checkCollision(RotatableBoxCollider collider);
 
 	// Debug

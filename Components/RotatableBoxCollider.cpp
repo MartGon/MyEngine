@@ -52,6 +52,16 @@ void RotatableBoxCollider::setRotation(Vector2<int> rotationCenter, double angle
 		vertex[i] = rotateVertex(rotationCenter, angle, roVertex[i]);
 }
 
+Vector2<int> RotatableBoxCollider::getColliderCenter()
+{
+    Vector2<int> center;
+
+    center.x = roVertex[3].x / 2;
+    center.y = roVertex[3].y / 2;
+
+    return center;
+}
+
 // Checkers
 
 bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
@@ -108,9 +118,13 @@ bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 void RotatableBoxCollider::update()
 {
     // TODO - Take box center as rotation center when rotation == nullptr
-	if(gameObject)
-		if(Vector2<int> *rotation = gameObject->transform.rotationCenter)
-			setRotation(*rotation, gameObject->transform.zRotation);
+    if (gameObject)
+    {
+        if (Vector2<int> *rotation = gameObject->transform.rotationCenter)
+            setRotation(*rotation, gameObject->transform.zRotation);
+        else
+            setRotation(getColliderCenter(), gameObject->transform.zRotation);
+    }
 }
 
 // Debug
