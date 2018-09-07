@@ -73,6 +73,24 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 	}
 }
 
+// Rotation
+
+Vector2<int> GameObject::getAbsoluteRotationCenter()
+{
+    
+    Vector2<int> abs_center = (Vector2<int>)transform.position + (*transform.rotationCenter);
+
+    return abs_center;
+}
+
+void GameObject::setAbsoluteRotationCenter(Vector2<int> center)
+{
+    if (transform.rotationCenter)
+        *transform.rotationCenter = center - (Vector2<int>)transform.position;
+    else
+        transform.rotationCenter = new Vector2<int>(center - (Vector2<int>)transform.position);
+}
+
 void GameObject::setScale(Vector2<float> scale)
 {
 	transform.scale = scale;

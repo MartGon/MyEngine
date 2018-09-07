@@ -75,6 +75,9 @@ public:
 	// Position
 	// Take the object's center as its positions, instead of upper left corner
 	void setRelativePosition(Vector2<float> pos);
+        // Rotation
+    Vector2<int> getAbsoluteRotationCenter();
+    void setAbsoluteRotationCenter(Vector2<int> center);
 
 	// Update
 	virtual void onUpdate();
