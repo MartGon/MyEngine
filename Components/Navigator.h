@@ -24,7 +24,9 @@ public:
 	// Own Methods
 	Vector2<float> getDirection();
 	void setDirection(Vector2<float> dir);
+    void goToPreviousPos();
 
 private:
 	Vector2<float> direction;
+    Vector2<float> previousPos;
 };

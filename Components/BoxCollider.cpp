@@ -18,9 +18,6 @@ BoxCollider::BoxCollider(int width, int height) : Collider()
 	// Set values
 	cWidth = width;
 	cHeight = height;
-
-	// Add to static list
-	//gColliders.push_back(this);
 }
 
 void BoxCollider::calculateColliderBoundaries()

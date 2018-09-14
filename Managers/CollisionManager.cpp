@@ -41,6 +41,10 @@ void CollisionManager::manage()
 		{
 			Collider* c2 = resizableColliderVector[j];
 
+            // Check if the other collider is enabled
+            if (!c2->isEnabled)
+                continue;
+
 			// Check if collision exists
 			if (checkCollisionsBetweenColliders(c1, c2))
 			{

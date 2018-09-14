@@ -20,9 +20,13 @@ void Navigator::update()
 	// Hook
 	gameObject->beforeMove();
 
-	Vector2<float> pos = gameObject->transform.position;
+    // If the previous hook deactivates
+    if (!isEnabled)
+        return;
+
+    previousPos = gameObject->transform.position;
 	Vector2<float> displacement = (direction * speed);
-	Vector2<float> newPos = pos + displacement;
+	Vector2<float> newPos = previousPos + displacement;
 	gameObject->transform.position = newPos;
 
 	// Is Affected by acceleration ?
@@ -47,4 +51,9 @@ void Navigator::setDirection(Vector2<float> dir)
 {
 	dir.normalize();
 	direction = dir;
+}
+
+void Navigator::goToPreviousPos()
+{
+    gameObject->transform.position = previousPos;
 }
