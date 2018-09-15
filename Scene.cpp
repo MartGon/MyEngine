@@ -114,7 +114,7 @@ void Scene::update()
 	// Update hook
 	onUpdate();
 
-	// Update Managers
+    // Update Managers
     for (auto manager : managers)
         manager->manage();
 

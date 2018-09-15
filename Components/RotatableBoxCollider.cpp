@@ -115,6 +115,14 @@ bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 
 // Upper
 
+void RotatableBoxCollider::start()
+{
+    if (Vector2<int> *rotation = gameObject->transform.rotationCenter)
+        setRotation(*rotation, gameObject->transform.zRotation);
+    else
+        setRotation(getColliderCenter(), gameObject->transform.zRotation);
+}
+
 void RotatableBoxCollider::update()
 {
     // TODO - Take box center as rotation center when rotation == nullptr

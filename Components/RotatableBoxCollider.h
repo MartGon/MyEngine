@@ -26,6 +26,7 @@ public:
 	void drawCollisionBoundaries() override;
 
 	// Upper
+    void start() override;
 	void update() override;
 	bool isCollidingWith(Collider* collider) override;
 

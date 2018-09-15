@@ -45,6 +45,11 @@ Vector2<float> BoxCollider::getCollisionCenter()
 	return Vector2<float>(x, y);
 }
 
+void BoxCollider::start()
+{
+    calculateColliderBoundaries();
+}
+
 void BoxCollider::update()
 {
 	calculateColliderBoundaries();

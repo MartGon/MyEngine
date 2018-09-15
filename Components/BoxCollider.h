@@ -34,6 +34,7 @@ public:
 
 	// Overrided
 	bool isCollidingWith(Collider* collider) override;
+    void start() override;
 	void update() override;
 	void destroy() override;
 };

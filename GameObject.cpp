@@ -71,6 +71,10 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 
 		transform.position = pos;
 	}
+    if (Collider *collider = getComponent<Collider>())
+    {
+        collider->update();
+    }
 }
 
 // Rotation
