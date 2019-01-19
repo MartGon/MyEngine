@@ -7,8 +7,8 @@ SDL_Renderer* RendererManager::renderer = nullptr;
 
 // GBA Res: 240 x 160
 
-int RendererManager::nativeWidthResolution = 240;
-int RendererManager::nativeHeightResolution = 160;
+int RendererManager::nativeWidthResolution = 480;
+int RendererManager::nativeHeightResolution = 320;
 
 // Cam position
 Vector2<int> RendererManager::camera_position = Vector2<int>(120, 80);

@@ -39,6 +39,10 @@ public:
 	void normalize()
 	{
 		float mod = getModule();
+
+		if (mod == 0)
+			return;
+
 		x /= mod;
 		y /= mod;
 	}

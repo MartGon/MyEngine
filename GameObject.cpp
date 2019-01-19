@@ -125,7 +125,7 @@ void GameObject::destroy()
 
 void GameObject::onColliderEnter(Collider *collider)
 {
-	printf("%i: Collision detectada con %i\n", id, collider->gameObject->id);
+	//printf("%i: Collision detectada con %i\n", id, collider->gameObject->id);
 }
 
 // Navigator hooks
@@ -151,10 +151,10 @@ void GameObject::handleEvent(const SDL_Event &event)
 
 void GameObject::onAnimationFinished(Animation* anim)
 {
-	printf("Animation %i has finished\n", anim->id);
+	//printf("Animation %i has finished\n", anim->id);
 }
 
 void GameObject::beforeAnimationFrame(Animation* anim, int frameNumber)
 {
-	printf("Animation %i frame %i has finished\n", anim->id, frameNumber);
+	//printf("Animation %i frame %i has finished\n", anim->id, frameNumber);
 }
