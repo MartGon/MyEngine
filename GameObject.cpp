@@ -81,7 +81,9 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 
 Vector2<int> GameObject::getAbsoluteRotationCenter()
 {
-    
+	if (!transform.rotationCenter)
+		transform.rotationCenter = new Vector2<int>(0, 0);
+
     Vector2<int> abs_center = (Vector2<int>)transform.position + (*transform.rotationCenter);
 
     return abs_center;

@@ -36,6 +36,9 @@ void Navigator::update()
 
 		// Y axis is inverted on SDL
 		direction.y -= acceleration.y;
+
+		// TODO - Esto altera el vector direccion, provocando que ya no este normalizado
+		// Solucion - Restar aceleracion al displacement, coger el modulo = speed y normalizar luego
 	}
 
 	// Hook
