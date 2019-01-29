@@ -18,7 +18,7 @@ Packet::Packet(GameObject gameObject)
 {
 	packetType = PACKET_MISC;
 	id = gameObject.id;
-	position = gameObject.transform.position;
+	position = gameObject.transform->position;
 
 	if (Navigator *nav = gameObject.getComponent<Navigator>())
 		direction = nav->getDirection();

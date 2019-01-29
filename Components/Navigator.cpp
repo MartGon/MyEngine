@@ -24,10 +24,10 @@ void Navigator::update()
     if (!isEnabled)
         return;
 
-    previousPos = gameObject->transform.position;
+    previousPos = gameObject->transform->position;
 	Vector2<float> displacement = (direction * speed);
 	Vector2<float> newPos = previousPos + displacement;
-	gameObject->transform.position = newPos;
+	gameObject->transform->position = newPos;
 
 	// Is Affected by acceleration ?
 	if (isKinematic)
@@ -58,5 +58,5 @@ void Navigator::setDirection(Vector2<float> dir)
 
 void Navigator::goToPreviousPos()
 {
-    gameObject->transform.position = previousPos;
+    gameObject->transform->position = previousPos;
 }

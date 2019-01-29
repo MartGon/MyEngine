@@ -8,6 +8,7 @@ class Transform : public Component
 public:
 	Transform();
 
+	Transform* parent = nullptr;
 	Vector2<float> position;
 	Vector2<float> scale;
 	double zRotation;
