@@ -237,12 +237,12 @@ bool Scene::handlePacket(Packet *packet)
 	if (mode == ONLINE_SERVER)
 	{
 		if (gameObject->updateFromClient)
-			gameObject->transform->position = packet->position;
+			gameObject->transform.position = packet->position;
 	}
 	else if (mode == ONLINE_CLIENT)
 	{
 		if (!gameObject->updateFromClient)
-			gameObject->transform->position = packet->position;
+			gameObject->transform.position = packet->position;
 
 		if (Navigator *nav = gameObject->getComponent<Navigator>())
 			nav->setDirection(packet->direction);

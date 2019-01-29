@@ -12,8 +12,8 @@ GameObject::GameObject()
 	SceneManager::scene->addGameObject(this);
 
 	// Add reference to self in transform component
-	transform = new Transform();
-	transform->gameObject = this;
+	transform = Transform();
+	transform.gameObject = this;
 
 	// Set GameObject's id
 	id = Scene::lastGameObjectID++;
@@ -55,8 +55,8 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 {
 	if (TextureRenderer *tRenderer = getComponent<TextureRenderer>())
 	{	
-		float xOffset = tRenderer->texture.mWidth / 2 * transform->scale.x;
-		float yOffset = tRenderer->texture.mHeight / 2 * transform->scale.y;
+		float xOffset = tRenderer->texture.mWidth / 2 * transform.scale.x;
+		float yOffset = tRenderer->texture.mHeight / 2 * transform.scale.y;
 		
 		// Check if position will be valid
 		if (pos.x - xOffset >= 0)
@@ -69,7 +69,7 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 		else
 			pos.y = 0;
 
-		transform->position = pos;
+		transform.position = pos;
 	}
     if (Collider *collider = getComponent<Collider>())
     {
@@ -79,8 +79,8 @@ void GameObject::setRelativePosition(Vector2<float> pos)
 
 Vector2<float> GameObject::getAbsolutePosition()
 {
-	Vector2<float> position = this->transform->position;
-	Transform* current_transform = this->transform->parent;
+	Vector2<float> position = this->transform.position;
+	Transform* current_transform = this->transform.parent;
 
 	while (current_transform != nullptr)
 	{
@@ -95,25 +95,25 @@ Vector2<float> GameObject::getAbsolutePosition()
 
 Vector2<int> GameObject::getAbsoluteRotationCenter()
 {
-	if (!transform->rotationCenter)
-		transform->rotationCenter = new Vector2<int>(0, 0);
+	if (!transform.rotationCenter)
+		transform.rotationCenter = new Vector2<int>(0, 0);
 
-    Vector2<int> abs_center = (Vector2<int>)transform->position + (*transform->rotationCenter);
+    Vector2<int> abs_center = (Vector2<int>)transform.position + (*transform.rotationCenter);
 
     return abs_center;
 }
 
 void GameObject::setAbsoluteRotationCenter(Vector2<int> center)
 {
-    if (transform->rotationCenter)
-        *transform->rotationCenter = center - (Vector2<int>)transform->position;
+    if (transform.rotationCenter)
+        *transform.rotationCenter = center - (Vector2<int>)transform.position;
     else
-        transform->rotationCenter = new Vector2<int>(center - (Vector2<int>)transform->position);
+        transform.rotationCenter = new Vector2<int>(center - (Vector2<int>)transform.position);
 }
 
 void GameObject::setScale(Vector2<float> scale)
 {
-	transform->scale = scale;
+	transform.scale = scale;
 }
 
 // Behaviour hooks

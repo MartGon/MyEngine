@@ -29,7 +29,7 @@ public:
 	bool isActive = true;
 
 	// Transform
-	Transform* transform;
+	Transform transform;
 
 	// Methods
 

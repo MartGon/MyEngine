@@ -36,15 +36,15 @@ void TextureRenderer::render()
 	int x = pos.x * scaler.x;
 	int y = pos.y * scaler.y;
 
-	texture.scale = gameObject->transform->scale * scaler;
+	texture.scale = gameObject->transform.scale * scaler;
 
 	// Rotation stuff
-	double angle = gameObject->transform->zRotation;
+	double angle = gameObject->transform.zRotation;
 
 	SDL_Point* fCenter = NULL;
 
 	// If center is not set, pass NULL so width/2, height/2 is taken
-	if (Vector2<int>* center = gameObject->transform->rotationCenter)
+	if (Vector2<int>* center = gameObject->transform.rotationCenter)
 	{
 		Vector2<int> cCenter;
 		cCenter.x = center->x * scaler.x;

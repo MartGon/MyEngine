@@ -22,7 +22,7 @@ BoxCollider::BoxCollider(int width, int height) : Collider()
 
 void BoxCollider::calculateColliderBoundaries()
 {
-	Vector2<float> position = gameObject->transform->position;
+	Vector2<float> position = gameObject->transform.position;
 	Vector2<float> dimensions = getDimensions();
 	Vector2<float> offsetVector = getOffsetVector();
 
@@ -111,16 +111,16 @@ void BoxCollider::destroy()
 
 Vector2<float> BoxCollider::getDimensions()
 {
-	int fWidth = cWidth * gameObject->transform->scale.x;
-	int fHeight = cHeight * gameObject->transform->scale.y;
+	int fWidth = cWidth * gameObject->transform.scale.x;
+	int fHeight = cHeight * gameObject->transform.scale.y;
 
 	return Vector2<float>(fWidth, fHeight);
 }
 
 Vector2<float> BoxCollider::getOffsetVector()
 {
-	int xOffset = offset.x * gameObject->transform->scale.x;
-	int yOffset = offset.y * gameObject->transform->scale.y;
+	int xOffset = offset.x * gameObject->transform.scale.x;
+	int yOffset = offset.y * gameObject->transform.scale.y;
 
 	return Vector2<float>(xOffset, yOffset);
 }

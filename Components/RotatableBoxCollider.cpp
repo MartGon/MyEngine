@@ -76,8 +76,8 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
         for (Uint8 j = 0; j < 2; j++)
         {
             // Origin to other collider vertex vector
-            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform->position + collider.offset * collider.gameObject->transform->scale);
-            Vector2<float> axisCenter = (vertex[0] + gameObject->transform->position + offset * gameObject->transform->scale);
+            Vector2<float> point = (o_vertex[i] + collider.gameObject->transform.position + collider.offset * collider.gameObject->transform.scale);
+            Vector2<float> axisCenter = (vertex[0] + gameObject->transform.position + offset * gameObject->transform.scale);
             Vector2<float> op = point - axisCenter;
 
             // Project op onto side
@@ -117,10 +117,10 @@ bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 
 void RotatableBoxCollider::start()
 {
-    if (Vector2<int> *rotation = gameObject->transform->rotationCenter)
-        setRotation(*rotation, gameObject->transform->zRotation);
+    if (Vector2<int> *rotation = gameObject->transform.rotationCenter)
+        setRotation(*rotation, gameObject->transform.zRotation);
     else
-        setRotation(getColliderCenter(), gameObject->transform->zRotation);
+        setRotation(getColliderCenter(), gameObject->transform.zRotation);
 }
 
 void RotatableBoxCollider::update()
@@ -128,10 +128,10 @@ void RotatableBoxCollider::update()
     // TODO - Take box center as rotation center when rotation == nullptr
     if (gameObject)
     {
-        if (Vector2<int> *rotation = gameObject->transform->rotationCenter)
-            setRotation(*rotation, gameObject->transform->zRotation);
+        if (Vector2<int> *rotation = gameObject->transform.rotationCenter)
+            setRotation(*rotation, gameObject->transform.zRotation);
         else
-            setRotation(getColliderCenter(), gameObject->transform->zRotation);
+            setRotation(getColliderCenter(), gameObject->transform.zRotation);
     }
 }
 
@@ -156,8 +156,8 @@ void RotatableBoxCollider::drawCollisionBoundaries()
 	
 	for (int i = 0; i < 4; i++)
 	{
-		points[i].x = (vertex[i].x + gameObject->transform->position.x - cam_pos.x) * scaler.x;
-		points[i].y = (vertex[i].y + gameObject->transform->position.y - cam_pos.y) * scaler.y;
+		points[i].x = (vertex[i].x + gameObject->transform.position.x - cam_pos.x) * scaler.x;
+		points[i].y = (vertex[i].y + gameObject->transform.position.y - cam_pos.y) * scaler.y;
 	}
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
