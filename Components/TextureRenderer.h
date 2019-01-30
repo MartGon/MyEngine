@@ -16,15 +16,20 @@ public:
 	Texture texture;
 	std::string tPath;
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
-	Uint8 layer = 127;
 
 	SDL_Renderer *renderer = nullptr;
 
-	// methods
+	// overridden methods
 	void update() override;
 	void destroy() override;
+
+	// Own methods
+	void setLayer(Uint8 layer);
+	Uint8 getLayer();
 	void render();
 
 private:
 	SDL_Point* getSDLPointFromVector(Vector2<int> center);
+
+	Uint8 layer = 127;
 };

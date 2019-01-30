@@ -6,9 +6,6 @@
 TextureRenderer::TextureRenderer() : Component()
 {
 	renderer = RendererManager::renderer;
-
-	// Add to renderer list
-	SceneManager::scene->addComponentToManager(this);
 }
 
 TextureRenderer::TextureRenderer(const char* path, MapRGB *colorKey, Uint8 layer) : TextureRenderer(Texture(path, RendererManager::renderer, colorKey), layer)
@@ -21,6 +18,9 @@ TextureRenderer::TextureRenderer(Texture texture, Uint8 layer) : TextureRenderer
 	this->texture = texture;
 	this->layer = layer;
 	tPath = std::string(texture.path);
+
+	// Add to renderer list
+	SceneManager::scene->addComponentToManager(this);
 }
 
 TextureRenderer::~TextureRenderer()
@@ -72,6 +72,8 @@ SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)
 	return point;
 }
 
+// overridden methods
+
 void TextureRenderer::update()
 {
 
@@ -80,4 +82,22 @@ void TextureRenderer::update()
 void TextureRenderer::destroy()
 {
 	SceneManager::scene->removeComponentFromManager(this);
+}
+
+// own methods
+ 
+Uint8 TextureRenderer::getLayer()
+{
+	return layer;
+}
+
+void TextureRenderer::setLayer(Uint8 layer)
+{
+	this->layer = layer;
+
+	// Re-order the array
+	Manager<TextureRenderer*>* manager = SceneManager::scene->getManager<TextureRenderer*>();
+
+	if (manager)
+		manager->onAddComponent(this);
 }

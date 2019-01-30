@@ -35,9 +35,9 @@ Vector2<int> RendererManager::getNativeResolution()
 	return Vector2<int>(nativeWidthResolution, nativeHeightResolution);
 }
 
-bool RendererManager::lesser(const TextureRenderer* tr1, const TextureRenderer* tr2)
+bool RendererManager::lesser(TextureRenderer* tr1, TextureRenderer* tr2)
 {
-	return (tr1->layer < tr2->layer);
+	return (tr1->getLayer() < tr2->getLayer());
 }
 
 void RendererManager::init()
@@ -91,3 +91,6 @@ void RendererManager::manage()
 		components[i]->render();
 	}
 }
+
+// TODO - Poner layer a private. Hacer metodo setLayer que sortea el array cuando se cambia el layer
+// TODO - La layer se tiene en cuenta una vez que el objeto esta creado, por lo que es necesario ordenar el array en otro momento. Solucion: Hacer metodo start en la clase manager
