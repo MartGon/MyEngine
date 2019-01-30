@@ -23,6 +23,11 @@ public:
 	virtual void onAddComponent(T component) {}
 	virtual void onRemoveComponent(T component) {}
 
+	std::vector<T> getComponents()
+	{
+		return components;
+	}
+
 protected:
 	std::vector<T> components;
 };

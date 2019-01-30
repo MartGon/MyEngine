@@ -86,9 +86,25 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
+	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{
 		components[i]->render();
+	}
+
+	// Draw Colliders which are set to be debugged.
+	Manager<Collider*>* collider_manager = SceneManager::scene->getManager<Collider*>();
+
+	if (collider_manager)
+	{
+		std::vector<Collider*> colliders = collider_manager->getComponents();
+
+		for (auto &collider : colliders)
+		{
+			if(collider->isEnabled)
+				if (collider->debug)
+					collider->drawCollisionBoundaries();
+		}
 	}
 }
 

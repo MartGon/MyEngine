@@ -22,7 +22,7 @@ BoxCollider::BoxCollider(int width, int height) : Collider()
 
 void BoxCollider::calculateColliderBoundaries()
 {
-	Vector2<float> position = gameObject->transform.position;
+	Vector2<float> position = gameObject->getAbsolutePosition();
 	Vector2<float> dimensions = getDimensions();
 	Vector2<float> offsetVector = getOffsetVector();
 

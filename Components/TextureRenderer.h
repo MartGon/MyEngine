@@ -31,5 +31,6 @@ public:
 private:
 	SDL_Point* getSDLPointFromVector(Vector2<int> center);
 
+	// Attributes
 	Uint8 layer = 127;
 };
