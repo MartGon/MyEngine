@@ -89,7 +89,8 @@ void RendererManager::manage()
 	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{
-		components[i]->render();
+		if(components[i]->gameObject->isActive)
+			components[i]->render();
 	}
 
 	// Draw Colliders which are set to be debugged.
@@ -101,9 +102,10 @@ void RendererManager::manage()
 
 		for (auto &collider : colliders)
 		{
-			if(collider->isEnabled)
-				if (collider->debug)
-					collider->drawCollisionBoundaries();
+			if (collider->gameObject->isActive)
+				if(collider->isEnabled)
+					if (collider->debug)
+						collider->drawCollisionBoundaries();
 		}
 	}
 }
