@@ -16,8 +16,9 @@ public:
 	Texture texture;
 	std::string tPath;
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
-
 	SDL_Renderer *renderer = nullptr;
+	Vector2<float> render_offset;
+
 
 	// overridden methods
 	void update() override;

@@ -31,7 +31,7 @@ TextureRenderer::~TextureRenderer()
 void TextureRenderer::render()
 {
 	Vector2<float> scaler = RendererManager::getScaler();
-	Vector2<float> pos = gameObject->getAbsolutePosition();
+	Vector2<float> pos = gameObject->getAbsolutePosition() + render_offset;
 
 	int x = pos.x * scaler.x;
 	int y = pos.y * scaler.y;
