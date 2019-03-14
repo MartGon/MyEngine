@@ -36,7 +36,7 @@ void TextureRenderer::render()
 	int x = pos.x * scaler.x;
 	int y = pos.y * scaler.y;
 
-	texture.scale = gameObject->transform.scale * scaler;
+	texture.scale = gameObject->transform.scale * scaler * scale;
 
 	// Rotation stuff
 	double angle = gameObject->transform.zRotation;

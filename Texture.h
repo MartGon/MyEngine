@@ -32,6 +32,7 @@ public:
 	int mHeight = 10;
 
 	// Scale
+	// This value is modified by texureRenderer
 	Vector2<float> scale;
 
 	// Other
