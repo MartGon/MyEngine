@@ -91,6 +91,7 @@ void RendererManager::manage()
 	{
 		TextureRenderer* tRenderer = components.at(i);
 		if (tRenderer->isEnabled)
+			// Needs to check if gameobject is null (SetComponent was not called)
 			if(tRenderer->gameObject->isActive)
 				tRenderer->render();
 	}

@@ -3,6 +3,7 @@
 #include "RendererManager.h"
 #include "SceneManager.h"
 
+// TODO - Needs to be added to the manager
 TextureRenderer::TextureRenderer() : Component()
 {
 	renderer = RendererManager::renderer;

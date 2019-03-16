@@ -11,8 +11,8 @@ Texture::Texture()
 
 Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
 {
-	path = getPathFromResourceFolder(resourcePath).c_str();
-	SDL_Surface *imgSurface = IMG_Load(path);
+	path = getPathFromResourceFolder(resourcePath);
+	SDL_Surface *imgSurface = IMG_Load(path.c_str());
 	if (!imgSurface)
 	{
 		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
@@ -107,7 +107,7 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *col
 	path = tempRet.c_str();
 	mRenderer = renderer;
 
-	SDL_Surface *imgSurface = IMG_Load(path);
+	SDL_Surface *imgSurface = IMG_Load(path.c_str());
 	if (!imgSurface)
 	{
 		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());

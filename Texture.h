@@ -37,7 +37,7 @@ public:
 
 	// Other
 	static const char* folder;
-	const char* path = nullptr;
+	std::string path;
 
 	// Methods
 
