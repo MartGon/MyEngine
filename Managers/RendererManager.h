@@ -28,7 +28,7 @@ public:
 
 	// Non-static methods
 	void onAddComponent(TextureRenderer* tRenderer) override;
-	void manage();
+	void manage() override;
 
 private:
 	static int nativeWidthResolution;
