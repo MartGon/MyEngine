@@ -55,6 +55,7 @@ bool AudioPlayer::isPaused()
 	return paused;
 }
 
+// TODO - Check if file has already been loaded
 AudioData* AudioPlayer::loadAudioFile(std::string path)
 {
 	// Set location

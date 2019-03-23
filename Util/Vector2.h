@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include <iostream>
 #include <string>
 
 class Utilities;
@@ -140,5 +141,11 @@ public:
 		v.y = (L)y;
 
 		return v;
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Vector2<T> &x2)
+	{
+		os << '(' << x2.x << ", " << x2.y << ')';
+		return os;
 	}
 };
