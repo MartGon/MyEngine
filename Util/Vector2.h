@@ -99,6 +99,14 @@ public:
 		return Vector2(fX, fY);
 	}
 
+	friend Vector2<T> operator-(const Vector2<T> &v1)
+	{
+		T fX = -v1.x;
+		T fY = -v1.y;
+
+		return Vector2(fX, fY);
+	}
+
 	template <typename L>
 	friend Vector2<L> operator*(const Vector2<L> &vector, const T &value)
 	{
@@ -131,6 +139,16 @@ public:
 		T sY = x1.y / x2.y;
 
 		return Vector2<T>(sX, sY);
+	}
+
+	friend bool operator==(const Vector2<T> &x1, const Vector2<T> &x2)
+	{
+		return x1.x == x2.x && x1.y == x2.y;
+	}
+
+	friend bool operator!=(const Vector2<T> &x1, const Vector2<T> &x2)
+	{
+		return x1.x != x2.x || x1.y != x2.y;
 	}
 
 	template <typename L>
