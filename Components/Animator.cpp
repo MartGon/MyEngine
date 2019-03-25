@@ -47,7 +47,7 @@ std::vector<Frame*> Animator::loadFrames(const char* prefixPath, MapRGB* colorKe
 	std::vector<Frame*> frames;
 	Frame *frame = nullptr;
 
-	int frameAmount = lastFrame - firstFrame;
+	int frameAmount = lastFrame - firstFrame + 1;
 
 	if (frameAmount <= 0)
 	{
@@ -147,6 +147,10 @@ void Animator::finishCurrentAnimation()
 void Animator::reset()
 {
 	frameCount = 0;
-	currentIndex = 0;
 	isAnimationFinished = false;
+	currentIndex = 0;
+
+	// Set to initial texture
+	if(currentAnimation)
+		currentAnimation->tRenderer->texture = currentAnimation->frames.at(currentIndex)->texture;
 }
