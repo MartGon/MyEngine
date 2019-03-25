@@ -15,6 +15,12 @@ Navigator::Navigator(Vector2<float> direction, int speed) : Component()
 	this->speed = speed;
 }
 
+Navigator::Navigator(Vector2<float> direction, int speed, bool isKinematic, Vector2<float> acceleration) : Navigator(direction, speed)
+{
+	this->isKinematic = isKinematic;
+	this->acceleration = acceleration;
+}
+
 void Navigator::update()
 {
 	// Hook
@@ -24,6 +30,7 @@ void Navigator::update()
     if (!isEnabled)
         return;
 
+	// Set new position
     previousPos = gameObject->transform.position;
 	Vector2<float> displacement = (direction * speed);
 	Vector2<float> newPos = previousPos + displacement;
@@ -32,13 +39,23 @@ void Navigator::update()
 	// Is Affected by acceleration ?
 	if (isKinematic)
 	{
-		direction.x += acceleration.x;
-
-		// Y axis is inverted on SDL
-		direction.y -= acceleration.y;
-
 		// TODO - Esto altera el vector direccion, provocando que ya no este normalizado
 		// Solucion - Restar aceleracion al displacement, coger el modulo = speed y normalizar luego
+		displacement.x += acceleration.x;
+
+		// Y axis is inverted on SDL
+		displacement.y -= acceleration.y;
+
+		// Get new speed value
+		float new_speed = displacement.getModule();
+
+		// Update new direction
+		setDirection(displacement);
+
+		updateNavStatus(new_speed, speed);
+
+		// Set new speed value
+		speed = new_speed;
 	}
 
 	// Hook
@@ -59,4 +76,31 @@ void Navigator::setDirection(Vector2<float> dir)
 void Navigator::goToPreviousPos()
 {
     gameObject->transform.position = previousPos;
+}
+
+void Navigator::updateNavStatus(float cur_speed, float prev_speed)
+{
+	NavStatus old_status = status;
+
+	if (cur_speed > prev_speed)
+		status = NavStatus::SPEED_INCREASING;
+	else if(cur_speed < prev_speed)
+		status = NavStatus::SPEED_DECREASING;
+	else
+	{
+		status = NavStatus::SPEED_NONE;
+		return;
+	}
+
+	if (old_status == NavStatus::SPEED_NONE)
+		return;
+
+	if (old_status != status)
+	{
+		if (stopAtInflectionPoint)
+		{
+			isEnabled = false;
+			status = NavStatus::SPEED_NONE;
+		}
+	}
 }
