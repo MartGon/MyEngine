@@ -49,9 +49,13 @@ Texture::~Texture()
 
 void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
+	// Calculate render Quad
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 	renderQuad.w *= scale.x;
 	renderQuad.h *= scale.y;
+
+	// Set alpha value
+	SDL_SetTextureAlphaMod(mTexture, alpha);
 
 	// Rotation center is taken the texture width and height as reference
 	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
@@ -63,14 +67,11 @@ void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_Renderer
 
 void Texture::setAlpha(Uint8 alpha)
 {
-	SDL_SetTextureAlphaMod(mTexture, alpha);
+	this->alpha = alpha;
 }
 
 Uint8 Texture::getAlpha()
 {
-	Uint8 alpha;
-	SDL_GetTextureAlphaMod(mTexture, &alpha);
-
 	return alpha;
 }
 

@@ -40,13 +40,24 @@ public:
 	std::string path;
 
 	// Methods
-
 	void render(int x, int y, double angle = 0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
+
+	// Alpha setter/getter
 	void setAlpha(Uint8 alpha);
 	Uint8 getAlpha();
-	void free();
-	std::string getPathFromResourceFolder(const char* localPath);
+
+	// Checking
 	bool isValid();
+
+	// Free resources
+	void free();
+
+private:
+	// Alpha
+	Uint8 alpha = SDL_ALPHA_OPAQUE;
+
+	// Methods
+	std::string getPathFromResourceFolder(const char* localPath);
 	bool load(const char* path, SDL_Renderer *renderer, MapRGB *colorKey = nullptr);
 };
 
