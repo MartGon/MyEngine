@@ -55,6 +55,9 @@ public:
 	// GameObjects to initialize
 	std::vector<GameObject*> gameObjectsToInitialize;
 
+	// GameObjects to be destroy
+	std::vector<GameObject*> gameObjectsToDestroy;
+
 	// Managers
     std::vector<ManagerBase*> managers;
 
@@ -121,7 +124,9 @@ public:
 	virtual void handleEvent(const SDL_Event& event);
 
 	void addGameObject(GameObject *gameObject);
+	void removeGameObject(GameObject *gameObject);
 	void initGameObject(GameObject *gameObject);
+	void destroyGameObject(GameObject *gameObject);
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();

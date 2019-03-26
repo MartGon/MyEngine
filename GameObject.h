@@ -97,6 +97,9 @@ public:
 	virtual void onColliderEnter(Collider *collider);
 	//virtual void onColliderEnter(RotatableBoxCollider* collider);
 
+		// Texture Renderer
+	virtual void onVanish();
+
 		// Movement
 	virtual void beforeMove();
 	virtual void afterMove();

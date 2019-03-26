@@ -77,7 +77,8 @@ SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)
 
 void TextureRenderer::update()
 {
-
+	if(isVanishing)
+		vanish();
 }
 
 void TextureRenderer::destroy()
@@ -101,4 +102,16 @@ void TextureRenderer::setLayer(Uint8 layer)
 
 	if (manager)
 		manager->onAddComponent(this);
+}
+
+void TextureRenderer::vanish()
+{
+	Uint8 alpha = texture.getAlpha();
+	if (!alpha)
+	{
+		if (gameObject)
+			gameObject->onVanish();
+	}
+	else
+		texture.setAlpha(alpha - 1);
 }

@@ -21,6 +21,13 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	while (!components.empty())
+	{
+		Component* c = components.front();
+		components.erase(components.begin());
+		c->destroy();
+		delete c;
+	}
 }
 
 GameObject::GameObject(Texture texture) : GameObject()
@@ -130,11 +137,7 @@ void GameObject::onUpdate()
 
 void GameObject::destroy()
 {
-	//texture.free();
-	for (auto &component : components)
-		component->destroy();
-
-	this->~GameObject();
+	SceneManager::scene->destroyGameObject(this);
 }
 
 // Collider hooks
@@ -142,6 +145,13 @@ void GameObject::destroy()
 void GameObject::onColliderEnter(Collider *collider)
 {
 	//printf("%i: Collision detectada con %i\n", id, collider->gameObject->id);
+}
+
+// TextureRenderer
+
+void GameObject::onVanish()
+{
+
 }
 
 // Navigator hooks

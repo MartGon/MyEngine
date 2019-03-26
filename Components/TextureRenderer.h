@@ -18,6 +18,9 @@ public:
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	SDL_Renderer *renderer = nullptr;
 
+	// Misc
+	bool isVanishing = false;
+
 	// Specifications
 	Vector2<float> render_offset;
 	Vector2<float> scale = Vector2<float>(1.f, 1.f);
@@ -36,4 +39,7 @@ private:
 
 	// Attributes
 	Uint8 layer = 127;
+
+	// Own methods
+	void vanish();
 };

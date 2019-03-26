@@ -24,9 +24,11 @@ public:
 	// Constructor
 	AudioPlayer();
 	AudioPlayer(std::string audio_file);
+	~AudioPlayer();
 
 	// Overrided methods
 	void update() override;
+	void destroy() override;
 
 	// Own methods
 

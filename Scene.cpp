@@ -81,6 +81,11 @@ void Scene::addGameObject(GameObject *gameObject)
 	gameObjectsToInitialize.push_back(gameObject);
 }
 
+void Scene::removeGameObject(GameObject *gameObject)
+{
+	gameObjectMap.erase(gameObject->id);
+}
+
 void Scene::initGameObject(GameObject *gameObject)
 {
 	gameObject->start();
@@ -89,11 +94,25 @@ void Scene::initGameObject(GameObject *gameObject)
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
 }
 
+void Scene::destroyGameObject(GameObject* gameObject)
+{
+	gameObjectsToDestroy.push_back(gameObject);
+}
+
 void Scene::update()
 {
 	// Return if paused
 	if (isPaused)
 		return;
+
+	// Destroy objects that were set to be destroyed
+	while (!gameObjectsToDestroy.empty())
+	{
+		GameObject* go = gameObjectsToDestroy.front();
+		gameObjectsToDestroy.erase(gameObjectsToDestroy.begin());
+		removeGameObject(go);
+		delete go;
+	}
 
 	// Init gameObjects
 	// This loops allows the list to be altered during the gameObjects' initialization

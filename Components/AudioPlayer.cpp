@@ -20,6 +20,17 @@ AudioPlayer::AudioPlayer(std::string audio_file) : AudioPlayer()
 	setAudioToPlay(index);
 }
 
+AudioPlayer::~AudioPlayer()
+{
+	destroy();
+}
+
+// Overrided methods
+void AudioPlayer::destroy()
+{
+	SceneManager::scene->removeComponentFromManager(this);
+}
+
 // Own methods
 void AudioPlayer::play() 
 {
@@ -87,7 +98,7 @@ int AudioPlayer::addAudioToList(AudioData* audio_data)
 
 void AudioPlayer::setAudioToPlay(int index, bool loop)
 {
-	if (index >= audio_list.size())
+	if (!isAudioIndexValid(index))
 		return;
 
 	// Set new audio
