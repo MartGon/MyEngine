@@ -23,7 +23,7 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 			continue;
 
 		// Check if gameObject is active
-		if (!audioPlayer->gameObject->isActive)
+		if (!audioPlayer->gameObject->shouldBeLoaded())
 			continue;
 
 		// Check if audio exists

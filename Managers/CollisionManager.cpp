@@ -29,7 +29,7 @@ void CollisionManager::manage()
 			continue;
 
 		// Don't check collisions if object is not active
-		if (!c1->gameObject->isActive)
+		if (!c1->gameObject->shouldBeLoaded())
 			continue;
 
         // If debug enabled, draw collisions

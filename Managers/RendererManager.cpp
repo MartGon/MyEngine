@@ -92,7 +92,7 @@ void RendererManager::manage()
 		TextureRenderer* tRenderer = components.at(i);
 		if (tRenderer->isEnabled)
 			// Needs to check if gameobject is null (SetComponent was not called)
-			if(tRenderer->gameObject->isActive)
+			if(tRenderer->gameObject->shouldBeLoaded())
 				tRenderer->render();
 	}
 
@@ -105,7 +105,7 @@ void RendererManager::manage()
 
 		for (auto &collider : colliders)
 		{
-			if (collider->gameObject->isActive)
+			if (collider->gameObject->shouldBeLoaded())
 				if(collider->isEnabled)
 					if (collider->debug)
 						collider->drawCollisionBoundaries();

@@ -4,6 +4,8 @@
 // Class to wrap al the different kinds of components
 class GameObject;
 
+// TODO - Virtual destructor
+
 class Component : public Updateable
 {
 public:

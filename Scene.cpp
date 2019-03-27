@@ -138,7 +138,7 @@ void Scene::update()
     {
         if (GameObject *gameObject = gameObjectPair.second)
         {
-            if (gameObject->isActive)
+            if (gameObject->shouldBeLoaded())
             {
                 // Update the object
                 gameObject->update();

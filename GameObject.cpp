@@ -56,6 +56,28 @@ void GameObject::update()
 	onUpdate();
 }
 
+// State
+
+bool GameObject::shouldBeLoaded() 
+{
+	if (!isActive)
+		return false;
+
+	// Don't load if any superior gameobject is not active
+	Transform* parent = transform.parent;
+	while (parent)
+	{
+		GameObject* go = parent->gameObject;
+
+		if (!go->isActive)
+			return false;
+		
+		parent = go->transform.parent;
+	}
+
+	return true;
+}
+
 // Position
 
 void GameObject::setRelativePosition(Vector2<float> pos)
