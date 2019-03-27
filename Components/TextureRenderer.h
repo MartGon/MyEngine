@@ -21,7 +21,7 @@ public:
 	// Misc
 	bool isVanishing = false;
 	
-	void setBlink(int framerate);
+	void setBlink(int framerate, int duration);
 	void unsetBlink();
 
 	// Specifications
@@ -45,6 +45,7 @@ private:
 
 	// Misc
 	bool isBlinking = false;
+	int blink_frame_duration = 0;
 	int blink_rate = 2;
 	int blink_frame_count = 0;
 

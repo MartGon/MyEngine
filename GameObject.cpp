@@ -176,6 +176,11 @@ void GameObject::onVanish()
 
 }
 
+void GameObject::onBlinkFinish()
+{
+
+}
+
 // Navigator hooks
 
 void GameObject::beforeMove()

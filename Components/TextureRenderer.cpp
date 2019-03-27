@@ -121,27 +121,43 @@ void TextureRenderer::vanish()
 
 // Misc
 
-void TextureRenderer::setBlink(int framerate)
+void TextureRenderer::setBlink(int framerate, int duration)
 {
 	blink_rate = framerate;
+	blink_frame_duration = duration;
 	isBlinking = true;
 }
 
 void TextureRenderer::unsetBlink()
 {
+	texture.setAlpha(SDL_ALPHA_OPAQUE);
 	isBlinking = false;
 	blink_frame_count = 0;
 }
 
 void TextureRenderer::blink()
 {
-	Uint8 alpha = texture.getAlpha();
+	// Check if blink has finished
+	blink_frame_duration--;
+	if (!blink_frame_duration)
+	{
+		unsetBlink();
+
+		if (GameObject* go = gameObject)
+			go->onBlinkFinish();
+
+		return;
+	}
+
+	// Check if alpha should be changed
 	blink_frame_count = (blink_frame_count + 1) % blink_rate;
 	bool blink = !blink_frame_count;
 
 	if (!blink)
 		return;
 
+	// Update alpha value
+	Uint8 alpha = texture.getAlpha();
 	if (alpha == SDL_ALPHA_OPAQUE)
 		texture.setAlpha(SDL_ALPHA_TRANSPARENT);
 	else
