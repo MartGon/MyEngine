@@ -79,6 +79,9 @@ void TextureRenderer::update()
 {
 	if(isVanishing)
 		vanish();
+	
+	if (isBlinking)
+		blink();
 }
 
 void TextureRenderer::destroy()
@@ -114,4 +117,33 @@ void TextureRenderer::vanish()
 	}
 	else
 		texture.setAlpha(alpha - 1);
+}
+
+// Misc
+
+void TextureRenderer::setBlink(int framerate)
+{
+	blink_rate = framerate;
+	isBlinking = true;
+}
+
+void TextureRenderer::unsetBlink()
+{
+	isBlinking = false;
+	blink_frame_count = 0;
+}
+
+void TextureRenderer::blink()
+{
+	Uint8 alpha = texture.getAlpha();
+	blink_frame_count = (blink_frame_count + 1) % blink_rate;
+	bool blink = !blink_frame_count;
+
+	if (!blink)
+		return;
+
+	if (alpha == SDL_ALPHA_OPAQUE)
+		texture.setAlpha(SDL_ALPHA_TRANSPARENT);
+	else
+		texture.setAlpha(SDL_ALPHA_OPAQUE);
 }

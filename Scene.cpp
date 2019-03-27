@@ -130,9 +130,6 @@ void Scene::update()
 		}
 	}
 
-	// Update hook
-	onUpdate();
-
     // Update every object
     for (auto &gameObjectPair : gameObjectMap)
     {
@@ -168,6 +165,9 @@ void Scene::update()
 	// Update Managers
 	for (auto manager : managers)
 		manager->manage();
+
+	// Update hook
+	onUpdate();
 }
 
 void Scene::deactivateAllGameObjects()

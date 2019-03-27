@@ -20,6 +20,9 @@ public:
 
 	// Misc
 	bool isVanishing = false;
+	
+	void setBlink(int framerate);
+	void unsetBlink();
 
 	// Specifications
 	Vector2<float> render_offset;
@@ -40,6 +43,12 @@ private:
 	// Attributes
 	Uint8 layer = 127;
 
+	// Misc
+	bool isBlinking = false;
+	int blink_rate = 2;
+	int blink_frame_count = 0;
+
 	// Own methods
 	void vanish();
+	void blink();
 };
