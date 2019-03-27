@@ -9,9 +9,9 @@ int WINDOW_HEIGHT = 480;
 
 bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 {
-	if (SDL_Init(SDL_INIT_VIDEO))
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 	{
-		printf("Could not initialize SDL Video, Error: %s \n", SDL_GetError());
+		printf("Could not initialize SDL Video | SDL Timer, Error: %s \n", SDL_GetError());
 		return false;
 	}
 

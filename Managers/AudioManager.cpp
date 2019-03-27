@@ -110,5 +110,5 @@ void AudioManager::manage()
 
 void AudioManager::onAddComponent(AudioPlayer * aPlayer)
 {
-	std::cout << "AduioPlayer added" << std::endl;
+	//std::cout << "AduioPlayer added" << std::endl;
 }
