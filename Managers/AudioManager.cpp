@@ -71,6 +71,11 @@ AudioManager::AudioManager()
 {
 	if (!isInitialized)
 		init();
+	else
+	{
+		SDL_CloseAudio();
+		init();
+	}
 }
 
 // Own methods
