@@ -9,7 +9,12 @@ Button::Button()
 
 Button::Button(Texture texture) : GameObject(texture)
 {
+	// Set collider
 	collider = setComponent(new BoxCollider(texture));
+
+	// Init tLabel
+	tLabel = new TextLabel();
+	tLabel->transform.parent = &this->transform;
 }
 
 Button::~Button()
@@ -20,6 +25,10 @@ Button::~Button()
 
 void Button::handleEvent(const SDL_Event& event)
 {
+	// Check wether it is enabled
+	if (!isEnabled)
+		return;
+
 	// Get Mouse coordinates
 	int x, y;
 	SDL_GetMouseState(&x, &y);
@@ -36,7 +45,7 @@ void Button::handleEvent(const SDL_Event& event)
 		case SDL_MOUSEBUTTONDOWN:
 			break;
 		case SDL_MOUSEBUTTONUP:
-			onClick();
+			click();
 			break;
 		default:
 			break;
@@ -73,4 +82,16 @@ void Button::setOnClickListener(std::function<void()> callback)
 void Button::onStart()
 {
 	collider = getComponent<BoxCollider>();
+}
+
+void Button::click()
+{
+	try
+	{
+		onClick();
+	}
+	catch (std::bad_function_call)
+	{
+		std::cout << "Button function has not been implemented \n";
+	}
 }
