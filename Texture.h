@@ -7,6 +7,10 @@
 
 struct MapRGB
 {
+	MapRGB() {}
+	MapRGB(Uint8 red, Uint8 green, Uint8 blue) : red{red}, green{green}, blue{blue}
+	{}
+
 	Uint8 red = 0;
 	Uint8 green = 0;
 	Uint8 blue = 0;
@@ -17,6 +21,7 @@ class Texture
 public:
 	// Constructors
 	Texture();
+	Texture(const char* resourcePath);
 	Texture(const char* resourcePath, SDL_Surface* screenSurface);
 	Texture(const char* resourcePath, SDL_Renderer* renderer);
 	Texture(const char* resourcePath, SDL_Renderer* renderer, MapRGB *colorKey);

@@ -12,9 +12,17 @@ public:
 	// quit flag
 	static bool quit;
 
-	static void loadScene(Scene& s);
+	// Scene loading
+	static void loadNextScene(Scene* s);
+	static void loadScene();
 
 	// methods
 	static void quitGame();
+	static bool canLoadNextScene();
+
+private:
+	// load next scene flag
+	static bool load_next_scene;
+	static Scene* next_scene;
 };
 

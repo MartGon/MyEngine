@@ -63,7 +63,8 @@ int engine_main()
 
 		Scene *scene = gFirstScene;
 		gFirstScene->renderer = renderer;
-		SceneManager::loadScene(*scene);
+		SceneManager::loadNextScene(scene);
+		SceneManager::loadScene();
 
 		SDL_Event e;
 		bool *quit = &SceneManager::quit;
@@ -71,6 +72,9 @@ int engine_main()
 		//While application is running
 		while (!(*quit))
 		{
+			// Update scene
+			SceneManager::scene->update();
+
 			//Handle events on queue
 			while (SDL_PollEvent(&e) != 0)
 			{
@@ -83,12 +87,13 @@ int engine_main()
 					SceneManager::scene->handleEvent(e);
 			}
 
-			// Update scene
-			SceneManager::scene->update();
-
 			// Render buffer
 			SDL_RenderPresent(renderer);
 			SDL_RenderClear(renderer);
+
+			// Check for next scene
+			if (SceneManager::canLoadNextScene())
+				SceneManager::loadScene();
 		}
 	}
 

@@ -151,7 +151,7 @@ void TextureRenderer::blink()
 
 	// Check if alpha should be changed
 	blink_frame_count = (blink_frame_count + 1) % blink_rate;
-	bool blink = !blink_frame_count;
+	bool blink = blink_frame_count == 0;
 
 	if (!blink)
 		return;

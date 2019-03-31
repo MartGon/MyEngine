@@ -9,6 +9,11 @@ Texture::Texture()
 	mTexture = RendererManager::nullTexture.mTexture;
 }
 
+Texture::Texture(const char* resoucePath) : Texture(resoucePath, RendererManager::renderer)
+{
+
+}
+
 Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
 {
 	path = getPathFromResourceFolder(resourcePath);
