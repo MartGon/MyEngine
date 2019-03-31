@@ -54,21 +54,7 @@ void TextLabel::setText(std::string text)
 	}
 
 	// Fix positions
-	for (int i = 1; i < font_tRenderers.size(); i++)
-	{
-		TextureRenderer* tRenderer = font_tRenderers.at(i);
-
-		if (!tRenderer->isEnabled)
-			continue;
-
-		TextureRenderer* prev_tRenderer = font_tRenderers.at(i - 1);
-		int prev_font_w = prev_tRenderer->texture.mWidth;
-		Vector2<float> prev_offset = prev_tRenderer->render_offset;
-		int offset = prev_offset.x + prev_font_w + 1;
-
-		tRenderer->render_offset = Vector2<float>(offset, prev_offset.y);
-
-	}
+	fixCharPositions();
 
 	return;
 }
@@ -78,7 +64,39 @@ std::string TextLabel::getText()
 	return text;
 }
 
+void TextLabel::setTextScale(Vector2<float> scale)
+{
+	transform.scale = scale;
+
+	// Fix positions
+	fixCharPositions();
+}
+
+Vector2<float> TextLabel::getTextScale()
+{
+	return transform.scale;
+}
+
 // Private methods
+void TextLabel::fixCharPositions()
+{
+	for (int i = 1; i < font_tRenderers.size(); i++)
+	{
+		TextureRenderer* tRenderer = font_tRenderers.at(i);
+
+		if (!tRenderer->isEnabled)
+			continue;
+
+		TextureRenderer* prev_tRenderer = font_tRenderers.at(i - 1);
+		int prev_font_w = prev_tRenderer->texture.mWidth * transform.scale.x;
+		Vector2<float> prev_offset = prev_tRenderer->render_offset;
+		int offset = prev_offset.x + prev_font_w + 1 * transform.scale.x;
+
+		tRenderer->render_offset = Vector2<float>(offset, prev_offset.y);
+
+	}
+}
+
 Texture TextLabel::getTextureByChar(char c)
 {
 	Texture font;

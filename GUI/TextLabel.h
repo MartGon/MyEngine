@@ -14,6 +14,9 @@ public:
 	void setText(std::string text);
 	std::string getText();
 
+	void setTextScale(Vector2<float> scale);
+	Vector2<float> getTextScale();
+
 private:
 	// Attributes
 	std::string text;
@@ -30,6 +33,7 @@ private:
 	const std::string fonts_ext = std::string(".png");
 
 	// Private Methods
+	void fixCharPositions();
 	Texture getTextureByChar(char c);
 	std::string getTexturePath(char c);
 	void init();
