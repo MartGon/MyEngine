@@ -14,7 +14,7 @@ NetworkClient::~NetworkClient()
 bool NetworkClient::readConfigFile()
 {
 	// Open File
-	std::string configFileName = "client-config.txt";
+	std::string configFileName = "resources/client-config.txt";
 	std::ifstream configFile(configFileName);
 
 	if (!configFile)

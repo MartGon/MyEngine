@@ -27,7 +27,7 @@ public:
 
 	// Overrided Methods
 	void onStart() override;
-	void handleEvent(const SDL_Event& event) override;
+	bool handleEvent(const SDL_Event& event) override;
 
 	// Own methods
 	const bool isWithinBoundaries(int mousePosX, int mousePosY);

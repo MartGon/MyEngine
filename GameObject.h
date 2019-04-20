@@ -108,7 +108,7 @@ public:
 	virtual void beforeMove();
 	virtual void afterMove();
 		// Events
-	virtual void handleEvent(const SDL_Event& event);
+	virtual bool handleEvent(const SDL_Event& event);
 		// Animation
 	virtual void onAnimationFinished(Animation* anim);
 	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);

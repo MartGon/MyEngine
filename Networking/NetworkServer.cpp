@@ -15,7 +15,7 @@ NetworkServer::~NetworkServer()
 bool NetworkServer::readConfigFile()
 {
 	// Open File
-	std::string configFileName = "server-config.txt";
+	std::string configFileName = "resources/server-config.txt";
 	std::ifstream configFile(configFileName);
 
 	if (!configFile)
@@ -88,7 +88,6 @@ bool NetworkServer::establishConnection()
 		if (readConfigFile())
 			state = SERVER_STATE_OPENING_SOCKET;
 		break;
-
 	case SERVER_STATE_OPENING_SOCKET:
 		if (openServerSocket())
 			state = SERVER_STATE_PAIRING;

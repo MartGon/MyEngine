@@ -23,11 +23,11 @@ Button::~Button()
 
 // Methods
 
-void Button::handleEvent(const SDL_Event& event)
+bool Button::handleEvent(const SDL_Event& event)
 {
 	// Check wether it is enabled
 	if (!isEnabled)
-		return;
+		return false;
 
 	// Get Mouse coordinates
 	int x, y;
@@ -35,7 +35,7 @@ void Button::handleEvent(const SDL_Event& event)
 
 	// Check if it affects this button
 	if (!isWithinBoundaries(x, y))
-		return;
+		return false;
 
 	// Handle event
 	switch (event.type)
@@ -43,14 +43,15 @@ void Button::handleEvent(const SDL_Event& event)
 		case SDL_MOUSEMOTION:
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			break;
+			return true;
 		case SDL_MOUSEBUTTONUP:
 			click();
-			break;
+			return true;
 		default:
 			break;
 	}
 
+	return false;
 }
 
 const bool Button::isWithinBoundaries(int mousePosX, int mousePosY)

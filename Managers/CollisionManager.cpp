@@ -28,6 +28,10 @@ void CollisionManager::manage()
 		if (!c1->isEnabled)
 			continue;
 
+		// Check if it has an owner
+		if (!c1->gameObject)
+			continue;
+
 		// Don't check collisions if object is not active
 		if (!c1->gameObject->shouldBeLoaded())
 			continue;
