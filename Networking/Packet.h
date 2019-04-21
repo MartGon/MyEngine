@@ -1,37 +1,89 @@
 #include <string>
 #include "Vector2.h"
 #include "GameObject.h"
+
+#include "Navigator.h"
+
 #pragma once
+
+enum PacketType
+{
+	NULL_PACKET,
+	COMPONENT_PACKET
+};
+
+enum ComponentPacketType
+{
+	COMPONENT_NULL,
+	COMPONENT_TRANSFORM,
+	COMPONENT_NAVIGATOR,
+	COMPONENT_ANIMATOR,
+	COMPONENT_TEXTURE_RENDERER,
+	COMPONENT_AUDIO_PLAYER
+};
 
 class Packet
 {
 public:
-
-	// This is a hack to be able to have the packet system independent from the game
-	// TODO - Needs Serialization
-
-	// Packet Type
-	enum PacketType
-	{
-		PACKET_INIT_MATCH,
-		PACKET_PLAYER_1_POSITION,
-		PACKET_PLAYER_2_POSITION,
-		PACKET_BALL_POSITION,
-		PACKET_MISC
-	};
-
 	// Constructors
 	Packet();
 	Packet(PacketType type);
-	Packet(GameObject gameObject);
 	~Packet();
 
 	// Packet data
-	PacketType packetType = PACKET_MISC;
-	Uint16 id = -1;
+	PacketType packetType = NULL_PACKET;
 	
-	// Vectors
-	Vector2<float> position;
-	Vector2<float> direction;
+	// Methods
+	virtual size_t getSize() { return sizeof(Packet); };
 };
 
+class ComponentPacket : public Packet
+{
+public:
+
+	// Constructor
+	ComponentPacket() {};
+	ComponentPacket(ComponentPacketType sub_type, Component* component);
+
+	// Members
+	ComponentPacketType sub_type = COMPONENT_NULL;
+	int gameobject_id = -1;
+};
+
+class NavigatorPacket : public ComponentPacket
+{
+public:
+	// Constructor
+	NavigatorPacket() {};
+	NavigatorPacket(Navigator* nav);
+
+	// Members
+	Vector2<float> direction;
+	float speed = 0;
+
+	// Kinematics
+	bool isKinematic = false;
+	bool stopAtInflectionPoint = false;
+	Vector2<float> acceleration;
+
+	// Methods
+	size_t getSize() override;
+};
+
+class TransformPacket : public ComponentPacket
+{
+public:
+	// Constructor
+	TransformPacket() {};
+	TransformPacket(Transform* transform);
+
+	// Members
+	int parent_id = -1;
+	Vector2<float> position;
+	Vector2<float> scale;
+	double zRotation;
+	Vector2<int> rotationCenter;
+
+	// Methods
+	size_t getSize() override;
+};

@@ -30,6 +30,9 @@ public:
 	Scene(SceneMode mode);
 	~Scene();
 
+	// Scene Mode
+	SceneMode mode = SINGLE_PLAYER;
+
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
 	bool connectionEstablished = false;
@@ -105,7 +108,6 @@ public:
         
     }
 
-
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();
@@ -130,10 +132,5 @@ public:
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
-
-protected:
-
-	// Scene Mode
-	SceneMode mode = SINGLE_PLAYER;
 };
 

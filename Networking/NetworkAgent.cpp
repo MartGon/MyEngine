@@ -47,9 +47,14 @@ bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet)
 	}
 
 	int result;
-	int len = sizeof(Packet);
-	//printf("Longitud enviada %i\n", len);
+	size_t len = packet->getSize();
+	// Send packet size
+	result = SDLNet_TCP_Send(socket, &len, sizeof(size_t));
+
+	// Send packet
 	result = SDLNet_TCP_Send(socket, packet, len);
+
+	//std::cout << "Sent " << result << " bytes of data\n";
 
 	if (result < len)
 	{
@@ -69,14 +74,15 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		return nullptr;
 	}
 
-	Packet *packet = new Packet();
-	int result;
-	int len = sizeof(Packet);
-	result = SDLNet_TCP_Recv(socket, packet, len);
+	// Read packet length
+	size_t packet_len = 0;
+	int data_read = SDLNet_TCP_Recv(socket, &packet_len, sizeof(size_t));
 
-	//printf("Longitud recibida %i\n", len);
+	// Read data
+	Packet* packet = (Packet*)std::malloc(packet_len);
+	data_read = SDLNet_TCP_Recv(socket, packet, packet_len);
 
-	if (result <= 0)
+	if (data_read <= 0)
 	{
 		std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";
 		return nullptr;

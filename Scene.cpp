@@ -137,8 +137,14 @@ void Scene::update()
         {
             if (gameObject->shouldBeLoaded())
             {
+				if(isOnline())
+					SDL_SemWait(sem);
+
                 // Update the object
                 gameObject->update();
+
+				if(isOnline())
+					SDL_SemPost(sem);
 
                 // Online measures
                 if (isOnline())
@@ -146,17 +152,43 @@ void Scene::update()
                 {
                     if (mode == ONLINE_SERVER)
                     {
-                        Packet *packet = new Packet(*gameObject);
-                        networkAgent->sendPacket(packet);
+						if (Transform* transform = &gameObject->transform)
+						{
+							TransformPacket transform_packet = TransformPacket(transform);
+							networkAgent->sendPacket(&transform_packet);
+						}
+						if (Navigator* nav = gameObject->getComponent<Navigator>())
+						{
+							if (nav->isEnabled)
+							{
+								NavigatorPacket* nav_packet = new NavigatorPacket(nav);
+								networkAgent->sendPacket(nav_packet);
+								delete nav_packet;
+							}
+						}
                     }
+					/*
                     else if (mode == ONLINE_CLIENT)
                     {
                         if (gameObject->updateFromClient)
                         {
-							Packet *packet = new Packet(*gameObject);
-							networkAgent->sendPacket(packet);
+							if (Transform* transform = &gameObject->transform)
+							{
+								TransformPacket transform_packet = TransformPacket(transform);
+								networkAgent->sendPacket(&transform_packet);
+							}
+							if (Navigator* nav = gameObject->getComponent<Navigator>())
+							{
+								if (nav->isEnabled)
+								{
+									NavigatorPacket* nav_packet = new NavigatorPacket(nav);
+									networkAgent->sendPacket(nav_packet);
+									delete nav_packet;
+								}
+							}
                         }
                     }
+					*/
                 }
             }
         }
@@ -244,27 +276,104 @@ void Scene::disconnect()
 
 bool Scene::handlePacket(Packet *packet)
 {
-	// TODO
-
 	if (!packet)
 		return false;
 
-	Uint16 id  = packet->id;
-
-	GameObject *gameObject = gameObjectMap.at(id);
-
-	if (mode == ONLINE_SERVER)
+	switch (packet->packetType)
 	{
-		if (gameObject->updateFromClient)
-			gameObject->transform.position = packet->position;
-	}
-	else if (mode == ONLINE_CLIENT)
-	{
-		if (!gameObject->updateFromClient)
-			gameObject->transform.position = packet->position;
+		case PacketType::COMPONENT_PACKET:
+		{
+			ComponentPacket* component_packet = static_cast<ComponentPacket*>(packet);
 
-		if (Navigator *nav = gameObject->getComponent<Navigator>())
-			nav->setDirection(packet->direction);
+			// Get gameobject
+			int id = component_packet->gameobject_id;
+			if (gameObjectMap.find(id) == gameObjectMap.end())
+			{
+				//std::cout << "Packet id was not valid\n";
+				return true;
+			}
+			GameObject *gameObject = gameObjectMap.at(id);
+
+			if (mode == ONLINE_SERVER)
+			{
+				if (gameObject->updateFromClient)
+				{
+					if (component_packet->sub_type == ComponentPacketType::COMPONENT_NAVIGATOR)
+					{
+						NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
+						if (Navigator *nav = gameObject->getComponent<Navigator>())
+						{
+							nav->speed = navigator_packet->speed;
+							nav->setDirection(navigator_packet->direction);
+							nav->acceleration = navigator_packet->acceleration;
+							nav->isKinematic = navigator_packet->isKinematic;
+							nav->stopAtInflectionPoint = navigator_packet->stopAtInflectionPoint;
+						}
+					}
+					else if (component_packet->sub_type == ComponentPacketType::COMPONENT_TRANSFORM)
+					{
+						TransformPacket* transform_packet = static_cast<TransformPacket*>(component_packet);
+						if (Transform* transform = &gameObject->transform)
+						{
+							// Set parent
+							if (transform_packet->parent_id == -1)
+								transform->parent = nullptr;
+							else if (gameObjectMap.find(transform_packet->parent_id) == gameObjectMap.end())
+							{
+								Transform *parent = &gameObjectMap.at(id)->transform;
+								transform->parent = parent;
+							}
+
+							transform->position = transform_packet->position;
+							transform->zRotation = transform_packet->zRotation;
+							transform->scale = transform_packet->scale;
+							if (transform->rotationCenter)
+								*transform->rotationCenter = transform_packet->rotationCenter;
+						}
+					}
+				}
+			}
+			else if (mode == ONLINE_CLIENT)
+			{
+				if (component_packet->sub_type == ComponentPacketType::COMPONENT_NAVIGATOR)
+				{
+					NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
+					if (Navigator *nav = gameObject->getComponent<Navigator>())
+					{
+						nav->speed = navigator_packet->speed;
+						nav->setDirection(navigator_packet->direction);
+						nav->acceleration = navigator_packet->acceleration;
+						nav->isKinematic = navigator_packet->isKinematic;
+						nav->stopAtInflectionPoint = navigator_packet->stopAtInflectionPoint;
+					}
+				}
+				else if (component_packet->sub_type == ComponentPacketType::COMPONENT_TRANSFORM)
+				{
+					TransformPacket* transform_packet = static_cast<TransformPacket*>(component_packet);
+					if (Transform* transform = &gameObject->transform)
+					{
+						// Set parent
+						if (transform_packet->parent_id == -1)
+							transform->parent = nullptr;
+						else if (gameObjectMap.find(transform_packet->parent_id) == gameObjectMap.end())
+						{
+							Transform *parent = &gameObjectMap.at(id)->transform;
+							transform->parent = parent;
+						}
+
+						transform->position = transform_packet->position;
+						transform->zRotation = transform_packet->zRotation;
+						transform->scale = transform_packet->scale;
+						if (transform->rotationCenter)
+							*transform->rotationCenter = transform_packet->rotationCenter;
+					}
+				}
+			}
+
+			break;
+		}
+		default:
+			break;
 	}
 
 	return true;
@@ -306,8 +415,6 @@ int recvPacketThread(void* data)
 		}
 
 		SDL_SemPost(scene->sem);
-
-		//printf("Main Thread\n", game->player->score);
 	}
 
 	return 0;
