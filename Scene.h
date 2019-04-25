@@ -115,6 +115,8 @@ public:
 	virtual void onDisconnect() {};
 	virtual void handleConnectionEstablished() {};
 	bool isOnline();
+	bool shouldSendGameObjectUpdate(GameObject* go);
+	void sendGameObjectUpdate(GameObject* go);
 	bool handlePacket(Packet *packet);
 
 	// Overrided Methods
@@ -124,11 +126,13 @@ public:
 	virtual void onUpdate();
 	virtual void destroy();
 	virtual void handleEvent(const SDL_Event& event);
+	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };
 
 	void addGameObject(GameObject *gameObject);
 	void removeGameObject(GameObject *gameObject);
 	void initGameObject(GameObject *gameObject);
 	void destroyGameObject(GameObject *gameObject);
+	GameObject* getGameObjectById(int id);
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();

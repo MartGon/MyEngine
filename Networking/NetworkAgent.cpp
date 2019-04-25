@@ -82,6 +82,8 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 	Packet* packet = (Packet*)std::malloc(packet_len);
 	data_read = SDLNet_TCP_Recv(socket, packet, packet_len);
 
+	//std::cout << "Received " << data_read << " bytes of data\n";
+
 	if (data_read <= 0)
 	{
 		std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";

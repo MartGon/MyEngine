@@ -104,3 +104,23 @@ void Navigator::updateNavStatus(float cur_speed, float prev_speed)
 		}
 	}
 }
+
+ComponentPacket* Navigator::toComponentPacket()
+{
+	return new NavigatorPacket(this);
+}
+
+void Navigator::updateFromComponentPacket(ComponentPacket* component_packet) 
+{
+	// Not a correct type
+	if (component_packet->sub_type != ComponentPacketType::COMPONENT_NAVIGATOR)
+		return;
+
+	// Update from data received
+	NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
+	speed = navigator_packet->speed;
+	setDirection(navigator_packet->direction);
+	acceleration = navigator_packet->acceleration;
+	isKinematic = navigator_packet->isKinematic;
+	stopAtInflectionPoint = navigator_packet->stopAtInflectionPoint;
+}

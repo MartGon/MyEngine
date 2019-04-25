@@ -5,6 +5,7 @@
 #include "BoxCollider.h"
 #include "Animator.h"
 #include "RotatableBoxCollider.h"
+#include "Packet.h"
 #include <string>
 #include <vector>
 
@@ -18,9 +19,13 @@ public:
 
 	// Network Flag
 	bool updateFromClient = false;
+	bool netCreated = false;
 
 	// Name
 	std::string name = "";
+
+	// Template id
+	int template_id = -1;
 
 	// Id
 	Uint16 id = 0;
@@ -30,6 +35,9 @@ public:
 
 	// Transform
 	Transform transform;
+
+	// Components
+	std::vector<Component*> components;
 
 	// Methods
 
@@ -95,6 +103,12 @@ public:
 	// Cleaning
 	virtual void destroy();
 
+	// Network 
+	bool shouldBeUpdatedFromClient();
+	void updateGameObjectFromComponentPacket(ComponentPacket* component_packet);
+	GameObjectUpdatePacket* toGameObjectUpdatePacket();
+	void updateFromGameObjectUpdatePacket(GameObjectUpdatePacket* goup);
+
 	// Hooks
 		// Collisions
 	virtual void onColliderEnter(Collider *collider);
@@ -114,9 +128,6 @@ public:
 	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);
 
 private:
-
-	// Components
-	std::vector<Component*> components;
 
 	// Bool
 	bool isInitialized = false;

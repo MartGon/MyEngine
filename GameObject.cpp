@@ -3,6 +3,7 @@
 #include "TextureRenderer.h"
 #include "RendererManager.h"
 #include "Animator.h"
+#include "Navigator.h"
 
 // Constructors
 
@@ -51,6 +52,9 @@ void GameObject::update()
 	for (auto &component : components)
 		if(component->isEnabled)
 			component->update();
+
+	if (SceneManager::scene->isOnline() && !SceneManager::scene->shouldSendGameObjectUpdate(this))
+		return;
 
 	// Hook for gameObject updates
 	onUpdate();
@@ -143,6 +147,54 @@ void GameObject::setAbsoluteRotationCenter(Vector2<int> center)
 void GameObject::setScale(Vector2<float> scale)
 {
 	transform.scale = scale;
+}
+
+// Netowrk
+
+bool GameObject::shouldBeUpdatedFromClient()
+{
+	if (updateFromClient)
+		return true;
+
+	// Check if any of parents should be uptdated
+	Transform* parent = transform.parent;
+	while (parent)
+	{
+		GameObject* go = parent->gameObject;
+
+		if (go->updateFromClient)
+			return true;
+
+		parent = go->transform.parent;
+	}
+
+	return false;
+}
+
+void GameObject::updateGameObjectFromComponentPacket(ComponentPacket* component_packet)
+{
+	switch (component_packet->sub_type)
+	{
+		case ComponentPacketType::COMPONENT_NAVIGATOR:
+			if (Navigator* nav = getComponent<Navigator>())
+			{
+				nav->updateFromComponentPacket(component_packet);
+			}
+			break;
+		case ComponentPacketType::COMPONENT_TRANSFORM:
+			transform.updateFromComponentPacket(component_packet);
+	}
+}
+
+GameObjectUpdatePacket* GameObject::toGameObjectUpdatePacket()
+{
+	return new GameObjectUpdatePacket(this);
+}
+
+void GameObject::updateFromGameObjectUpdatePacket(GameObjectUpdatePacket* goup)
+{
+	this->isActive = goup->isActive;
+	this->updateFromClient = goup->updateFromClient;
 }
 
 // Behaviour hooks

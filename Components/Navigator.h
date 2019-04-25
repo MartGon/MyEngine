@@ -28,6 +28,10 @@ public:
 	void setDirection(Vector2<float> dir);
     void goToPreviousPos();
 
+	// Network methods
+	ComponentPacket* toComponentPacket() override;
+	void updateFromComponentPacket(ComponentPacket* component_packet) override;
+
 private:
 	enum class NavStatus 
 	{

@@ -71,7 +71,11 @@ void Scene::destroy()
 void Scene::handleEvent(const SDL_Event& event) 
 {
 	for (auto gameObjectPair : gameObjectMap)
-		gameObjectPair.second->handleEvent(event);
+	{
+		GameObject* go = gameObjectPair.second;
+		if (isOnline() && !shouldSendGameObjectUpdate(go))
+			go->handleEvent(event);
+	}
 }
 
 // Methods
@@ -90,6 +94,17 @@ void Scene::initGameObject(GameObject *gameObject)
 {
 	gameObject->start();
 
+	if (isOnline() && connectionEstablished)
+		if(!gameObject->netCreated)
+		{
+			if (gameObject->template_id == 1)
+				std::cout << "Sending arrow \n";
+
+			Packet* packet = new GameObjectCreatePacket(gameObject);
+			networkAgent->sendPacket(packet);
+			delete packet;
+		}
+
 	gameObjectsToInitialize.erase(gameObjectsToInitialize.begin());
 	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
 }
@@ -97,6 +112,18 @@ void Scene::initGameObject(GameObject *gameObject)
 void Scene::destroyGameObject(GameObject* gameObject)
 {
 	gameObjectsToDestroy.push_back(gameObject);
+}
+
+GameObject* Scene::getGameObjectById(int id)
+{
+	if (gameObjectMap.find(id) == gameObjectMap.end())
+	{
+		//std::cout << "Packet id was not valid\n";
+		return nullptr;
+	}
+	GameObject *gameObject = gameObjectMap.at(id);
+
+	return gameObject;
 }
 
 void Scene::update()
@@ -117,7 +144,9 @@ void Scene::update()
 	// Init gameObjects
 	// This loops allows the list to be altered during the gameObjects' initialization
 	while (!gameObjectsToInitialize.empty())
+	{		
 		initGameObject(gameObjectsToInitialize.front());
+	}
 
 	if (isOnline())
 	{
@@ -145,52 +174,11 @@ void Scene::update()
 
 				if(isOnline())
 					SDL_SemPost(sem);
-
-                // Online measures
-                if (isOnline())
-                    // Once connection is established
-                {
-                    if (mode == ONLINE_SERVER)
-                    {
-						if (Transform* transform = &gameObject->transform)
-						{
-							TransformPacket transform_packet = TransformPacket(transform);
-							networkAgent->sendPacket(&transform_packet);
-						}
-						if (Navigator* nav = gameObject->getComponent<Navigator>())
-						{
-							if (nav->isEnabled)
-							{
-								NavigatorPacket* nav_packet = new NavigatorPacket(nav);
-								networkAgent->sendPacket(nav_packet);
-								delete nav_packet;
-							}
-						}
-                    }
-					/*
-                    else if (mode == ONLINE_CLIENT)
-                    {
-                        if (gameObject->updateFromClient)
-                        {
-							if (Transform* transform = &gameObject->transform)
-							{
-								TransformPacket transform_packet = TransformPacket(transform);
-								networkAgent->sendPacket(&transform_packet);
-							}
-							if (Navigator* nav = gameObject->getComponent<Navigator>())
-							{
-								if (nav->isEnabled)
-								{
-									NavigatorPacket* nav_packet = new NavigatorPacket(nav);
-									networkAgent->sendPacket(nav_packet);
-									delete nav_packet;
-								}
-							}
-                        }
-                    }
-					*/
-                }
             }
+
+			// Online measures
+			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
+				sendGameObjectUpdate(gameObject);
         }
     }
 
@@ -267,6 +255,45 @@ bool Scene::isOnline()
 	return mode == ONLINE_CLIENT || mode == ONLINE_SERVER;
 }
 
+bool Scene::shouldSendGameObjectUpdate(GameObject* go)
+{
+	if (mode == ONLINE_SERVER)
+	{
+		if (!go->shouldBeUpdatedFromClient())
+			return true;
+	}
+	else if (mode == ONLINE_CLIENT)
+	{
+		if (go->shouldBeUpdatedFromClient())
+			return true;
+	}
+	
+	return false;
+}
+
+void Scene::sendGameObjectUpdate(GameObject* go)
+{
+	// GameObject State
+	Packet* packet = go->toGameObjectUpdatePacket();
+	networkAgent->sendPacket(packet);
+	delete packet;
+
+	// Transform
+	packet = go->transform.toComponentPacket();
+	networkAgent->sendPacket(packet);
+	delete packet;
+
+	for (Component* component : go->components)
+	{
+		Packet* packet = component->toComponentPacket();
+		if(packet->packetType != PacketType::NULL_PACKET)
+			networkAgent->sendPacket(packet);
+		delete packet;
+	}
+
+	return;
+}
+
 void Scene::disconnect()
 {
 	onDisconnect();
@@ -287,91 +314,50 @@ bool Scene::handlePacket(Packet *packet)
 
 			// Get gameobject
 			int id = component_packet->gameobject_id;
-			if (gameObjectMap.find(id) == gameObjectMap.end())
+			
+			if (GameObject* gameObject = getGameObjectById(id))
 			{
-				//std::cout << "Packet id was not valid\n";
-				return true;
+				if (!shouldSendGameObjectUpdate(gameObject))
+					gameObject->updateGameObjectFromComponentPacket(component_packet);
 			}
-			GameObject *gameObject = gameObjectMap.at(id);
-
-			if (mode == ONLINE_SERVER)
-			{
-				if (gameObject->updateFromClient)
-				{
-					if (component_packet->sub_type == ComponentPacketType::COMPONENT_NAVIGATOR)
-					{
-						NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
-						if (Navigator *nav = gameObject->getComponent<Navigator>())
-						{
-							nav->speed = navigator_packet->speed;
-							nav->setDirection(navigator_packet->direction);
-							nav->acceleration = navigator_packet->acceleration;
-							nav->isKinematic = navigator_packet->isKinematic;
-							nav->stopAtInflectionPoint = navigator_packet->stopAtInflectionPoint;
-						}
-					}
-					else if (component_packet->sub_type == ComponentPacketType::COMPONENT_TRANSFORM)
-					{
-						TransformPacket* transform_packet = static_cast<TransformPacket*>(component_packet);
-						if (Transform* transform = &gameObject->transform)
-						{
-							// Set parent
-							if (transform_packet->parent_id == -1)
-								transform->parent = nullptr;
-							else if (gameObjectMap.find(transform_packet->parent_id) == gameObjectMap.end())
-							{
-								Transform *parent = &gameObjectMap.at(id)->transform;
-								transform->parent = parent;
-							}
-
-							transform->position = transform_packet->position;
-							transform->zRotation = transform_packet->zRotation;
-							transform->scale = transform_packet->scale;
-							if (transform->rotationCenter)
-								*transform->rotationCenter = transform_packet->rotationCenter;
-						}
-					}
-				}
-			}
-			else if (mode == ONLINE_CLIENT)
-			{
-				if (component_packet->sub_type == ComponentPacketType::COMPONENT_NAVIGATOR)
-				{
-					NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
-					if (Navigator *nav = gameObject->getComponent<Navigator>())
-					{
-						nav->speed = navigator_packet->speed;
-						nav->setDirection(navigator_packet->direction);
-						nav->acceleration = navigator_packet->acceleration;
-						nav->isKinematic = navigator_packet->isKinematic;
-						nav->stopAtInflectionPoint = navigator_packet->stopAtInflectionPoint;
-					}
-				}
-				else if (component_packet->sub_type == ComponentPacketType::COMPONENT_TRANSFORM)
-				{
-					TransformPacket* transform_packet = static_cast<TransformPacket*>(component_packet);
-					if (Transform* transform = &gameObject->transform)
-					{
-						// Set parent
-						if (transform_packet->parent_id == -1)
-							transform->parent = nullptr;
-						else if (gameObjectMap.find(transform_packet->parent_id) == gameObjectMap.end())
-						{
-							Transform *parent = &gameObjectMap.at(id)->transform;
-							transform->parent = parent;
-						}
-
-						transform->position = transform_packet->position;
-						transform->zRotation = transform_packet->zRotation;
-						transform->scale = transform_packet->scale;
-						if (transform->rotationCenter)
-							*transform->rotationCenter = transform_packet->rotationCenter;
-					}
-				}
-			}
-
 			break;
 		}
+		case PacketType::GAMEOBJECT_UPDATE_PACKET:
+		{
+			GameObjectUpdatePacket* gameobject_update_packet = static_cast<GameObjectUpdatePacket*>(packet);
+
+			// Get gameobject
+			int id = gameobject_update_packet->gameobject_id;
+
+			if (GameObject* gameObject = getGameObjectById(id))
+			{
+				gameObject->updateFromGameObjectUpdatePacket(gameobject_update_packet);
+			}
+			break;
+		}
+		case PacketType::GAMEOBJECT_CREATE_PACKET:
+		{
+			// Create Packet
+			GameObjectCreatePacket* gameobject_create_packet = static_cast<GameObjectCreatePacket*>(packet);
+
+			// Create the GameObject
+			int template_id = gameobject_create_packet->gameobject_template_id;
+			if (GameObject* go = createGameObjectByTemplateId(template_id))
+			{
+				// Set flag
+				go->netCreated = true;
+
+				// Error check
+				int desired_id = gameobject_create_packet->gameobject_id;
+				if (go->id != desired_id)
+				{
+					std::cout << "Id desync issue!!\n";
+					go->id = desired_id;
+				}
+			}
+			break;
+		}
+		case PacketType::NULL_PACKET:
 		default:
 			break;
 	}

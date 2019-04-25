@@ -15,4 +15,8 @@ public:
 	Vector2<int>* rotationCenter;
 	
 	void update() override {};
+
+	// Network methods
+	ComponentPacket* toComponentPacket() override;
+	void updateFromComponentPacket(ComponentPacket* component_packet) override;
 };

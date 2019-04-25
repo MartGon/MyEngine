@@ -1,5 +1,9 @@
 #include "Packet.h"
 #include "Navigator.h"
+#include "Transform.h"
+#include "GameObject.h"
+
+#include <typeinfo>
 
 // Constructors
 
@@ -14,6 +18,32 @@ Packet::Packet(PacketType type)
 
 Packet::~Packet()
 {
+}
+
+// GameObject Update Packet
+
+GameObjectUpdatePacket::GameObjectUpdatePacket()
+{
+	packetType = GAMEOBJECT_UPDATE_PACKET;
+}
+
+GameObjectUpdatePacket::GameObjectUpdatePacket(GameObject* gameobject) : GameObjectUpdatePacket()
+{
+	this->gameobject_id = gameobject->id;
+	this->isActive = gameobject->isActive;
+	this->updateFromClient = gameobject->updateFromClient;
+}
+
+// GameObject Create Packet
+GameObjectCreatePacket::GameObjectCreatePacket()
+{
+	packetType = GAMEOBJECT_CREATE_PACKET;
+}
+
+GameObjectCreatePacket::GameObjectCreatePacket(GameObject* gameobject) : GameObjectCreatePacket()
+{
+	this->gameobject_template_id = gameobject->template_id;
+	this->gameobject_id = gameobject->id;
 }
 
 // Component Packet
@@ -39,11 +69,6 @@ NavigatorPacket::NavigatorPacket(Navigator* nav) : ComponentPacket(COMPONENT_NAV
 	this->acceleration = nav->acceleration;
 }
 
-size_t NavigatorPacket::getSize()
-{
-	return sizeof(NavigatorPacket);
-}
-
 // Transform Packet
 
 TransformPacket::TransformPacket(Transform* transform) : ComponentPacket(COMPONENT_TRANSFORM, transform)
@@ -57,7 +82,3 @@ TransformPacket::TransformPacket(Transform* transform) : ComponentPacket(COMPONE
 		this->rotationCenter = *transform->rotationCenter;
 }
 
-size_t TransformPacket::getSize()
-{
-	return sizeof(TransformPacket);
-}
