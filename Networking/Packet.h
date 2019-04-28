@@ -20,6 +20,7 @@ enum ComponentPacketType
 {
 	COMPONENT_NULL,
 	COMPONENT_TRANSFORM,
+	COMPONENT_COLLIDER,
 	COMPONENT_NAVIGATOR,
 	COMPONENT_ANIMATOR,
 	COMPONENT_TEXTURE_RENDERER,
@@ -51,7 +52,7 @@ public:
 	// Members
 	int gameobject_id = -1;
 	bool isActive = false;
-	bool updateFromClient = false;
+	//bool updateFromClient = false;
 
 	// Overrided
 	size_t getSize() override { return sizeof(GameObjectUpdatePacket); };
@@ -79,12 +80,15 @@ public:
 	// Constructor
 	ComponentPacket() {};
 	ComponentPacket(ComponentPacketType sub_type, Component* component);
+	ComponentPacket(Component* component);
 
 	// Members
 	ComponentPacketType sub_type = COMPONENT_NULL;
 	int gameobject_id = -1;
+	bool isEnabled = false;
 
 	// Overrided
+	size_t getSize() override { return sizeof(ComponentPacket); };
 
 };
 

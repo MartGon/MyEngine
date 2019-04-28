@@ -31,7 +31,7 @@ GameObjectUpdatePacket::GameObjectUpdatePacket(GameObject* gameobject) : GameObj
 {
 	this->gameobject_id = gameobject->id;
 	this->isActive = gameobject->isActive;
-	this->updateFromClient = gameobject->updateFromClient;
+	//this->updateFromClient = gameobject->updateFromClient;
 }
 
 // GameObject Create Packet
@@ -53,6 +53,12 @@ ComponentPacket::ComponentPacket(ComponentPacketType sub_type, Component* compon
 	this->sub_type = sub_type;
 	if(GameObject* go = component->gameObject)
 		this->gameobject_id = go->id;
+	this->isEnabled = component->isEnabled;
+}
+
+ComponentPacket::ComponentPacket(Component* component) : ComponentPacket(component->getComponentPacketType(), component)
+{
+
 }
 
 // Navigator Packet

@@ -118,6 +118,7 @@ void Navigator::updateFromComponentPacket(ComponentPacket* component_packet)
 
 	// Update from data received
 	NavigatorPacket* navigator_packet = static_cast<NavigatorPacket*>(component_packet);
+	isEnabled = component_packet->isEnabled;
 	speed = navigator_packet->speed;
 	setDirection(navigator_packet->direction);
 	acceleration = navigator_packet->acceleration;

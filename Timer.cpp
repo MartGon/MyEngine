@@ -5,7 +5,7 @@ Uint32 TimerNs::timer_callback(Uint32 delay, void* params)
 {
 	if (Timer* timer = static_cast<Timer*>(params))
 	{
-		if (TimerHandler* handler = timer->timer_handler)
+		if (TimerHandler* handler = dynamic_cast<TimerHandler*>(timer->timer_handler))
 			handler->onTimerFinish(timer->param);
 	}
 

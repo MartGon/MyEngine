@@ -73,6 +73,7 @@ void Scene::handleEvent(const SDL_Event& event)
 	for (auto gameObjectPair : gameObjectMap)
 	{
 		GameObject* go = gameObjectPair.second;
+		// Don't send event to objects that are handled by other client
 		if (isOnline() && !shouldSendGameObjectUpdate(go))
 			go->handleEvent(event);
 	}
@@ -94,12 +95,10 @@ void Scene::initGameObject(GameObject *gameObject)
 {
 	gameObject->start();
 
+	// Send notification of a created gameObject
 	if (isOnline() && connectionEstablished)
 		if(!gameObject->netCreated)
 		{
-			if (gameObject->template_id == 1)
-				std::cout << "Sending arrow \n";
-
 			Packet* packet = new GameObjectCreatePacket(gameObject);
 			networkAgent->sendPacket(packet);
 			delete packet;
@@ -141,10 +140,33 @@ void Scene::update()
 		delete go;
 	}
 
+	// Handle received packets at the start of this frame
+	if (isOnline() && connectionEstablished)
+	{
+		// Critical Section start
+		SDL_SemWait(sem);
+
+		// Clone safely to a second vector
+		std::vector<Packet*> packets_to_read = recv_packets;
+
+		// Clear the original vector
+		recv_packets.clear();
+
+		SDL_SemPost(sem);
+		// Critical Section End
+
+		// Handle each packet before updating the objects
+		for (auto packet : packets_to_read)
+		{
+			handlePacket(packet);
+			delete packet;
+		}
+	}
+
 	// Init gameObjects
 	// This loops allows the list to be altered during the gameObjects' initialization
 	while (!gameObjectsToInitialize.empty())
-	{		
+	{
 		initGameObject(gameObjectsToInitialize.front());
 	}
 
@@ -159,28 +181,22 @@ void Scene::update()
 		}
 	}
 
-    // Update every object
-    for (auto &gameObjectPair : gameObjectMap)
-    {
-        if (GameObject *gameObject = gameObjectPair.second)
-        {
-            if (gameObject->shouldBeLoaded())
-            {
-				if(isOnline())
-					SDL_SemWait(sem);
+	// Update every object
+	for (auto &gameObjectPair : gameObjectMap)
+	{
+		if (GameObject *gameObject = gameObjectPair.second)
+		{
+			if (gameObject->shouldBeLoaded())
+			{
+				// Update the object
+				gameObject->update();
+			}
 
-                // Update the object
-                gameObject->update();
-
-				if(isOnline())
-					SDL_SemPost(sem);
-            }
-
-			// Online measures
+			// Send notification of updated gameobject
 			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
 				sendGameObjectUpdate(gameObject);
-        }
-    }
+		}
+	}
 
 	// Update Managers
 	for (auto manager : managers)
@@ -314,7 +330,7 @@ bool Scene::handlePacket(Packet *packet)
 
 			// Get gameobject
 			int id = component_packet->gameobject_id;
-			
+
 			if (GameObject* gameObject = getGameObjectById(id))
 			{
 				if (!shouldSendGameObjectUpdate(gameObject))
@@ -358,6 +374,8 @@ bool Scene::handlePacket(Packet *packet)
 			break;
 		}
 		case PacketType::NULL_PACKET:
+			std::cout << "Null packet"; 
+			break;
 		default:
 			break;
 	}
@@ -382,6 +400,11 @@ int recvPacketThread(void* data)
 		// Receive data
 		packet = scene->networkAgent->recvPacket();
 
+		/* On this critical section we are only modifying this vars
+		   scene->recv_packets
+		*/
+
+		// Critical Section Start
 		SDL_SemWait(scene->sem);
 
 		if (!packet)
@@ -391,16 +414,11 @@ int recvPacketThread(void* data)
 			break;
 		}
 
-		valid = scene->handlePacket(packet);
-
-		if (!valid)
-		{
-			scene->disconnect();
-			SDL_SemPost(scene->sem);
-			break;
-		}
+		// Add to the list of packets to be read
+		scene->recv_packets.push_back(packet);
 
 		SDL_SemPost(scene->sem);
+		// Critical Section End
 	}
 
 	return 0;

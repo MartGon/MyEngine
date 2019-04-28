@@ -34,6 +34,7 @@ public:
 	SceneMode mode = SINGLE_PLAYER;
 
 	// Network stuff
+	std::vector<Packet*> recv_packets;
 	NetworkAgent *networkAgent = nullptr;
 	bool connectionEstablished = false;
 	bool disconnected = false;
@@ -60,6 +61,9 @@ public:
 
 	// GameObjects to be destroy
 	std::vector<GameObject*> gameObjectsToDestroy;
+
+	// Debug
+	uint64_t frame_count = 0;
 
 	// Managers
     std::vector<ManagerBase*> managers;

@@ -23,7 +23,8 @@ public:
 	virtual void destroy() {};
 
 	// Network Methods
-	virtual ComponentPacket* toComponentPacket() { return new ComponentPacket(); };
-	virtual void updateFromComponentPacket(ComponentPacket* component_packet) {};
+	virtual ComponentPacket* toComponentPacket() { return new ComponentPacket(this); };
+	virtual void updateFromComponentPacket(ComponentPacket* component_packet) { this->isEnabled = component_packet->isEnabled; };
+	virtual ComponentPacketType getComponentPacketType() { return ComponentPacketType::COMPONENT_NULL; };
 };
 

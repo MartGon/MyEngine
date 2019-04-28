@@ -25,13 +25,19 @@ void Transform::updateFromComponentPacket(ComponentPacket* component_packet)
 		// Set parent
 		if (transform_packet->parent_id == -1)
 			parent = nullptr;
-		else if (SceneManager::scene->gameObjectMap.find(transform_packet->parent_id) == SceneManager::scene->gameObjectMap.end())
-			parent = &SceneManager::scene->gameObjectMap.at(gameObject->id)->transform;
+		else if (Transform* new_parent = &SceneManager::scene->getGameObjectById(transform_packet->parent_id)->transform)
+			parent = new_parent;
 
 		position = transform_packet->position;
 		zRotation = transform_packet->zRotation;
 		scale = transform_packet->scale;
-		if (rotationCenter)
-			*rotationCenter = transform_packet->rotationCenter;
+		if (transform_packet->rotationCenter != Vector2<int>(-1, -1))
+		{
+			// Delete previous entry
+			if (rotationCenter)
+				delete rotationCenter;
+
+			rotationCenter = new Vector2<int>(transform_packet->rotationCenter.x, transform_packet->rotationCenter.y);
+		}
 	}
 }

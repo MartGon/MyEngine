@@ -183,6 +183,16 @@ void GameObject::updateGameObjectFromComponentPacket(ComponentPacket* component_
 			break;
 		case ComponentPacketType::COMPONENT_TRANSFORM:
 			transform.updateFromComponentPacket(component_packet);
+			break;
+		case ComponentPacketType::COMPONENT_COLLIDER:
+			if (Collider* col = getComponent<Collider>())
+			{
+				col->updateFromComponentPacket(component_packet);
+			}
+			break;
+		case ComponentPacketType::COMPONENT_NULL:
+			//std::cout << "Not a valid component";
+			break;
 	}
 }
 
@@ -194,7 +204,7 @@ GameObjectUpdatePacket* GameObject::toGameObjectUpdatePacket()
 void GameObject::updateFromGameObjectUpdatePacket(GameObjectUpdatePacket* goup)
 {
 	this->isActive = goup->isActive;
-	this->updateFromClient = goup->updateFromClient;
+	//this->updateFromClient = goup->updateFromClient;
 }
 
 // Behaviour hooks

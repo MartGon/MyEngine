@@ -22,4 +22,5 @@ public:
 	// Upper methods
 	void update() override {};
 	void destroy() override;
+	ComponentPacketType getComponentPacketType() override { return ComponentPacketType::COMPONENT_COLLIDER; };
 };
