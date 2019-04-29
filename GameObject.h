@@ -51,7 +51,14 @@ public:
 	{
 		if (Component *cComponent = dynamic_cast<Component*>(component))
 		{
+			// Set component id
+			unsigned int id = components.empty() ? 0 : components.back()->id + 1;
+			cComponent->id = id;
+
+			// Set reference
 			cComponent->gameObject = this;
+
+			// Add to the list
 			components.push_back(cComponent);
 
 			// Init once set
@@ -79,6 +86,8 @@ public:
 		}
 		return nullptr;
 	}
+
+	Component* getComponentById(unsigned int id);
 
 	// State
 	bool shouldBeLoaded();

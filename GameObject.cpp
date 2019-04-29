@@ -60,6 +60,19 @@ void GameObject::update()
 	onUpdate();
 }
 
+// Component Management
+
+Component* GameObject::getComponentById(unsigned int id)
+{
+	if (id == -1)
+		return &transform;
+
+	if (components.empty() || components.size() <= id)
+		return nullptr;
+
+	return components[id];
+}
+
 // State
 
 bool GameObject::shouldBeLoaded() 
@@ -173,26 +186,12 @@ bool GameObject::shouldBeUpdatedFromClient()
 
 void GameObject::updateGameObjectFromComponentPacket(ComponentPacket* component_packet)
 {
-	switch (component_packet->sub_type)
+	unsigned int component_id = component_packet->id;
+	if (Component* component = getComponentById(component_id))
 	{
-		case ComponentPacketType::COMPONENT_NAVIGATOR:
-			if (Navigator* nav = getComponent<Navigator>())
-			{
-				nav->updateFromComponentPacket(component_packet);
-			}
-			break;
-		case ComponentPacketType::COMPONENT_TRANSFORM:
-			transform.updateFromComponentPacket(component_packet);
-			break;
-		case ComponentPacketType::COMPONENT_COLLIDER:
-			if (Collider* col = getComponent<Collider>())
-			{
-				col->updateFromComponentPacket(component_packet);
-			}
-			break;
-		case ComponentPacketType::COMPONENT_NULL:
-			//std::cout << "Not a valid component";
-			break;
+		// Set state
+		component->isEnabled = component_packet->isEnabled;
+		component->updateFromComponentPacket(component_packet);
 	}
 }
 

@@ -51,6 +51,7 @@ GameObjectCreatePacket::GameObjectCreatePacket(GameObject* gameobject) : GameObj
 ComponentPacket::ComponentPacket(ComponentPacketType sub_type, Component* component) : Packet(COMPONENT_PACKET)
 {
 	this->sub_type = sub_type;
+	this->id = component->id;
 	if(GameObject* go = component->gameObject)
 		this->gameobject_id = go->id;
 	this->isEnabled = component->isEnabled;

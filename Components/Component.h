@@ -14,6 +14,7 @@ public:
 	~Component();
 
 	// Attributes
+	unsigned int id = -1;
 	bool isEnabled = true;
 	GameObject *gameObject = nullptr;
 

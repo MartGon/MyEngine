@@ -84,6 +84,7 @@ public:
 
 	// Members
 	ComponentPacketType sub_type = COMPONENT_NULL;
+	unsigned int id = -1;
 	int gameobject_id = -1;
 	bool isEnabled = false;
 

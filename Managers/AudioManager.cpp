@@ -18,6 +18,10 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 	std::vector<AudioPlayer*> audioPlayers = audioManager->getComponents();
 	for (auto audioPlayer : audioPlayers)
 	{
+		// Check if audioPlayer is enabled
+		if (!audioPlayer->isEnabled)
+			continue;
+
 		// Check if gameObject exists
 		if (!audioPlayer->gameObject)
 			continue;
