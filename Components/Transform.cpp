@@ -31,7 +31,9 @@ void Transform::updateFromComponentPacket(ComponentPacket* component_packet)
 		position = transform_packet->position;
 		zRotation = transform_packet->zRotation;
 		scale = transform_packet->scale;
-		if (transform_packet->rotationCenter != Vector2<int>(-1, -1))
+		if (transform_packet->isRotationCenterNull)
+			rotationCenter = nullptr;
+		else
 		{
 			// Delete previous entry
 			if (rotationCenter)

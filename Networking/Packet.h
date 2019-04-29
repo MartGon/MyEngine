@@ -123,6 +123,7 @@ public:
 	int parent_id = -1;
 	Vector2<float> position;
 	Vector2<float> scale;
+	bool isRotationCenterNull = false;
 	double zRotation;
 	Vector2<int> rotationCenter;
 

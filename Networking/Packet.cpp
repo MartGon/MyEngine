@@ -84,7 +84,14 @@ TransformPacket::TransformPacket(Transform* transform) : ComponentPacket(COMPONE
 	this->position = transform->position;
 	this->scale = transform->scale;
 	this->zRotation = transform->zRotation;
-	if(transform->rotationCenter)
+	if (transform->rotationCenter)
+	{
+		this->isRotationCenterNull = false;
 		this->rotationCenter = *transform->rotationCenter;
+	}
+	else
+	{
+		this->isRotationCenterNull = true;
+	}
 }
 
