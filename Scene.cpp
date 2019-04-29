@@ -191,10 +191,6 @@ void Scene::update()
 				// Update the object
 				gameObject->update();
 			}
-
-			// Send notification of updated gameobject
-			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
-				sendGameObjectUpdate(gameObject);
 		}
 	}
 
@@ -204,6 +200,16 @@ void Scene::update()
 
 	// Update hook
 	onUpdate();
+
+	// Send notification of updated gameobjects
+	for (auto &gameObjectPair : gameObjectMap)
+	{
+		if (GameObject *gameObject = gameObjectPair.second)
+		{
+			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
+				sendGameObjectUpdate(gameObject);
+		}
+	}
 }
 
 void Scene::deactivateAllGameObjects()
