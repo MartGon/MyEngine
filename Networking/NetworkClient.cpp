@@ -72,7 +72,7 @@ bool NetworkClient::establishConnection()
 			state = CLIENT_SENDING;
 		break;
 	case CLIENT_SENDING:
-		if (sendPacket(new Packet()))
+		if (sendPacket(new Packet(), false))
 			state = CLIENT_RECEIVING;
 		break;
 	case CLIENT_RECEIVING:
@@ -88,9 +88,9 @@ bool NetworkClient::establishConnection()
 	return false;
 }
 
-bool NetworkClient::sendPacket(Packet* packet)
+bool NetworkClient::sendPacket(Packet* packet, bool buffered)
 {
-	return NetworkAgent::sendPacket(clientSocket, packet);
+	return NetworkAgent::sendPacket(clientSocket, packet, buffered);
 }
 
 Packet* NetworkClient::recvPacket()

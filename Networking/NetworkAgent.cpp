@@ -1,5 +1,57 @@
 #include "NetworkAgent.h"
 
+// Network buffer
+
+NetworkBuffer::NetworkBuffer(size_t size, size_t limit) : virtual_size{ size }
+{
+	// Allocate buffer
+	buffer = std::malloc(virtual_size);
+	buffer_ptr = (Uint8*)buffer;
+
+	// Set limit to 90% of virtual_size
+	if (!limit)
+		this->limit = virtual_size - 2 * virtual_size / 10;
+}
+
+NetworkBuffer::~NetworkBuffer()
+{
+	// Deallocate buffer
+	std::free(buffer);
+}
+
+bool NetworkBuffer::append_data(void* data, size_t len)
+{
+	// Check for overflow
+	size_t next_size = real_size + len;
+	if (next_size > virtual_size)
+		return false;
+
+	// Copy data to buffer
+	std::memcpy(buffer_ptr, data, len);
+
+	// Update pointer location
+	buffer_ptr += len;
+
+	// Update real_size
+	real_size += len;
+	
+	return true;
+}
+
+bool NetworkBuffer::isOverLimit()
+{
+	return real_size > limit;
+}
+
+void NetworkBuffer::clear()
+{
+	// Reset to start
+	buffer_ptr = (Uint8*)buffer;
+
+	// Reset real_size
+	real_size = 0;
+}
+
 // Attributes
 
 
@@ -38,7 +90,7 @@ bool NetworkAgent::establishConnection()
 	return false;
 }
 
-bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet)
+bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet, bool buffered)
 {
 	if (!socket)
 	{
@@ -46,13 +98,36 @@ bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet)
 		return false;
 	}
 
-	int result;
 	size_t len = packet->getSize();
-	// Send packet size
-	result = SDLNet_TCP_Send(socket, &len, sizeof(size_t));
+	int result = 0;
 
-	// Send packet
-	result = SDLNet_TCP_Send(socket, packet, len);
+	// Add to the data buffer
+	if (buffered)
+	{
+		// Add to buffer
+			// Add packet Length
+		if (!buffer.append_data(&len, sizeof(size_t)))
+			std::cout << "Overflow detected, buffer copy aborted\n";
+		// Add packet data
+		if (!buffer.append_data(packet, len))
+			std::cout << "Overflow detected, buffer copy aborted\n";
+
+		// Return if buffer is not ready
+		if (!buffer.isOverLimit())
+			return true;
+
+		// Send buffer
+		result = SDLNet_TCP_Send(socket, buffer.buffer, buffer.real_size);
+
+		// Clear buffer
+		buffer.clear();
+	}
+	// Send directly
+	else
+	{
+		result = SDLNet_TCP_Send(socket, &len, sizeof(size_t));
+		result = SDLNet_TCP_Send(socket, packet, len);
+	}
 
 	//std::cout << "Sent " << result << " bytes of data\n";
 
@@ -94,7 +169,7 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 	return packet;
 }
 
-bool NetworkAgent::sendPacket(Packet * packet)
+bool NetworkAgent::sendPacket(Packet * packet, bool buffered)
 {
 	return false;
 }

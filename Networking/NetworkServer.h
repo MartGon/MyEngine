@@ -42,7 +42,7 @@ public:
 	bool pairWithClient();
 
 		// Communication
-	virtual bool sendPacket(Packet* packet);
+	virtual bool sendPacket(Packet* packet, bool buffered = true) override;
 	virtual Packet* recvPacket();
 
 	// Other

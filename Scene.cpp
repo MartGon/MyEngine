@@ -210,17 +210,17 @@ void Scene::update()
 	onUpdate();
 
 	// Send notification of updated gameobjects
-	//if(frame_count % 1 == 0)
-		for (auto &gameObjectPair : gameObjectMap)
+	//if(frame_count % 2 == 0)
+	for (auto &gameObjectPair : gameObjectMap)
+	{
+		if (GameObject *gameObject = gameObjectPair.second)
 		{
-			if (GameObject *gameObject = gameObjectPair.second)
-			{
-				if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
-					sendGameObjectUpdate(gameObject);
-			}
+			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
+				sendGameObjectUpdate(gameObject);
 		}
+	}
 
-	++frame_count;
+	//++frame_count;
 }
 
 void Scene::deactivateAllGameObjects()

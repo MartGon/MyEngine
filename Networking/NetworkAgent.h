@@ -4,12 +4,38 @@
 #include <sstream>
 #include "Packet.h"
 #pragma once
+
+class NetworkBuffer
+{
+public:
+	NetworkBuffer(size_t  size, size_t limit = 0);
+	~NetworkBuffer();
+
+	// Data ptr
+	void* buffer = nullptr;
+	Uint8* buffer_ptr = nullptr;
+
+	// Size
+	size_t virtual_size = 0;
+	size_t real_size = 0;
+
+	// Size Limit
+	size_t limit = 0;
+
+	bool append_data(void* data, size_t len);
+	bool isOverLimit();
+	void clear();
+};
+
 class NetworkAgent
 {
 public:
 	// Constructors
 	NetworkAgent();
 	~NetworkAgent();
+
+	// Attributes
+	NetworkBuffer buffer = NetworkBuffer(1460);
 
 	// Methods
 		// Initializing
@@ -21,7 +47,7 @@ public:
 	virtual bool establishConnection();
 
 	// Communication
-	virtual bool sendPacket(Packet* packet);
+	virtual bool sendPacket(Packet* packet, bool buffered = true);
 	virtual Packet* recvPacket();
 
 	// Other
@@ -30,7 +56,7 @@ public:
 
 protected:
 		// Communication
-	bool sendPacket(TCPsocket socket, Packet* packet);
+	bool sendPacket(TCPsocket socket, Packet* packet, bool buffered = true);
 	Packet* recvPacket(TCPsocket socket);
 };
 

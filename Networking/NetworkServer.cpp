@@ -113,9 +113,9 @@ bool NetworkServer::establishConnection()
 	return false;
 }
 
-bool NetworkServer::sendPacket(Packet *packet)
+bool NetworkServer::sendPacket(Packet *packet, bool buffered)
 {
-	return NetworkAgent::sendPacket(clientSocket, packet);
+	return NetworkAgent::sendPacket(clientSocket, packet, buffered);
 }
 
 Packet* NetworkServer::recvPacket()
