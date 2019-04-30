@@ -21,6 +21,11 @@ public:
 	bool updateFromClient = false;
 	bool netCreated = false;
 
+	/*	This gameobject is part of the scenery and 
+		therefore should not be updated through the network
+	*/
+	bool isNetworkStatic = true;
+
 	// Name
 	std::string name = "";
 
@@ -112,7 +117,8 @@ public:
 	// Cleaning
 	virtual void destroy();
 
-	// Network 
+	// Network
+	bool isNetworkUpdated();
 	bool shouldBeUpdatedFromClient();
 	void updateGameObjectFromComponentPacket(ComponentPacket* component_packet);
 	GameObjectUpdatePacket* toGameObjectUpdatePacket();

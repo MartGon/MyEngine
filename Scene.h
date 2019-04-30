@@ -129,7 +129,8 @@ public:
 	virtual void beforeUpdate();
 	virtual void onUpdate();
 	virtual void destroy();
-	virtual void handleEvent(const SDL_Event& event);
+	void handleEvent(const SDL_Event& event);
+	virtual void OnHandleEvent(const SDL_Event& event) {};
 	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };
 
 	void addGameObject(GameObject *gameObject);

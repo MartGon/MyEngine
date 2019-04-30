@@ -70,12 +70,20 @@ void Scene::destroy()
 // TODO - OnHandleEvent
 void Scene::handleEvent(const SDL_Event& event) 
 {
+	OnHandleEvent(event);
+
 	for (auto gameObjectPair : gameObjectMap)
 	{
 		GameObject* go = gameObjectPair.second;
-		// Don't send event to objects that are handled by other client
+
+		if (!go->shouldBeLoaded())
+			continue;
+
 		if (isOnline() && !shouldSendGameObjectUpdate(go))
-			go->handleEvent(event);
+			continue;
+
+		if (go->handleEvent(event))
+			return;
 	}
 }
 
@@ -202,14 +210,17 @@ void Scene::update()
 	onUpdate();
 
 	// Send notification of updated gameobjects
-	for (auto &gameObjectPair : gameObjectMap)
-	{
-		if (GameObject *gameObject = gameObjectPair.second)
+	//if(frame_count % 1 == 0)
+		for (auto &gameObjectPair : gameObjectMap)
 		{
-			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
-				sendGameObjectUpdate(gameObject);
+			if (GameObject *gameObject = gameObjectPair.second)
+			{
+				if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
+					sendGameObjectUpdate(gameObject);
+			}
 		}
-	}
+
+	++frame_count;
 }
 
 void Scene::deactivateAllGameObjects()
@@ -279,17 +290,20 @@ bool Scene::isOnline()
 
 bool Scene::shouldSendGameObjectUpdate(GameObject* go)
 {
-	if (mode == ONLINE_SERVER)
+	if (go->isNetworkUpdated())
 	{
-		if (!go->shouldBeUpdatedFromClient())
-			return true;
+		if (mode == ONLINE_SERVER)
+		{
+			if (!go->shouldBeUpdatedFromClient())
+				return true;
+		}
+		else if (mode == ONLINE_CLIENT)
+		{
+			if (go->shouldBeUpdatedFromClient())
+				return true;
+		}
 	}
-	else if (mode == ONLINE_CLIENT)
-	{
-		if (go->shouldBeUpdatedFromClient())
-			return true;
-	}
-	
+
 	return false;
 }
 

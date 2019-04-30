@@ -164,12 +164,28 @@ void GameObject::setScale(Vector2<float> scale)
 
 // Netowrk
 
+bool GameObject::isNetworkUpdated()
+{
+	Transform* parent = &transform;
+	while (parent)
+	{
+		GameObject* go = parent->gameObject;
+
+		if (!go->isNetworkStatic)
+			return true;
+
+		parent = go->transform.parent;
+	}
+
+	return false;
+}
+
 bool GameObject::shouldBeUpdatedFromClient()
 {
 	if (updateFromClient)
 		return true;
 
-	// Check if any of parents should be uptdated
+	// Check if any of parents should be updated
 	Transform* parent = transform.parent;
 	while (parent)
 	{
