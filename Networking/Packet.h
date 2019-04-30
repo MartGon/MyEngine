@@ -1,5 +1,6 @@
 #include <string>
 #include "Vector2.h"
+#include <SDL.h>
 
 class GameObject;
 class Component;
@@ -13,7 +14,9 @@ enum PacketType
 	NULL_PACKET,
 	COMPONENT_PACKET,
 	GAMEOBJECT_UPDATE_PACKET,
-	GAMEOBJECT_CREATE_PACKET
+	GAMEOBJECT_CREATE_PACKET,
+	EVENT_PACKET,
+	MOUSE_STATE_PACKET
 };
 
 enum ComponentPacketType
@@ -40,6 +43,33 @@ public:
 	
 	// Methods
 	virtual size_t getSize() { return sizeof(Packet); };
+};
+
+class EventPacket : public Packet
+{
+public:
+	// Constructors
+	EventPacket();
+	EventPacket(int gameobject_id, SDL_Event event);
+
+	int gameobject_id;
+	SDL_Event event;
+
+	// Overrided
+	size_t getSize() override { return sizeof(EventPacket); };
+};
+
+class MouseStatePacket : public Packet
+{
+public:
+	// Constructors
+	MouseStatePacket();
+	MouseStatePacket(Vector2<int> pos);
+
+	Vector2<int> position;
+
+	// Overrided
+	size_t getSize() override { return sizeof(MouseStatePacket); };
 };
 
 class GameObjectUpdatePacket : public Packet

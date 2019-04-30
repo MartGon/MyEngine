@@ -53,8 +53,8 @@ void GameObject::update()
 		if(component->isEnabled)
 			component->update();
 
-	if (SceneManager::scene->isOnline() && !SceneManager::scene->shouldSendGameObjectUpdate(this))
-		return;
+	//if (SceneManager::scene->isOnline() && !SceneManager::scene->shouldSendGameObjectUpdate(this))
+		//return;
 
 	// Hook for gameObject updates
 	onUpdate();
@@ -272,9 +272,9 @@ void GameObject::afterMove()
 
 // Event hooks
 
-bool GameObject::handleEvent(const SDL_Event &event)
+bool GameObject::handleEvent(const SDL_Event &event, bool from_network)
 {
-	return false;
+	return OnHandleEvent(event);
 }
 
 // Animation hooks

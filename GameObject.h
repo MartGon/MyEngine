@@ -137,7 +137,8 @@ public:
 	virtual void beforeMove();
 	virtual void afterMove();
 		// Events
-	virtual bool handleEvent(const SDL_Event& event);
+	bool handleEvent(const SDL_Event& event, bool from_network = false);
+	virtual bool OnHandleEvent(const SDL_Event& event) { return false; };
 		// Animation
 	virtual void onAnimationFinished(Animation* anim);
 	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);

@@ -20,6 +20,31 @@ Packet::~Packet()
 {
 }
 
+// EventPacket
+
+EventPacket::EventPacket() : Packet(EVENT_PACKET)
+{
+
+}
+
+EventPacket::EventPacket(int gameobject_id, SDL_Event event) : EventPacket()
+{
+	this->gameobject_id = gameobject_id;
+	this->event = event;
+}
+
+// Mouse State Packet
+
+MouseStatePacket::MouseStatePacket() : Packet(MOUSE_STATE_PACKET)
+{
+
+}
+
+MouseStatePacket::MouseStatePacket(Vector2<int> pos) : MouseStatePacket()
+{
+	this->position = pos;
+}
+
 // GameObject Update Packet
 
 GameObjectUpdatePacket::GameObjectUpdatePacket()

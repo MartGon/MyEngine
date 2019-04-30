@@ -23,7 +23,7 @@ Button::~Button()
 
 // Methods
 
-bool Button::handleEvent(const SDL_Event& event)
+bool Button::OnHandleEvent(const SDL_Event& event)
 {
 	// Check wether it is enabled
 	if (!isEnabled)

@@ -39,6 +39,7 @@ public:
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;
+	Vector2<int> pair_mouse_state;
 
 	// Thread
 	SDL_Thread *thread = nullptr;

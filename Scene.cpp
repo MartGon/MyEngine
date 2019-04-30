@@ -83,7 +83,15 @@ void Scene::handleEvent(const SDL_Event& event)
 			continue;
 
 		if (go->handleEvent(event))
-			return;
+		{
+			if (!isOnline())
+				return;
+
+			// Create event packet
+			EventPacket* event_packet = new EventPacket(go->id, event);
+			networkAgent->sendPacket(event_packet, false);
+			delete event_packet;
+		}
 	}
 }
 
@@ -108,7 +116,7 @@ void Scene::initGameObject(GameObject *gameObject)
 		if(!gameObject->netCreated)
 		{
 			Packet* packet = new GameObjectCreatePacket(gameObject);
-			networkAgent->sendPacket(packet);
+			//networkAgent->sendPacket(packet);
 			delete packet;
 		}
 
@@ -210,7 +218,7 @@ void Scene::update()
 	onUpdate();
 
 	// Send notification of updated gameobjects
-	//if(frame_count % 2 == 0)
+	/*if(frame_count % 2 == 0)
 	for (auto &gameObjectPair : gameObjectMap)
 	{
 		if (GameObject *gameObject = gameObjectPair.second)
@@ -219,7 +227,17 @@ void Scene::update()
 				sendGameObjectUpdate(gameObject);
 		}
 	}
+	*/
 
+	// Send Mouse State
+	if (isOnline())
+	{
+		Vector2<int> mouse_pos;
+		SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+		MouseStatePacket* mouse_packet = new MouseStatePacket(mouse_pos);
+		networkAgent->sendPacket(mouse_packet, false);
+		delete mouse_packet;
+	}
 	//++frame_count;
 }
 
@@ -310,6 +328,7 @@ bool Scene::shouldSendGameObjectUpdate(GameObject* go)
 void Scene::sendGameObjectUpdate(GameObject* go)
 {
 	// GameObject State
+	
 	Packet* packet = go->toGameObjectUpdatePacket();
 	networkAgent->sendPacket(packet);
 	delete packet;
@@ -391,6 +410,19 @@ bool Scene::handlePacket(Packet *packet)
 					go->id = desired_id;
 				}
 			}
+			break;
+		}
+		case PacketType::EVENT_PACKET:
+		{
+			EventPacket* event_packet = static_cast<EventPacket*>(packet);
+			if(GameObject* go = getGameObjectById(event_packet->gameobject_id))
+				go->handleEvent(event_packet->event);
+			break;
+		}
+		case PacketType::MOUSE_STATE_PACKET:
+		{
+			MouseStatePacket* mouse_state_packet = static_cast<MouseStatePacket*>(packet);
+			pair_mouse_state = mouse_state_packet->position;
 			break;
 		}
 		case PacketType::NULL_PACKET:
