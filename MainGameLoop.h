@@ -16,4 +16,7 @@ void closeGame();
 
 int engine_main();
 
+// Buffer Network based stuff
+int logic_thread_manager(void* data);
+
 

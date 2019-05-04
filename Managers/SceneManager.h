@@ -9,9 +9,6 @@ public:
 
 	static Scene *scene;
 
-	// quit flag
-	static bool quit;
-
 	// Scene loading
 	static void loadNextScene(Scene* s);
 	static void loadScene();

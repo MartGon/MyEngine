@@ -5,6 +5,8 @@
 #include "TextureRenderer.h"
 #include "Manager.h"
 
+#include <deque>
+
 class RendererManager : public Manager<TextureRenderer*>
 {
 public:
@@ -14,6 +16,9 @@ public:
 	// Attributes
 	static Texture nullTexture;
 	static SDL_Renderer* renderer;
+
+	// Threading
+	static std::deque<SDL_Texture*> frame_buffer;
 
 	// Methods
 	static void init();

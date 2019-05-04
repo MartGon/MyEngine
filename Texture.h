@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string>
 #include "Vector2.h"
+#include "TextureFactory.h"
 
 struct MapRGB
 {
@@ -22,14 +23,16 @@ public:
 	// Constructors
 	Texture();
 	Texture(const char* resourcePath);
-	Texture(const char* resourcePath, SDL_Surface* screenSurface);
 	Texture(const char* resourcePath, SDL_Renderer* renderer);
 	Texture(const char* resourcePath, SDL_Renderer* renderer, MapRGB *colorKey);
 	~Texture();
 	
+	// Thread safe vars
+	Monitor<SDL_Texture*>* texture = new Monitor<SDL_Texture*>(nullptr);
+	Monitor<SurfaceResult>* result = new Monitor<SurfaceResult>(SurfaceResult());
+
 	// SDL Stuff
 	SDL_Texture *mTexture = nullptr;
-	SDL_Surface *optimizedSurface = nullptr;
 	SDL_Renderer *mRenderer = nullptr;
 
 	// Dimensions
@@ -38,7 +41,7 @@ public:
 
 	// Scale
 	// This value is modified by texureRenderer
-	Vector2<float> scale;
+	Vector2<float> scale = Vector2<float>(1, 1);
 
 	// Other
 	static const char* folder;

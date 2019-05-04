@@ -37,8 +37,8 @@ void CollisionManager::manage()
 			continue;
 
         // If debug enabled, draw collisions
-        if (c1->debug)
-            c1->drawCollisionBoundaries();
+        //if (c1->debug)
+          //  c1->drawCollisionBoundaries();
 
 		// Iterate with the rest of them
 		for (int j = 0; j < resizableColliderVector.size(); j++)

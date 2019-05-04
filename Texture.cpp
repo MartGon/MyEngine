@@ -14,27 +14,6 @@ Texture::Texture(const char* resoucePath) : Texture(resoucePath, RendererManager
 
 }
 
-Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
-{
-	path = getPathFromResourceFolder(resourcePath);
-	SDL_Surface *imgSurface = IMG_Load(path.c_str());
-	if (!imgSurface)
-	{
-		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
-	}
-	else
-	{
-		optimizedSurface = SDL_ConvertSurface(imgSurface, screenSurface->format, NULL);
-
-		if (!optimizedSurface)
-		{
-			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
-		}
-
-		SDL_FreeSurface(imgSurface);
-	}
-}
-
 Texture::Texture(const char* resourcePath, SDL_Renderer* renderer)
 {
 	load(resourcePath, renderer);
@@ -54,6 +33,15 @@ Texture::~Texture()
 
 void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
+	if (!mTexture)
+	{
+		mTexture = texture->get_value();
+		SurfaceResult surface_result = result->get_value();
+		mWidth = surface_result.w;
+		mHeight = surface_result.h;
+		return;
+	}
+
 	// Calculate render Quad
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 	renderQuad.w *= scale.x;
@@ -107,45 +95,35 @@ bool Texture::isValid()
 bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *colorKey)
 {
 	bool correct = false;
-	std::string tempRet = getPathFromResourceFolder(resourcePath).c_str();
+	std::string path = getPathFromResourceFolder(resourcePath).c_str();
 
 	// Set must values
-	path = tempRet.c_str();
 	mRenderer = renderer;
 
-	SDL_Surface *imgSurface = IMG_Load(path.c_str());
-	if (!imgSurface)
+	// Create texture
+	SurfaceRequest surface_request{ path, SDL_TRUE, colorKey };
+	CreateTextureRequest request{ CREATE_TEXTURE_FROM_SURFACE , texture, surface_request, result, TextureRequest()};
+	TextureFactory::create_texture(request);
+
+	/*
+	if (texture.get_value())
 	{
-		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
+		printf("Unable to optimize surface from %s! SDL Error : %s \n", path.c_str(), SDL_GetError());
 		mTexture = RendererManager::nullTexture.mTexture;
 	}
 	else
 	{
-		if (colorKey)
-		{
-			SDL_SetColorKey(imgSurface, SDL_TRUE, SDL_MapRGB(imgSurface->format, colorKey->red, colorKey->green, colorKey->blue));
-		}
+		// Dimensions
+		SurfaceResult result_surface = result.get_value();
 
-		mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
+		mWidth = result_surface.w;
+		mHeight = result_surface.h;
+		scale = Vector2<float>(1, 1);
 
-		if (!mTexture)
-		{
-			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
-			mTexture = RendererManager::nullTexture.mTexture;
-		}
-		else
-		{
-			// Dimensions
-			mWidth = imgSurface->w;
-			mHeight = imgSurface->h;
-			scale = Vector2<float>(1, 1);
-
-			// Flag
-			correct = true;
-		}
-
-		SDL_FreeSurface(imgSurface);
+		// Flag
+		correct = true;
 	}
+	*/
 
 	return correct;
 }

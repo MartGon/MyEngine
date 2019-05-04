@@ -3,7 +3,6 @@
 Scene* SceneManager::scene = nullptr;
 Scene* SceneManager::next_scene = nullptr;
 
-bool SceneManager::quit = false;
 bool SceneManager::load_next_scene = false;
 
 SceneManager::SceneManager()
@@ -22,7 +21,7 @@ void SceneManager::loadNextScene(Scene* s)
 
 void SceneManager::quitGame()
 {
-	quit = true;
+	//quit = true;
 }
 
 bool SceneManager::canLoadNextScene()

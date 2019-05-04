@@ -212,22 +212,15 @@ void Scene::update()
 
 	// Update Managers
 	for (auto manager : managers)
-		manager->manage();
+	{
+		if (RendererManager* renderer_manager = dynamic_cast<RendererManager*>(manager))
+			continue;
+		else
+			manager->manage();
+	}
 
 	// Update hook
 	onUpdate();
-
-	// Send notification of updated gameobjects
-	/*if(frame_count % 2 == 0)
-	for (auto &gameObjectPair : gameObjectMap)
-	{
-		if (GameObject *gameObject = gameObjectPair.second)
-		{
-			if (isOnline() && shouldSendGameObjectUpdate(gameObject))	// Once connection is established
-				sendGameObjectUpdate(gameObject);
-		}
-	}
-	*/
 
 	// Send Mouse State
 	if (isOnline())
@@ -238,7 +231,6 @@ void Scene::update()
 		networkAgent->sendPacket(mouse_packet, false);
 		delete mouse_packet;
 	}
-	//++frame_count;
 }
 
 void Scene::deactivateAllGameObjects()

@@ -1,12 +1,15 @@
 #include "RendererManager.h"
 #include "SceneManager.h"
+#include "TextureFactory.h"
 
+// Threading
+std::deque<SDL_Texture*> RendererManager::frame_buffer = std::deque<SDL_Texture*>();
+
+// Texturing
 Texture RendererManager::nullTexture;
-
 SDL_Renderer* RendererManager::renderer = nullptr;
 
 // GBA Res: 240 x 160
-
 int RendererManager::nativeWidthResolution = 480;
 int RendererManager::nativeHeightResolution = 320;
 
@@ -48,7 +51,7 @@ void RendererManager::init()
 		return;
 	}
 
-	nullTexture = Texture("null.png", renderer);
+	//nullTexture = Texture("null.png", renderer);
 }
 
 // Camera
@@ -86,14 +89,21 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
+	// Create frame texture
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
+	SDL_SetRenderTarget(renderer, texture);
+
 	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{
 		TextureRenderer* tRenderer = components.at(i);
 		if (tRenderer->isEnabled)
-			// Needs to check if gameobject is null (SetComponent was not called)
-			if(tRenderer->gameObject->shouldBeLoaded())
-				tRenderer->render();
+			if(tRenderer->gameObject)
+				// Needs to check if gameobject is null (SetComponent was not called)
+				if (tRenderer->gameObject->shouldBeLoaded())
+				{
+					tRenderer->render();
+				}
 	}
 
 	// Draw Colliders which are set to be debugged.
@@ -105,12 +115,16 @@ void RendererManager::manage()
 
 		for (auto &collider : colliders)
 		{
-			if (collider->gameObject->shouldBeLoaded())
-				if(collider->isEnabled)
-					if (collider->debug)
-						collider->drawCollisionBoundaries();
+			if(collider->gameObject)
+				if (collider->gameObject->shouldBeLoaded())
+					if(collider->isEnabled)
+						if (collider->debug)
+							collider->drawCollisionBoundaries();
 		}
 	}
+
+	// Create frame 
+	frame_buffer.push_front(texture);
 }
 
 // TODO - Poner layer a private. Hacer metodo setLayer que sortea el array cuando se cambia el layer

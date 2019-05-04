@@ -1,13 +1,18 @@
 #include "MainGameLoop.h"
 #include "RendererManager.h"
 #include "SceneManager.h"
+#include "Monitor.h"
+#include "TextureFactory.h"
+#include <deque>
 
-#include <queue>
 
-std::queue<SDL_Renderer*> q;
-
+// Thread
+Monitor<std::deque<SDL_Event>> events_queue{ std::deque<SDL_Event>() };
+SDL_semaphore* sem = nullptr;
+SDL_Thread* thread = nullptr;
 
 Scene *gFirstScene = nullptr;
+Scene* scene = nullptr;
 
 int WINDOW_WIDTH = 640;
 int WINDOW_HEIGHT = 480;
@@ -27,7 +32,7 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 		return false;
 	}
 
-	window = SDL_CreateWindow("SDL-Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("ArcherDuel", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	if (!window)
 	{
 		printf("Window could not be created! SDL Error: %s \n", SDL_GetError());
@@ -50,6 +55,46 @@ void setWindowResolution(int width, int height)
 	WINDOW_HEIGHT = height;
 }
 
+// Thread that will block for packets
+int logic_thread_manager(void* data)
+{
+	// Scene init
+	SceneManager::loadNextScene(scene);
+	SceneManager::loadScene();
+
+	// Loop
+	while (true)
+	{
+		// Update scene
+		SDL_SemWait(sem);
+
+		// Check for next scene
+		if (SceneManager::canLoadNextScene())
+			SceneManager::loadScene();
+
+		SceneManager::scene->update();
+
+		// Handle Events
+		std::deque<SDL_Event> events = events_queue.get_value();
+		while (!events.empty())
+		{
+			SDL_Event event = events.back();
+			SceneManager::scene->handleEvent(event);
+			events.pop_back();
+		}
+
+		// Reset events queue
+		events_queue.set_value(events);
+
+		SDL_SemPost(sem);
+
+		// Keep the same calculation framerate
+		SDL_Delay(15);
+	}
+
+	return 0;
+}
+
 int engine_main()
 {
 	SDL_Window *window = NULL;
@@ -62,43 +107,63 @@ int engine_main()
 	}
 	else
 	{
-		// Game initialization
+		// Renderer init
 		RendererManager::renderer = renderer;
 		RendererManager::init();
 
-		Scene *scene = gFirstScene;
+		// Init TextureFactory
+		TextureFactory::init();
+
+		// Scene init
+		scene = gFirstScene;
 		gFirstScene->renderer = renderer;
-		SceneManager::loadNextScene(scene);
-		SceneManager::loadScene();
 
-		SDL_Event e;
-		bool *quit = &SceneManager::quit;
+		// Create logic thread
+		thread = SDL_CreateThread(logic_thread_manager, "render_thread", nullptr);
+		SDL_DetachThread(thread);
 
-		//While application is running
-		while (!(*quit))
+		// Rendering frame
+		sem = SDL_CreateSemaphore(1);
+		while (true)
 		{
-			// Update scene
-			SceneManager::scene->update();
+			// Attend request
+			TextureFactory::attend_requests();
 
-			//Handle events on queue
+			// Check fot exit
+			// Get events from queue
+			SDL_Event e;
 			while (SDL_PollEvent(&e) != 0)
 			{
 				//User requests quit
 				if (e.type == SDL_QUIT)
 				{
-					*quit = true;
+					return 0;
 				}
+				// Add events to the queue
 				else
-					SceneManager::scene->handleEvent(e);
+				{
+					auto events = events_queue.get_value();
+					events.push_front(e);
+					events_queue.set_value(events);
+				}
 			}
 
-			// Render buffer
-			SDL_RenderPresent(renderer);
-			SDL_RenderClear(renderer);
+			// Calculate one frame
+			SDL_SemWait(sem);
+			if(RendererManager* renderer_manager = dynamic_cast<RendererManager*>(scene->getManager<TextureRenderer*>()))
+				renderer_manager->manage();
+			SDL_SemPost(sem);
 
-			// Check for next scene
-			if (SceneManager::canLoadNextScene())
-				SceneManager::loadScene();
+			// Render if frame buffer is enough
+			if (RendererManager::frame_buffer.size() >= 1)
+			{
+				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_RenderCopy(renderer, RendererManager::frame_buffer.back(), NULL, NULL);
+				RendererManager::frame_buffer.pop_back();
+				SDL_RenderPresent(renderer);
+				SDL_RenderClear(renderer);
+			}
+
 		}
 	}
 
