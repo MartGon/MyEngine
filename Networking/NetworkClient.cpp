@@ -69,11 +69,11 @@ bool NetworkClient::establishConnection()
 		break;
 	case CLIENT_OPENING_SOCKET:
 		if (openClientSocket())
-			state = CLIENT_SENDING;
+			state = CLIENT_CONNECTION_ESTABLISHED;
 		break;
 	case CLIENT_SENDING:
 		if (sendPacket(new Packet(), false))
-			state = CLIENT_RECEIVING;
+			state = CLIENT_CONNECTION_ESTABLISHED;
 		break;
 	case CLIENT_RECEIVING:
 		if (recvPacket())

@@ -45,6 +45,18 @@ MouseStatePacket::MouseStatePacket(Vector2<int> pos) : MouseStatePacket()
 	this->position = pos;
 }
 
+// TimeStamp Packet
+
+TimeStampPacket::TimeStampPacket() : Packet(TIMESTAMP_PACKET)
+{
+
+}
+
+TimeStampPacket::TimeStampPacket(std::chrono::milliseconds ms) : TimeStampPacket()
+{
+	this->timestamp = ms;
+}
+
 // GameObject Update Packet
 
 GameObjectUpdatePacket::GameObjectUpdatePacket()

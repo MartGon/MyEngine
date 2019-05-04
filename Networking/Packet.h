@@ -1,6 +1,7 @@
 #include <string>
 #include "Vector2.h"
 #include <SDL.h>
+#include <chrono>
 
 class GameObject;
 class Component;
@@ -16,7 +17,8 @@ enum PacketType
 	GAMEOBJECT_UPDATE_PACKET,
 	GAMEOBJECT_CREATE_PACKET,
 	EVENT_PACKET,
-	MOUSE_STATE_PACKET
+	MOUSE_STATE_PACKET,
+	TIMESTAMP_PACKET
 };
 
 enum ComponentPacketType
@@ -70,6 +72,19 @@ public:
 
 	// Overrided
 	size_t getSize() override { return sizeof(MouseStatePacket); };
+};
+
+class TimeStampPacket : public Packet
+{
+public:
+	// Constructors
+	TimeStampPacket();
+	TimeStampPacket(std::chrono::milliseconds ms);
+
+	std::chrono::milliseconds timestamp;
+
+	// Override
+	size_t getSize() override { return sizeof(TimeStampPacket); };
 };
 
 class GameObjectUpdatePacket : public Packet

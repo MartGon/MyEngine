@@ -125,8 +125,13 @@ bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet, bool buffered)
 	// Send directly
 	else
 	{
-		result = SDLNet_TCP_Send(socket, &len, sizeof(size_t));
-		result = SDLNet_TCP_Send(socket, packet, len);
+		size_t data_size = sizeof(size_t) + len;
+		NetworkBuffer buffer = NetworkBuffer(data_size);
+
+		buffer.append_data(&len, sizeof(size_t));
+		buffer.append_data(packet, len);
+
+		result = SDLNet_TCP_Send(socket, buffer.buffer, buffer.real_size);
 	}
 
 	//std::cout << "Sent " << result << " bytes of data\n";

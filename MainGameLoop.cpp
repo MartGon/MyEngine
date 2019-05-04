@@ -2,6 +2,11 @@
 #include "RendererManager.h"
 #include "SceneManager.h"
 
+#include <queue>
+
+std::queue<SDL_Renderer*> q;
+
+
 Scene *gFirstScene = nullptr;
 
 int WINDOW_WIDTH = 640;

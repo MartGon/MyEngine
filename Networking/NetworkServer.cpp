@@ -98,7 +98,7 @@ bool NetworkServer::establishConnection()
 		break;
 	case SERVER_STATE_SENDING:
 		if (sendPacket(new Packet()))
-			state = SERVER_STATE_RECEIVING;
+			state = SERVER_STATE_CONNECTION_ESTABLISHED;
 		break;
 	case SERVER_STATE_RECEIVING:
 		if (recvPacket())
