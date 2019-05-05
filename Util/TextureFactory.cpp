@@ -1,80 +1,92 @@
 #include "TextureFactory.h"
-#include "RendererManager.h"
 
 // Private
-Monitor<std::deque<CreateTextureRequest>> TextureFactory::create_texture_requests{ std::deque<CreateTextureRequest>() };
+
+Monitor<CreateTextureRequestType> TextureFactory::do_create{CREATE_NONE};
+SDL_Texture* TextureFactory::created_texture = nullptr;
+TextureRequest TextureFactory::texture_request;
+SurfaceRequest TextureFactory::surface_request;
+SurfaceResult TextureFactory::surface_result;
+SDL_semaphore* TextureFactory::sem = nullptr;
 
 // Public
 void TextureFactory::init()
 {
+	// Create mutex
+	sem = SDL_CreateSemaphore(0);
 }
 
-int TextureFactory::create_texture(CreateTextureRequest request)
+int TextureFactory::create_texture(TextureRequest request, SDL_Texture*& texture)
 {
 	// Activate flag
-	add_request(request);
+	do_create.set_value(CREATE_TEXTURE);
+
+	// Set request value
+	texture_request = request;
+
+	// Wait for the main thread to create a texture
+	SDL_SemWait(sem);
+
+	// Return
+	texture = created_texture;
+
+	// Deactivate flag
+	do_create.set_value(CREATE_NONE);
 
 	// Return created texture
 	return 0;
 }
 
-void TextureFactory::attend_requests()
+SurfaceResult TextureFactory::create_texture_from_surface(SurfaceRequest request, SDL_Texture*& texture)
 {
-	// Get request and block
-	create_texture_requests.lock();
-	std::deque<CreateTextureRequest> requests = create_texture_requests.get_value();
+	// Activate flag
+	do_create.set_value(CREATE_TEXTURE_FROM_SURFACE);
 
-	while (!requests.empty())
-	{
-		CreateTextureRequest request = requests.back();
-		requests.pop_back();
+	// Set request value
+	surface_request = request;
 
-		if (request.type == CREATE_NONE)
-			return;
+	// Wait for the main thread to create a texture
+	SDL_SemWait(sem);
 
-		// Create texture
-		if (request.type == CREATE_TEXTURE)
-		{
-			TextureRequest texture_request = request.texture_requset;
-			SDL_Texture* texture = SDL_CreateTexture(RendererManager::renderer, texture_request.format, texture_request.access, texture_request.w, texture_request.h);
-			
-			// Set Response
-			request.texture->set_value(texture);
-		}
-		// Create texture from surface
-		if (request.type == CREATE_TEXTURE_FROM_SURFACE)
-		{
-			SurfaceRequest surface_request = request.surface_request;
-			SurfaceResult surface_result;
+	// Return
+	texture = created_texture;
 
-			if (SDL_Surface* surface = IMG_Load(surface_request.path.c_str()))
-			{
-				if (surface_request.rgb)
-					SDL_SetColorKey(surface, surface_request.flag, SDL_MapRGB(surface->format, surface_request.rgb->red, surface_request.rgb->green, surface_request.rgb->blue));
-				SDL_Texture* texture = SDL_CreateTextureFromSurface(RendererManager::renderer, surface);
+	// Deactivate flag
+	do_create.set_value(CREATE_NONE);
 
-				surface_result.status = true;
-				surface_result.h = surface->h;
-				surface_result.w = surface->w;
-
-				SDL_FreeSurface(surface);
-
-				// Set Response
-				request.texture->set_value(texture);
-				request.surface_result->set_value(surface_result);
-			}
-		}
-
-	}
-
-	// Empty requests and unlock
-	create_texture_requests.set_value(requests);
-	create_texture_requests.unlock();
+	// Return created texture
+	return surface_result;
 }
 
-void TextureFactory::add_request(CreateTextureRequest& request)
+void TextureFactory::attend_requests()
 {
-	std::deque<CreateTextureRequest> requests = create_texture_requests.get_value();
-	requests.push_front(request);
-	create_texture_requests.set_value(requests);
+	// Return if there are no requests
+	CreateTextureRequestType type = do_create.get_value();
+
+	if (type == CREATE_NONE)
+		return;
+
+	// Create texture
+	if (type == CREATE_TEXTURE)
+		created_texture = SDL_CreateTexture(RendererManager::renderer, texture_request.format, texture_request.access, texture_request.w, texture_request.h);
+
+	// Create texture from surface
+	if (type == CREATE_TEXTURE_FROM_SURFACE)
+	{
+		if (SDL_Surface* surface = IMG_Load(surface_request.path.c_str()))
+		{
+			if(surface_request.rgb)
+				SDL_SetColorKey(surface, surface_request.flag, SDL_MapRGB(surface->format, surface_request.rgb->red, surface_request.rgb->green, surface_request.rgb->blue));
+			created_texture = SDL_CreateTextureFromSurface(RendererManager::renderer, surface);
+
+			surface_result.status = true;
+			surface_result.h = surface->h;
+			surface_result.w = surface->w;
+
+			SDL_FreeSurface(surface);
+		}
+	}
+
+	// Unlock mutex
+	SDL_SemPost(sem);
 }

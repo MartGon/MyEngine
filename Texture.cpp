@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "RendererManager.h"
+#include "TextureFactory.h"
 
 const char* Texture::folder = "resources/";
 
@@ -33,15 +34,6 @@ Texture::~Texture()
 
 void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
-	if (!mTexture)
-	{
-		mTexture = texture->get_value();
-		SurfaceResult surface_result = result->get_value();
-		mWidth = surface_result.w;
-		mHeight = surface_result.h;
-		return;
-	}
-
 	// Calculate render Quad
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 	renderQuad.w *= scale.x;
@@ -102,28 +94,23 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *col
 
 	// Create texture
 	SurfaceRequest surface_request{ path, SDL_TRUE, colorKey };
-	CreateTextureRequest request{ CREATE_TEXTURE_FROM_SURFACE , texture, surface_request, result, TextureRequest()};
-	TextureFactory::create_texture(request);
+	SurfaceResult result = TextureFactory::create_texture_from_surface(surface_request, mTexture);
 
-	/*
-	if (texture.get_value())
+	if (!mTexture)
 	{
-		printf("Unable to optimize surface from %s! SDL Error : %s \n", path.c_str(), SDL_GetError());
+		printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
 		mTexture = RendererManager::nullTexture.mTexture;
 	}
 	else
 	{
 		// Dimensions
-		SurfaceResult result_surface = result.get_value();
-
-		mWidth = result_surface.w;
-		mHeight = result_surface.h;
+		mWidth = result.w;
+		mHeight = result.h;
 		scale = Vector2<float>(1, 1);
 
 		// Flag
 		correct = true;
 	}
-	*/
 
 	return correct;
 }

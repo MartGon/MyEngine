@@ -1,9 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "Monitor.h"
-#include <deque>
-
-struct MapRGB;
+#include "RendererManager.h"
 
 enum CreateTextureRequestType
 {
@@ -34,15 +32,6 @@ struct TextureRequest
 	int h = 0;
 };
 
-struct CreateTextureRequest
-{
-	CreateTextureRequestType type = CREATE_NONE;
-	Monitor<SDL_Texture*>* texture;
-	SurfaceRequest surface_request;
-	Monitor<SurfaceResult>* surface_result;
-	TextureRequest texture_requset;
-};
-
 class TextureFactory
 {
 public:
@@ -50,15 +39,29 @@ public:
 	static void init();
 
 	// Main method to get a texture, blocks until the texture is available
-	static int create_texture(CreateTextureRequest request);
+	static int create_texture(TextureRequest request, SDL_Texture*& texture);
+
+	// Maint mehtod to get a texture from a surface
+	static SurfaceResult create_texture_from_surface(SurfaceRequest request, SDL_Texture*& texture);
 
 	// Method to check by main thread
 	static void attend_requests();
 private:
 
-	// List of requests
-	static Monitor<std::deque<CreateTextureRequest>> create_texture_requests;
 
-	// Methods
-	static void add_request(CreateTextureRequest& request);
+	// Create texture flag to know if a texture has to be created
+	static Monitor<CreateTextureRequestType> do_create;
+
+	// Texture to return after a request is made
+	static SDL_Texture* created_texture;
+
+	// Request texture params
+	static TextureRequest texture_request;
+
+	// Set request surface
+	static SurfaceRequest surface_request;
+	static SurfaceResult surface_result;
+
+	// Mutex to activate return of values
+	static SDL_semaphore* sem;
 };
