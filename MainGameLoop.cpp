@@ -68,20 +68,14 @@ int engine_main()
 		SceneManager::loadScene();
 
 		// Create quit flag
-		bool* quit = &SceneManager::quit;
+		bool& quit = SceneManager::quit;
 
 		//While application is running
-		RendererManager* renderer_manager = nullptr;
-		while (!(*quit))
+		while (!(quit))
 		{
 			// Check for next scene
 			if (SceneManager::canLoadNextScene())
-			{
 				SceneManager::loadScene();
-				renderer_manager = dynamic_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
-				while (renderer_manager->frame_buffer.size() < 1)
-					renderer_manager->manage();
-			}
 
 			//Handle events on queue
 			SDL_Event e;
@@ -90,13 +84,12 @@ int engine_main()
 				//User requests quit
 				if (e.type == SDL_QUIT)
 				{
-					*quit = true;
+					quit = true;
 				}
 				else
 				{
 					// Add to scene event list
 					SceneManager::scene->event_deque.push_front(e);
-					SceneManager::scene->to_send_events.push_front(e);
 				}
 			}
 
@@ -104,21 +97,8 @@ int engine_main()
 			SceneManager::scene->update();
 
 			// Render if frame buffer is enough
-			/*if (RendererManager::frame_buffer.size() >= 10)
-			{*/
-				SDL_SetRenderTarget(renderer, nullptr);
-				SDL_RenderCopy(renderer, RendererManager::frame_buffer.back(), NULL, NULL);
-				if (RendererManager::frame_buffer.size() > 1)
-				{
-					if (SceneManager::scene->isOnline() && !SceneManager::scene->connectionEstablished)
-					{
-					}
-					else
-						RendererManager::frame_buffer.pop_back();
-				}
-				SDL_RenderPresent(renderer);
-				SDL_RenderClear(renderer);
-			//}
+			SDL_RenderPresent(renderer);
+			SDL_RenderClear(renderer);
 		}
 	}
 

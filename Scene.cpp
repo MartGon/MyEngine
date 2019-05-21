@@ -10,6 +10,8 @@ Uint16 Scene::lastGameObjectID = 0;
 Scene::Scene()
 {
 	renderer = RendererManager::renderer;
+	inputManager = new InputManager();
+	//setManager(inputManager);
 }
 
 Scene::Scene(Scene::SceneMode mode) : Scene()
@@ -68,7 +70,7 @@ void Scene::destroy()
 }
 
 
-void Scene::handleEvent(const SDL_Event& event, bool from_network)
+GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 {
 	OnHandleEvent(event);
 
@@ -79,46 +81,13 @@ void Scene::handleEvent(const SDL_Event& event, bool from_network)
 		// Go is not active
 		if (!go->shouldBeLoaded())
 			continue;
-
-		// Go is updated by pair
-		if (isOnline())
-		{ 
-			if (from_network)
-			{
-				if (go->isNetworkStatic)
-					continue;
-
-				if (mode == ONLINE_CLIENT && !go->updateFromClient)
-				{
-					if (go->handleEvent(event))
-						return;
-				}
-				else if (mode == ONLINE_SERVER && go->updateFromClient)
-				{
-					if (go->handleEvent(event))
-						return;
-				}
-				else
-					continue;
-			}
-			else
-			{
-				if (shouldSendGameObjectUpdate(go))
-				{
-					if (go->handleEvent(event))
-						return;
-				}
-				else
-					continue;
-			}
-		}
 			
 		// Handle local event
 		if (go->handleEvent(event))
-			return;
+			return go;
 	}
 
-	return;
+	return nullptr;
 }
 
 // Methods
@@ -173,170 +142,6 @@ void Scene::update()
 	if (isPaused)
 		return;
 
-	// Sends catched events and check for incoming ones
-	if (isOnline() && connectionEstablished)
-	{
-		// Calculate frame diff
-		InputStatusPacket* prev_packet = nullptr;
-
-		if(!recv_packets.empty())
-			prev_packet = recv_packets.front();
-
-		int diff = 0;
-		int last_packet_frame = prev_packet ? prev_packet->frame : 0;
-		diff = frame_count - last_packet_frame;
-
-		// Send packet if the delay is lesser than 10 frames
-		if (diff < 2)
-		{
-			// We craft a Input Status Packet if we have images left
-			InputStatusPacket* packet = new InputStatusPacket();
-
-			// Get key state
-			while (!to_send_events.empty())
-			{
-				// Get and remove event
-				SDL_Event e = to_send_events.back();
-				to_send_events.pop_back();
-
-				if (e.type == SDL_KEYDOWN)
-				{
-					if (e.key.keysym.sym == SDLK_w)
-						packet->input_flags += InputFlags::W_KEY_PRESSED;
-					if (e.key.keysym.sym == SDLK_s)
-						packet->input_flags += InputFlags::S_KEY_PRESSED;
-					if (e.key.keysym.sym == SDLK_d)
-						packet->input_flags += InputFlags::D_KEY_PRESSED;
-					if (e.key.keysym.sym == SDLK_a)
-						packet->input_flags += InputFlags::A_KEY_PRESSED;
-				}
-				else if (e.type == SDL_KEYUP)
-				{
-					if (e.key.keysym.sym == SDLK_w)
-						packet->input_flags += InputFlags::W_KEY_RELEASED;
-					if (e.key.keysym.sym == SDLK_s)
-						packet->input_flags += InputFlags::S_KEY_RELEASED;
-					if (e.key.keysym.sym == SDLK_d)
-						packet->input_flags += InputFlags::D_KEY_RELEASED;
-					if (e.key.keysym.sym == SDLK_a)
-						packet->input_flags += InputFlags::A_KEY_RELEASED;
-				}
-				else if (e.type == SDL_MOUSEBUTTONDOWN)
-				{
-					if (e.button.button == SDL_BUTTON_LEFT)
-						packet->input_flags += InputFlags::LEFT_MOUSE_KEY_PRESSED;
-				}
-				else if (e.type == SDL_MOUSEBUTTONUP)
-				{
-					if (e.button.button == SDL_BUTTON_LEFT)
-						packet->input_flags += InputFlags::LEFT_MOUSE_KEY_RELEASED;
-				}
-			}
-
-			// Get Mouse state
-			int x, y;
-			SDL_GetMouseState(&x, &y);
-			Vector2<Uint16> mouse_pos = Vector2<Uint16>(x, y);
-			packet->mouse_pos = mouse_pos;
-
-			// Set frame number
-			packet->frame = frame_count++;
-
-			// Send Packet
-			networkAgent->sendPacket(packet, false);
-			delete packet;
-		}
-
-		// Are there any packets to recv
-		if (Packet* recv_packet = networkAgent->recvPacket())
-		{
-			if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
-			{
-				InputStatusPacket* input_packet = static_cast<InputStatusPacket*>(recv_packet);
-				recv_packets.push_front(input_packet);
-
-				Uint16 flags = input_packet->input_flags;
-				this->pair_mouse_state = input_packet->mouse_pos;
-
-				// Handle inputs
-				std::vector<SDL_Event> events;
-				SDL_Event e;
-				if (flags & InputFlags::A_KEY_PRESSED)
-				{
-					e.type = SDL_KEYDOWN;
-					e.key.keysym.sym = SDLK_a;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::D_KEY_PRESSED)
-				{
-					e.type = SDL_KEYDOWN;
-					e.key.keysym.sym = SDLK_d;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::S_KEY_PRESSED)
-				{
-					e.type = SDL_KEYDOWN;
-					e.key.keysym.sym = SDLK_s;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::W_KEY_PRESSED)
-				{
-					e.type = SDL_KEYDOWN;
-					e.key.keysym.sym = SDLK_w;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::A_KEY_RELEASED)
-				{
-					e.type = SDL_KEYUP;
-					e.key.keysym.sym = SDLK_a;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::D_KEY_RELEASED)
-				{
-					e.type = SDL_KEYUP;
-					e.key.keysym.sym = SDLK_d;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::S_KEY_RELEASED)
-				{
-					e.type = SDL_KEYUP;
-					e.key.keysym.sym = SDLK_s;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::W_KEY_RELEASED)
-				{
-					e.type = SDL_KEYUP;
-					e.key.keysym.sym = SDLK_w;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::LEFT_MOUSE_KEY_PRESSED)
-				{
-					e.type = SDL_MOUSEBUTTONDOWN;
-					e.button.button = SDL_BUTTON_LEFT;
-					events.push_back(e);
-				}
-				if (flags & InputFlags::LEFT_MOUSE_KEY_RELEASED)
-				{
-					e.type = SDL_MOUSEBUTTONUP;
-					e.button.button = SDL_BUTTON_LEFT;
-					events.push_back(e);
-				}
-
-				for (auto e : events)
-					handleEvent(e, true);
-			}
-			else
-			{
-				std::cout << "Packet was not of type InputStatusPacket";
-			}
-		}
-		else
-		{
-			std::cout << "There were no packets to recv \n";
-			return;
-		}
-	}
-
 	// Destroy objects that were set to be destroyed
 	while (!gameObjectsToDestroy.empty())
 	{
@@ -365,8 +170,54 @@ void Scene::update()
 		}
 	}
 
-	// Handle events
+	// Handle Events
 	handle_events(event_deque);
+
+	// Update InputManager
+	inputManager->manage();
+
+	// Send and wait for Input Status packet
+	if (isOnline() && connectionEstablished)
+	{
+		// Get Input Status
+		InputStatus input_status = inputManager->getInputStatus(getNetworkOwnership());
+
+		// Craft Packet to send
+		InputStatusPacket* packet = new InputStatusPacket(0, input_status.input_flags);
+		packet->mouse_pos = input_status.mouse_pos;
+
+		// Send Packet
+		networkAgent->sendPacket(packet, false);
+		delete packet;
+
+		// Wait for packet
+		if (Packet* recv_packet = networkAgent->recvPacket())
+		{
+			if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
+			{
+				InputStatusPacket* input_packet = static_cast<InputStatusPacket*>(recv_packet);
+
+				// Get pair input status
+				InputStatus input_status;
+				input_status.input_flags = input_packet->input_flags;
+				input_status.mouse_pos = input_packet->mouse_pos;
+
+				// Get pair identity
+				NetworkOwner owner = mode == ONLINE_SERVER ? NetworkOwner::OWNER_CLIENT_1 : NetworkOwner::OWNER_SERVER;
+
+				// Add to input status
+				inputManager->setInputStatus(input_status, owner);
+			}
+			else
+			{
+				std::cout << "Packet was not of type InputStatusPacket";
+			}
+		}
+		else
+		{
+			std::cout << "There were no packets to recv \n";
+		}
+	}
 
 	// Update every object
 	for (auto &gameObjectPair : gameObjectMap)
@@ -446,12 +297,12 @@ bool Scene::shouldSendGameObjectUpdate(GameObject* go)
 	{
 		if (mode == ONLINE_SERVER)
 		{
-			if (!go->shouldBeUpdatedFromClient())
+			if (!go->isNetworkOwned())
 				return true;
 		}
 		else if (mode == ONLINE_CLIENT)
 		{
-			if (go->shouldBeUpdatedFromClient())
+			if (go->isNetworkOwned())
 				return true;
 		}
 	}
@@ -464,19 +315,19 @@ void Scene::sendGameObjectUpdate(GameObject* go)
 	// GameObject State
 	
 	Packet* packet = go->toGameObjectUpdatePacket();
-	networkAgent->sendPacket(packet);
+	networkAgent->sendPacket(packet, false);
 	delete packet;
 
 	// Transform
 	packet = go->transform.toComponentPacket();
-	networkAgent->sendPacket(packet);
+	networkAgent->sendPacket(packet, false);
 	delete packet;
 
 	for (Component* component : go->components)
 	{
 		Packet* packet = component->toComponentPacket();
 		if(packet->packetType != PacketType::NULL_PACKET)
-			networkAgent->sendPacket(packet);
+			networkAgent->sendPacket(packet, false);
 		delete packet;
 	}
 
@@ -558,7 +409,7 @@ bool Scene::handlePacket(Packet *packet)
 		case PacketType::MOUSE_STATE_PACKET:
 		{
 			MouseStatePacket* mouse_state_packet = static_cast<MouseStatePacket*>(packet);
-			pair_mouse_state = mouse_state_packet->position;
+			//pair_mouse_state = mouse_state_packet->position;
 			break;
 		}
 		case PacketType::NULL_PACKET:
@@ -581,4 +432,12 @@ void Scene::handle_events(std::deque<SDL_Event>& events, bool network)
 
 		handleEvent(event);
 	}
+}
+
+NetworkOwner Scene::getNetworkOwnership()
+{
+	if (mode == SceneMode::ONLINE_CLIENT)
+		return NetworkOwner::OWNER_CLIENT_1;
+	else
+		return NetworkOwner::OWNER_SERVER;
 }

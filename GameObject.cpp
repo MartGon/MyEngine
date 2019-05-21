@@ -48,6 +48,9 @@ void GameObject::start()
 
 void GameObject::update()
 {
+	// Hook for gameObject updates
+	onUpdate();
+
 	// Update every component
 	for (auto &component : components)
 		if(component->isEnabled)
@@ -55,9 +58,6 @@ void GameObject::update()
 
 	//if (SceneManager::scene->isOnline() && !SceneManager::scene->shouldSendGameObjectUpdate(this))
 		//return;
-
-	// Hook for gameObject updates
-	onUpdate();
 }
 
 // Component Management
@@ -180,9 +180,9 @@ bool GameObject::isNetworkUpdated()
 	return false;
 }
 
-bool GameObject::shouldBeUpdatedFromClient()
+bool GameObject::isNetworkOwned()
 {
-	if (updateFromClient)
+	if (SceneManager::scene->getNetworkOwnership() == network_owner)
 		return true;
 
 	// Check if any of parents should be updated
@@ -191,7 +191,7 @@ bool GameObject::shouldBeUpdatedFromClient()
 	{
 		GameObject* go = parent->gameObject;
 
-		if (go->updateFromClient)
+		if (SceneManager::scene->getNetworkOwnership() == network_owner)
 			return true;
 
 		parent = go->transform.parent;

@@ -5,6 +5,7 @@
 #include "NetworkServer.h"
 #include "NetworkClient.h"
 #include "Monitor.h"
+#include "InputManager.h"
 #include <SDL_thread.h>
 #include <SDL.h>
 #include <vector>
@@ -35,16 +36,13 @@ public:
 	SceneMode mode = SINGLE_PLAYER;
 
 	// Events
-	std::deque<SDL_Event> to_send_events;
 	std::deque<SDL_Event> event_deque;
 
 	// Network stuff
-	std::deque<InputStatusPacket*> recv_packets;
 	NetworkAgent *networkAgent = nullptr;
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;
-	Vector2<int> pair_mouse_state;
 
 	// Static last  gameObject id
 	static Uint16 lastGameObjectID;
@@ -68,6 +66,7 @@ public:
 	uint64_t frame_count = 0;
 
 	// Managers
+	InputManager* inputManager = nullptr;
     std::vector<ManagerBase*> managers;
 
     template <class T>
@@ -124,6 +123,7 @@ public:
 	bool shouldSendGameObjectUpdate(GameObject* go);
 	void sendGameObjectUpdate(GameObject* go);
 	bool handlePacket(Packet *packet);
+	NetworkOwner getNetworkOwnership();
 
 	// Overrided Methods
 	virtual void loadMedia();
@@ -131,7 +131,7 @@ public:
 	virtual void beforeUpdate();
 	virtual void onUpdate();
 	virtual void destroy();
-	void handleEvent(const SDL_Event& event, bool from_network = false);
+	GameObject* handleEvent(const SDL_Event& event, bool from_network = false);
 	virtual void OnHandleEvent(const SDL_Event& event) {};
 	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };
 

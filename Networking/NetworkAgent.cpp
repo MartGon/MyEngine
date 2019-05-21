@@ -157,22 +157,26 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		return nullptr;
 	}
 
-	// Check for activity
-	Uint32 result = SDLNet_CheckSockets(socket_set, 0);
-	if (result == -1)
+	// If not blocking, we do a SocketSet check for activity
+	if (!isBlocking)
 	{
-		std::cout << "SDLNet_CheckSockets: failed\n";
-		return nullptr;
-	}
-	if (result == 0)
-	{
-		std::cout << "SDLNet_CheckSockets: No activiy ";
-		return nullptr;
-	}
-	if (!SDLNet_SocketReady(socket))
-	{
-		std::cout << "SDLNet_SocketReady: Socket was not ready";
-		return nullptr;
+		// Check for activity
+		Uint32 result = SDLNet_CheckSockets(socket_set, 0);
+		if (result == -1)
+		{
+			std::cout << "SDLNet_CheckSockets: failed\n";
+			return nullptr;
+		}
+		if (result == 0)
+		{
+			std::cout << "SDLNet_CheckSockets: No activiy ";
+			return nullptr;
+		}
+		if (!SDLNet_SocketReady(socket))
+		{
+			std::cout << "SDLNet_SocketReady: Socket was not ready";
+			return nullptr;
+		}
 	}
 
 	// Read packet length
@@ -196,7 +200,7 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 	std::chrono::milliseconds diff = now - this->ping;
 	ping = now;
 
-	std::cout << "Ping rate is " << diff.count() << " ms\n";
+	//std::cout << "Ping rate is " << diff.count() << " ms\n";
 
 	//std::cout << "Pair packet: " << len << " recv succesfully \n";
 	return packet;

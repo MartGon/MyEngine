@@ -17,9 +17,6 @@ public:
 	static Texture nullTexture;
 	static SDL_Renderer* renderer;
 
-	// Frame Buffer
-	static std::deque<SDL_Texture*> frame_buffer;
-
 	// Methods
 	static void init();
 	static void setNativeResolution(int width, int height);

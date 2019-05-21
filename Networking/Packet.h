@@ -61,14 +61,8 @@ enum InputFlags
 	S_KEY_PRESSED = 0x2,
 	A_KEY_PRESSED = 0x4,
 	D_KEY_PRESSED = 0x8,
-	W_KEY_RELEASED = 0x10,
-	S_KEY_RELEASED = 0x20,
-	A_KEY_RELEASED = 0x40,
-	D_KEY_RELEASED = 0x80,
-	LEFT_MOUSE_KEY_PRESSED = 0x100,
-	RIGHT_MOUSE_KEY_PRESSED = 0x200,
-	LEFT_MOUSE_KEY_RELEASED = 0x400,
-	RIGHT_MOUSE_KEY_RELEASED = 0x800
+	LEFT_MOUSE_KEY_PRESSED = 0x10,
+	RIGHT_MOUSE_KEY_PRESSED = 0x20,
 };
 
 class InputStatusPacket : public Packet
@@ -76,10 +70,10 @@ class InputStatusPacket : public Packet
 public:
 	// Constructors
 	InputStatusPacket();
-	InputStatusPacket(Uint32 frame, Uint8 input_flags);
+	InputStatusPacket(Uint32 go_id, Uint8 input_flags);
 
 	// Packet data
-	Uint32 frame = 0;
+	Uint32 gameobject_id = 0;
 	Uint16 input_flags = 0;
 	Vector2<Uint16> mouse_pos = Vector2<Uint16>(0, 0);
 

@@ -9,6 +9,14 @@
 #include <string>
 #include <vector>
 
+enum NetworkOwner
+{
+	OWNER_SERVER,
+	OWNER_CLIENT_1,
+	OWNER_CLIENT_2,
+	OWNER_CLIENT_3
+};
+
 class Component;
 class GameObject : public Updateable
 {
@@ -18,7 +26,7 @@ public:
 	~GameObject();
 
 	// Network Flag
-	bool updateFromClient = false;
+	NetworkOwner network_owner = OWNER_SERVER;
 	bool netCreated = false;
 
 	/*	This gameobject is part of the scenery and 
@@ -119,7 +127,7 @@ public:
 
 	// Network
 	bool isNetworkUpdated();
-	bool shouldBeUpdatedFromClient();
+	bool isNetworkOwned();
 	void updateGameObjectFromComponentPacket(ComponentPacket* component_packet);
 	GameObjectUpdatePacket* toGameObjectUpdatePacket();
 	void updateFromGameObjectUpdatePacket(GameObjectUpdatePacket* goup);

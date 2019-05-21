@@ -26,9 +26,9 @@ InputStatusPacket::InputStatusPacket() : Packet(INPUT_STATUS_PACKET)
 
 }
 
-InputStatusPacket::InputStatusPacket(Uint32 frame, Uint8 input_flags)
+InputStatusPacket::InputStatusPacket(Uint32 go_id, Uint8 input_flags) : InputStatusPacket()
 {
-	this->frame = frame;
+	this->gameobject_id = go_id;
 	this->input_flags = input_flags;
 }
 

@@ -41,6 +41,9 @@ public:
 	// Socket Set
 	SDLNet_SocketSet socket_set;
 
+	// Operation Mode
+	bool isBlocking = true;
+
 	// Debug
 	std::chrono::milliseconds ping = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());;
 
