@@ -55,6 +55,12 @@ bool NetworkClient::openClientSocket()
 		return false;
 	}
 
+	if (SDLNet_TCP_AddSocket(socket_set, clientSocket) == -1)
+	{
+		std::cout << " Add socket failded \n";
+		return false;
+	}
+
 	std::cout << "TCP Write Port " << serverPort << " Opened Successfully! \n";
 	return true;
 }

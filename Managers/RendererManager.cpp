@@ -4,6 +4,7 @@
 Texture RendererManager::nullTexture;
 
 SDL_Renderer* RendererManager::renderer = nullptr;
+std::deque<SDL_Texture*> RendererManager::frame_buffer = std::deque<SDL_Texture*>();
 
 // GBA Res: 240 x 160
 
@@ -86,6 +87,10 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
+	// Create frame texture
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
+	SDL_SetRenderTarget(renderer, texture);
+
 	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{
@@ -111,6 +116,9 @@ void RendererManager::manage()
 						collider->drawCollisionBoundaries();
 		}
 	}
+
+	// Add frame to deque
+	frame_buffer.push_front(texture);
 }
 
 // TODO - Poner layer a private. Hacer metodo setLayer que sortea el array cuando se cambia el layer

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "Packet.h"
+#include <chrono>
 #pragma once
 
 class NetworkBuffer
@@ -36,6 +37,12 @@ public:
 
 	// Attributes
 	NetworkBuffer buffer = NetworkBuffer(1460);
+
+	// Socket Set
+	SDLNet_SocketSet socket_set;
+
+	// Debug
+	std::chrono::milliseconds ping = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());;
 
 	// Methods
 		// Initializing

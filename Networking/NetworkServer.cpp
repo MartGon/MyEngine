@@ -73,6 +73,14 @@ bool NetworkServer::pairWithClient()
 	if (clientSocket = SDLNet_TCP_Accept(serverSocket))
 	{
 		std::cout << " Paired succesfully with client \n";
+
+		// Add socket to socket set
+		if (SDLNet_TCP_AddSocket(socket_set, clientSocket) == -1)
+		{
+			std::cout << " Add socket failded \n";
+			return false;
+		}
+
 		return true;
 	}
 

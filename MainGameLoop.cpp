@@ -2,11 +2,6 @@
 #include "RendererManager.h"
 #include "SceneManager.h"
 
-#include <queue>
-
-std::queue<SDL_Renderer*> q;
-
-
 Scene *gFirstScene = nullptr;
 
 int WINDOW_WIDTH = 640;
@@ -62,25 +57,34 @@ int engine_main()
 	}
 	else
 	{
-		// Game initialization
+		// Render init
 		RendererManager::renderer = renderer;
 		RendererManager::init();
 
+		// Scene init
 		Scene *scene = gFirstScene;
 		gFirstScene->renderer = renderer;
 		SceneManager::loadNextScene(scene);
 		SceneManager::loadScene();
 
-		SDL_Event e;
-		bool *quit = &SceneManager::quit;
+		// Create quit flag
+		bool* quit = &SceneManager::quit;
 
 		//While application is running
+		RendererManager* renderer_manager = nullptr;
 		while (!(*quit))
 		{
-			// Update scene
-			SceneManager::scene->update();
+			// Check for next scene
+			if (SceneManager::canLoadNextScene())
+			{
+				SceneManager::loadScene();
+				renderer_manager = dynamic_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
+				while (renderer_manager->frame_buffer.size() < 1)
+					renderer_manager->manage();
+			}
 
 			//Handle events on queue
+			SDL_Event e;
 			while (SDL_PollEvent(&e) != 0)
 			{
 				//User requests quit
@@ -89,16 +93,32 @@ int engine_main()
 					*quit = true;
 				}
 				else
-					SceneManager::scene->handleEvent(e);
+				{
+					// Add to scene event list
+					SceneManager::scene->event_deque.push_front(e);
+					SceneManager::scene->to_send_events.push_front(e);
+				}
 			}
 
-			// Render buffer
-			SDL_RenderPresent(renderer);
-			SDL_RenderClear(renderer);
+			// Update scene
+			SceneManager::scene->update();
 
-			// Check for next scene
-			if (SceneManager::canLoadNextScene())
-				SceneManager::loadScene();
+			// Render if frame buffer is enough
+			/*if (RendererManager::frame_buffer.size() >= 10)
+			{*/
+				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_RenderCopy(renderer, RendererManager::frame_buffer.back(), NULL, NULL);
+				if (RendererManager::frame_buffer.size() > 1)
+				{
+					if (SceneManager::scene->isOnline() && !SceneManager::scene->connectionEstablished)
+					{
+					}
+					else
+						RendererManager::frame_buffer.pop_back();
+				}
+				SDL_RenderPresent(renderer);
+				SDL_RenderClear(renderer);
+			//}
 		}
 	}
 

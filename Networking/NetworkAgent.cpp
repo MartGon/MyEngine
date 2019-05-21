@@ -61,6 +61,9 @@ NetworkAgent::NetworkAgent()
 {
 		std::cout << "Inicializando networking\n";
 		initNetworking();
+
+		// Allocat a socket set
+		socket_set = SDLNet_AllocSocketSet(1);
 }
 
 NetworkAgent::~NetworkAgent()
@@ -154,6 +157,24 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		return nullptr;
 	}
 
+	// Check for activity
+	Uint32 result = SDLNet_CheckSockets(socket_set, 0);
+	if (result == -1)
+	{
+		std::cout << "SDLNet_CheckSockets: failed\n";
+		return nullptr;
+	}
+	if (result == 0)
+	{
+		std::cout << "SDLNet_CheckSockets: No activiy ";
+		return nullptr;
+	}
+	if (!SDLNet_SocketReady(socket))
+	{
+		std::cout << "SDLNet_SocketReady: Socket was not ready";
+		return nullptr;
+	}
+
 	// Read packet length
 	size_t packet_len = 0;
 	int data_read = SDLNet_TCP_Recv(socket, &packet_len, sizeof(size_t));
@@ -169,6 +190,13 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";
 		return nullptr;
 	}
+
+	// Calculate time diff
+	std::chrono::milliseconds now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+	std::chrono::milliseconds diff = now - this->ping;
+	ping = now;
+
+	std::cout << "Ping rate is " << diff.count() << " ms\n";
 
 	//std::cout << "Pair packet: " << len << " recv succesfully \n";
 	return packet;

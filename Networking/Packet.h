@@ -2,6 +2,7 @@
 #include "Vector2.h"
 #include <SDL.h>
 #include <chrono>
+#include <vector>
 
 class GameObject;
 class Component;
@@ -18,6 +19,7 @@ enum PacketType
 	GAMEOBJECT_CREATE_PACKET,
 	EVENT_PACKET,
 	MOUSE_STATE_PACKET,
+	INPUT_STATUS_PACKET,
 	TIMESTAMP_PACKET
 };
 
@@ -30,6 +32,12 @@ enum ComponentPacketType
 	COMPONENT_ANIMATOR,
 	COMPONENT_TEXTURE_RENDERER,
 	COMPONENT_AUDIO_PLAYER
+};
+
+struct HandledEvent
+{
+	int gameobject_id = 0;
+	SDL_Event event_handled;
 };
 
 class Packet
@@ -47,18 +55,56 @@ public:
 	virtual size_t getSize() { return sizeof(Packet); };
 };
 
+enum InputFlags
+{
+	W_KEY_PRESSED = 0x1,
+	S_KEY_PRESSED = 0x2,
+	A_KEY_PRESSED = 0x4,
+	D_KEY_PRESSED = 0x8,
+	W_KEY_RELEASED = 0x10,
+	S_KEY_RELEASED = 0x20,
+	A_KEY_RELEASED = 0x40,
+	D_KEY_RELEASED = 0x80,
+	LEFT_MOUSE_KEY_PRESSED = 0x100,
+	RIGHT_MOUSE_KEY_PRESSED = 0x200,
+	LEFT_MOUSE_KEY_RELEASED = 0x400,
+	RIGHT_MOUSE_KEY_RELEASED = 0x800
+};
+
+class InputStatusPacket : public Packet
+{
+public:
+	// Constructors
+	InputStatusPacket();
+	InputStatusPacket(Uint32 frame, Uint8 input_flags);
+
+	// Packet data
+	Uint32 frame = 0;
+	Uint16 input_flags = 0;
+	Vector2<Uint16> mouse_pos = Vector2<Uint16>(0, 0);
+
+	// Methods
+	virtual size_t getSize() { return sizeof(InputStatusPacket); };
+};
+
 class EventPacket : public Packet
 {
 public:
 	// Constructors
 	EventPacket();
-	EventPacket(int gameobject_id, SDL_Event event);
+	EventPacket(HandledEvent event);
 
-	int gameobject_id;
-	SDL_Event event;
+	// Methods
+	void add_event(HandledEvent event);
+	std::vector<HandledEvent> get_events() { return handled_events; };
+	Vector2<Uint8> mouse_pos;
 
 	// Overrided
 	size_t getSize() override { return sizeof(EventPacket); };
+
+private:
+	Uint8 events_len = 0;
+	std::vector<HandledEvent> handled_events;
 };
 
 class MouseStatePacket : public Packet

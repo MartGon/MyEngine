@@ -20,6 +20,18 @@ Packet::~Packet()
 {
 }
 
+// Input status packet
+InputStatusPacket::InputStatusPacket() : Packet(INPUT_STATUS_PACKET)
+{
+
+}
+
+InputStatusPacket::InputStatusPacket(Uint32 frame, Uint8 input_flags)
+{
+	this->frame = frame;
+	this->input_flags = input_flags;
+}
+
 // EventPacket
 
 EventPacket::EventPacket() : Packet(EVENT_PACKET)
@@ -27,10 +39,15 @@ EventPacket::EventPacket() : Packet(EVENT_PACKET)
 
 }
 
-EventPacket::EventPacket(int gameobject_id, SDL_Event event) : EventPacket()
+EventPacket::EventPacket(HandledEvent event) : EventPacket()
 {
-	this->gameobject_id = gameobject_id;
-	this->event = event;
+	add_event(event);
+}
+
+void EventPacket::add_event(HandledEvent event)
+{
+	this->handled_events.push_back(event);
+	this->events_len = handled_events.size();
 }
 
 // Mouse State Packet

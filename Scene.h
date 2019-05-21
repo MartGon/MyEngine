@@ -4,12 +4,13 @@
 #include "CollisionManager.h"
 #include "NetworkServer.h"
 #include "NetworkClient.h"
+#include "Monitor.h"
 #include <SDL_thread.h>
 #include <SDL.h>
 #include <vector>
+#include <deque>
 #include <map>
-
-int recvPacketThread(void *data);
+#include <chrono>
 
 class Scene
 {
@@ -33,17 +34,17 @@ public:
 	// Scene Mode
 	SceneMode mode = SINGLE_PLAYER;
 
+	// Events
+	std::deque<SDL_Event> to_send_events;
+	std::deque<SDL_Event> event_deque;
+
 	// Network stuff
-	std::vector<Packet*> recv_packets;
+	std::deque<InputStatusPacket*> recv_packets;
 	NetworkAgent *networkAgent = nullptr;
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;
 	Vector2<int> pair_mouse_state;
-
-	// Thread
-	SDL_Thread *thread = nullptr;
-	SDL_sem *sem = nullptr;
 
 	// Static last  gameObject id
 	static Uint16 lastGameObjectID;
@@ -130,7 +131,7 @@ public:
 	virtual void beforeUpdate();
 	virtual void onUpdate();
 	virtual void destroy();
-	void handleEvent(const SDL_Event& event);
+	void handleEvent(const SDL_Event& event, bool from_network = false);
 	virtual void OnHandleEvent(const SDL_Event& event) {};
 	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };
 
@@ -142,5 +143,7 @@ public:
 	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
+
+	void handle_events(std::deque<SDL_Event>& events, bool network = false);
 };
 
