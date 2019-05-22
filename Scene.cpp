@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Navigator.h"
+#include "Random.h"
 #include <stdio.h>
 
 // Attributes
@@ -179,19 +180,24 @@ void Scene::update()
 	// Send and wait for Input Status packet
 	if (isOnline() && connectionEstablished)
 	{
-		// Get Input Status
-		InputStatus input_status = inputManager->getInputStatus(getNetworkOwnership());
+		if (!stop_sending)
+		{
+			// Get Input Status
+			InputStatus input_status = inputManager->getInputStatus(getNetworkOwnership());
 
-		// Craft Packet to send
-		InputStatusPacket* packet = new InputStatusPacket(0, input_status.input_flags);
-		packet->mouse_pos = input_status.mouse_pos;
+			// Craft Packet to send
+			InputStatusPacket* packet = new InputStatusPacket(frame_count, input_status.input_flags);
+			packet->mouse_pos = input_status.mouse_pos;
 
-		// Send Packet
-		networkAgent->sendPacket(packet, false);
-		delete packet;
+			// Increment frame_count
+			frame_count++;
+
+			// Send Packet
+			networkAgent->sendPacket(packet, false);
+			delete packet;
+		}
 
 		// Wait for packet
-		//SDL_Delay(50);
 		if (Packet* recv_packet = networkAgent->recvPacket())
 		{
 			if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
@@ -208,15 +214,51 @@ void Scene::update()
 
 				// Add to input status
 				inputManager->setInputStatus(input_status, owner);
+
+				// Set last_packet
+				last_packet = input_packet;
 			}
 			else
 			{
 				std::cout << "Packet was not of type InputStatusPacket";
 			}
+
+			if (stop_sending)
+			{
+				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
+				{
+					if (std::abs((int)(frame_count - last_packet->frame_count)) == 0)
+					{
+						while(renderer_manager->frame_buffer.size() != renderer_manager->getMaxBufferSize())
+						{
+							renderer_manager->manage();
+						}
+						stop_sending = false;
+					}
+				}
+			}
 		}
 		else
 		{
-			std::cout << "There were no packets to recv \n";
+			//std::cout << "There were no packets to recv \n";
+
+			// Check if we can send next packet
+			if (!stop_sending)
+			{
+				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
+				{
+					if (last_packet)
+					{
+						// If last recv packet is 10 frames old, wait for sync
+						if (std::abs((int)(frame_count - last_packet->frame_count)) >= renderer_manager->frame_buffer.size())
+						{
+							stop_sending = true;
+							std::cout << "Timeout Ocurred, need to Desync\n";
+						}
+					}
+				}
+			}
+			return;
 		}
 	}
 
@@ -285,6 +327,9 @@ void Scene::setSceneMode(Scene::SceneMode sceneMode)
 		networkAgent = new NetworkServer();
 		break;
 	}
+
+	if (networkAgent)
+		networkAgent->isBlocking = false;
 }
 
 bool Scene::isOnline()

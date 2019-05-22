@@ -70,11 +70,11 @@ class InputStatusPacket : public Packet
 public:
 	// Constructors
 	InputStatusPacket();
-	InputStatusPacket(Uint32 go_id, Uint8 input_flags);
+	InputStatusPacket(Uint32 frame_number, Uint8 input_flags);
 
 	// Packet data
-	Uint32 gameobject_id = 0;
-	Uint16 input_flags = 0;
+	Uint32 frame_count = 0;
+	Uint8 input_flags = 0;
 	Vector2<Uint16> mouse_pos = Vector2<Uint16>(0, 0);
 
 	// Methods

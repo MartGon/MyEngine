@@ -169,7 +169,7 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		}
 		if (result == 0)
 		{
-			std::cout << "SDLNet_CheckSockets: No activiy ";
+			//std::cout << "SDLNet_CheckSockets: No activiy ";
 			return nullptr;
 		}
 		if (!SDLNet_SocketReady(socket))

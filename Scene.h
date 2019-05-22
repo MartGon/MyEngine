@@ -40,9 +40,12 @@ public:
 
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
+	InputStatusPacket* last_packet = nullptr;
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;
+	bool stop_sending = false;
+	Uint32 frame_count = 0;
 
 	// Static last  gameObject id
 	static Uint16 lastGameObjectID;
@@ -61,9 +64,6 @@ public:
 
 	// GameObjects to be destroy
 	std::vector<GameObject*> gameObjectsToDestroy;
-
-	// Debug
-	uint64_t frame_count = 0;
 
 	// Managers
 	InputManager* inputManager = nullptr;

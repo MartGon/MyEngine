@@ -136,6 +136,7 @@ SDL_Texture* RendererManager::getFrameFromBuffer()
 
 	SDL_Texture* frame = frame_buffer.front();
 	frame_buffer.pop_front();
+	
 	return frame;
 }
 

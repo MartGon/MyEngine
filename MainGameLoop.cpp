@@ -74,6 +74,7 @@ int engine_main()
 		RendererManager* renderer_manager = static_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
 
 		//While application is running
+		SDL_Texture* frame_to_render = nullptr;
 		while (!(quit))
 		{
 			// Check for next scene
@@ -102,18 +103,31 @@ int engine_main()
 			// Update scene
 			SceneManager::scene->update();
 
-			if (!renderer_manager->frame_buffer.empty())
+			// Don't render while waiting for connection
+			if (SceneManager::scene->isOnline())
 			{
-				if (SceneManager::scene->isOnline())
-				{
-					if (!SceneManager::scene->connectionEstablished)
-						continue;
-				}
+				if (!SceneManager::scene->connectionEstablished)
+					continue;
+			}
 
-				SDL_Texture* frame = renderer_manager->getFrameFromBuffer();
+			// Get a frame to render from the buffer
+			if (SDL_Texture* frame = renderer_manager->getFrameFromBuffer())
+			{
+				// Check if it is not first frame
+				if (frame_to_render)
+				{
+					SDL_SetRenderTarget(renderer, nullptr);
+					SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
+					SDL_DestroyTexture(frame_to_render);
+				}
+				// Set frame to render
+				frame_to_render = frame;
+			}
+			// If no frames left, render previous one
+			else if(frame_to_render)
+			{
 				SDL_SetRenderTarget(renderer, nullptr);
-				SDL_RenderCopy(renderer, frame, NULL, NULL);
-				SDL_DestroyTexture(frame);
+				SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
 			}
 
 			// Render if frame buffer is enough
