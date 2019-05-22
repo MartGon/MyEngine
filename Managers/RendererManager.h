@@ -12,10 +12,15 @@ class RendererManager : public Manager<TextureRenderer*>
 public:
 	// Constructor
 	RendererManager();
+	RendererManager(int buffer_size);
 
 	// Attributes
 	static Texture nullTexture;
 	static SDL_Renderer* renderer;
+
+	// Buffering
+	int max_buffer_size = 0;
+	std::deque<SDL_Texture*> frame_buffer;
 
 	// Methods
 	static void init();
@@ -31,6 +36,8 @@ public:
 	// Non-static methods
 	void onAddComponent(TextureRenderer* tRenderer) override;
 	void manage() override;
+	SDL_Texture* getFrameFromBuffer();
+	int getMaxBufferSize();
 
 private:
 	static int nativeWidthResolution;

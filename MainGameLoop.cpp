@@ -70,12 +70,18 @@ int engine_main()
 		// Create quit flag
 		bool& quit = SceneManager::quit;
 
+		// Get renderer manager and generate frames
+		RendererManager* renderer_manager = static_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
+
 		//While application is running
 		while (!(quit))
 		{
 			// Check for next scene
 			if (SceneManager::canLoadNextScene())
+			{
 				SceneManager::loadScene();
+				renderer_manager = static_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
+			}
 
 			//Handle events on queue
 			SDL_Event e;
@@ -89,12 +95,26 @@ int engine_main()
 				else
 				{
 					// Add to scene event list
-					SceneManager::scene->event_deque.push_front(e);
+					SceneManager::scene->event_deque.push_back(e);
 				}
 			}
 
 			// Update scene
 			SceneManager::scene->update();
+
+			if (!renderer_manager->frame_buffer.empty())
+			{
+				if (SceneManager::scene->isOnline())
+				{
+					if (!SceneManager::scene->connectionEstablished)
+						continue;
+				}
+
+				SDL_Texture* frame = renderer_manager->getFrameFromBuffer();
+				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_RenderCopy(renderer, frame, NULL, NULL);
+				SDL_DestroyTexture(frame);
+			}
 
 			// Render if frame buffer is enough
 			SDL_RenderPresent(renderer);

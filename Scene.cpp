@@ -191,6 +191,7 @@ void Scene::update()
 		delete packet;
 
 		// Wait for packet
+		//SDL_Delay(50);
 		if (Packet* recv_packet = networkAgent->recvPacket())
 		{
 			if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
