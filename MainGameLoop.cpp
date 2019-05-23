@@ -75,6 +75,7 @@ int engine_main()
 
 		//While application is running
 		SDL_Texture* frame_to_render = nullptr;
+		bool slowmode = false;
 		while (!(quit))
 		{
 			// Check for next scene
@@ -92,6 +93,13 @@ int engine_main()
 				if (e.type == SDL_QUIT)
 				{
 					quit = true;
+				}
+				if(e.type == SDL_KEYDOWN)
+				{
+					if (e.key.keysym.sym == SDLK_p)
+					{
+						slowmode = !slowmode;
+					}
 				}
 				else
 				{
@@ -133,6 +141,9 @@ int engine_main()
 			// Render if frame buffer is enough
 			SDL_RenderPresent(renderer);
 			SDL_RenderClear(renderer);
+
+			if(slowmode)
+				SDL_Delay(1000);
 		}
 	}
 

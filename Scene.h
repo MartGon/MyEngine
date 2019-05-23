@@ -41,6 +41,7 @@ public:
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
 	InputStatusPacket* last_packet = nullptr;
+	std::unordered_map<Uint32, InputStatus> input_status_history;
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;

@@ -4,7 +4,7 @@
 bool InputManager::isKeyPressed(SDL_Scancode key, NetworkOwner owner)
 {
 	// For this client
-	if (owner == SceneManager::scene->getNetworkOwnership())
+	/*if (owner == SceneManager::scene->getNetworkOwnership())
 	{
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
@@ -12,18 +12,18 @@ bool InputManager::isKeyPressed(SDL_Scancode key, NetworkOwner owner)
 	}
 	// For other clients
 	else
-	{
+	{*/
 		InputStatus status = getInputStatus(owner);
 		Uint16 flag = getFlagByScanCode(key);
 
 		return status.input_flags & flag;
-	}
+	//}
 }
 
 bool InputManager::isMousePressed(Uint8 button, NetworkOwner owner)
 {
 	// For this client
-	if (owner == SceneManager::scene->getNetworkOwnership())
+	/*if (owner == SceneManager::scene->getNetworkOwnership())
 	{
 		const Uint32 mouse_flags = SDL_GetMouseState(NULL, NULL);
 
@@ -31,12 +31,12 @@ bool InputManager::isMousePressed(Uint8 button, NetworkOwner owner)
 	}
 	// For other clients
 	else
-	{
+	{*/
 		InputStatus status = getInputStatus(owner);
 		Uint16 flag = getFlagByButton(button);
 
 		return status.input_flags & flag;
-	}
+	//}
 }
 
 bool InputManager::wasKeyPressed(SDL_Scancode key, NetworkOwner owner)

@@ -180,21 +180,27 @@ void Scene::update()
 	// Send and wait for Input Status packet
 	if (isOnline() && connectionEstablished)
 	{
+		bool update_frame = false;
+		
+		// Check if we can send the next packet
 		if (!stop_sending)
 		{
 			// Get Input Status
 			InputStatus input_status = inputManager->getInputStatus(getNetworkOwnership());
 
+			// Add inputstatus to history
+			input_status_history.insert({ frame_count, input_status });
+
 			// Craft Packet to send
 			InputStatusPacket* packet = new InputStatusPacket(frame_count, input_status.input_flags);
 			packet->mouse_pos = input_status.mouse_pos;
 
-			// Increment frame_count
-			frame_count++;
-
 			// Send Packet
 			networkAgent->sendPacket(packet, false);
 			delete packet;
+
+			// Increment frame_count
+			frame_count++;
 		}
 
 		// Wait for packet
@@ -215,34 +221,53 @@ void Scene::update()
 				// Add to input status
 				inputManager->setInputStatus(input_status, owner);
 
+				// Revert previously sent input status
+				if (input_status_history.find(input_packet->frame_count) != input_status_history.end())
+				{
+					InputStatus prev_input_status = input_status_history.at(input_packet->frame_count);
+					inputManager->setInputStatus(prev_input_status, getNetworkOwnership());
+				}
+
+				// Revert also one frame before if not the first frame
+				int prev_frame = last_packet ? last_packet->frame_count : 0;
+				if (input_status_history.find(prev_frame) != input_status_history.end())
+				{
+					InputStatus prev_bis_input_status = input_status_history.at(prev_frame);
+					inputManager->setPrevInputStatus(prev_bis_input_status, getNetworkOwnership());
+				}
+
 				// Set last_packet
 				last_packet = input_packet;
-			}
-			else
-			{
-				std::cout << "Packet was not of type InputStatusPacket";
+
+				// Set flag
+				update_frame = true;
 			}
 
+			// Check if we can start sending packets again
 			if (stop_sending)
 			{
 				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
 				{
-					if (std::abs((int)(frame_count - last_packet->frame_count)) == 0)
+					/*if (std::abs((int)(frame_count - last_packet->frame_count)) == 0)
 					{
 						while(renderer_manager->frame_buffer.size() != renderer_manager->getMaxBufferSize())
 						{
 							renderer_manager->manage();
 						}
 						stop_sending = false;
-					}
+						std::cout << "Last frame recv is " << last_packet->frame_count;
+					}*/
+
+					stop_sending = false;
 				}
 			}
 		}
+		// No packet was received
 		else
 		{
-			//std::cout << "There were no packets to recv \n";
+			std::cout << "There were no packets to recv \n";
 
-			// Check if we can send next packet
+			// Check how many frames we are off
 			if (!stop_sending)
 			{
 				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
@@ -250,16 +275,21 @@ void Scene::update()
 					if (last_packet)
 					{
 						// If last recv packet is 10 frames old, wait for sync
-						if (std::abs((int)(frame_count - last_packet->frame_count)) >= renderer_manager->frame_buffer.size())
+						if (std::abs((int)(frame_count - last_packet->frame_count)) >= renderer_manager->getMaxBufferSize())
 						{
 							stop_sending = true;
 							std::cout << "Timeout Ocurred, need to Desync\n";
 						}
 					}
+
+					// Create one dummy frame
+					//renderer_manager->manage();
 				}
 			}
-			return;
 		}
+
+		if (!update_frame)
+			return;
 	}
 
 	// Update every object
