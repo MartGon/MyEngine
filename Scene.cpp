@@ -248,16 +248,6 @@ void Scene::update()
 			{
 				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
 				{
-					/*if (std::abs((int)(frame_count - last_packet->frame_count)) == 0)
-					{
-						while(renderer_manager->frame_buffer.size() != renderer_manager->getMaxBufferSize())
-						{
-							renderer_manager->manage();
-						}
-						stop_sending = false;
-						std::cout << "Last frame recv is " << last_packet->frame_count;
-					}*/
-
 					stop_sending = false;
 				}
 			}
@@ -278,12 +268,9 @@ void Scene::update()
 						if (std::abs((int)(frame_count - last_packet->frame_count)) >= renderer_manager->getMaxBufferSize())
 						{
 							stop_sending = true;
-							std::cout << "Timeout Ocurred, need to Desync\n";
+							std::cout << "Timeout Ocurred, need to ReSync\n";
 						}
 					}
-
-					// Create one dummy frame
-					//renderer_manager->manage();
 				}
 			}
 		}
