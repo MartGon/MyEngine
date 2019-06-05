@@ -29,6 +29,7 @@ AudioPlayer::~AudioPlayer()
 void AudioPlayer::destroy()
 {
 	SceneManager::scene->removeComponentFromManager(this);
+	SDL_FreeWAV(wav_buffer);
 }
 
 // Own methods

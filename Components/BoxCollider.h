@@ -11,6 +11,7 @@ public:
 	BoxCollider();
 	BoxCollider(int width, int height);
 	BoxCollider(Texture texture);
+	~BoxCollider();
 
 	// Collider boundaries
 	int cTop = 0;
@@ -36,5 +37,4 @@ public:
 	bool isCollidingWith(Collider* collider) override;
     void start() override;
 	void update() override;
-	void destroy() override;
 };

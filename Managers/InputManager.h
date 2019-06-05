@@ -22,6 +22,9 @@ class InputManager : public ManagerBase
 {
 public:
 
+	// Member
+	NetworkOwner default_owner;
+
 	// Input State
 	bool isKeyPressed(SDL_Scancode key, NetworkOwner owner);
 	bool wasKeyPressed(SDL_Scancode key, NetworkOwner owner);
@@ -41,6 +44,9 @@ public:
 	// Translation SDL
 	Uint16 getFlagByScanCode(SDL_Scancode code);
 	Uint16 getFlagByButton(Uint8 button);
+
+	// Convenience
+	static InputManager* get();
 
 	// Override
 	void manage() override;

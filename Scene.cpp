@@ -12,7 +12,6 @@ Scene::Scene()
 {
 	renderer = RendererManager::renderer;
 	inputManager = new InputManager();
-	//setManager(inputManager);
 }
 
 Scene::Scene(Scene::SceneMode mode) : Scene()
@@ -60,6 +59,9 @@ void Scene::destroy()
 	for (auto &gameObjectPair : gameObjectMap)
 		if (GameObject *gameObject = gameObjectPair.second)
 			gameObject->destroy();
+
+	for (auto manager : managers)
+		manager->destroy();
 
 	// Reset las id
 	lastGameObjectID = 0;
@@ -347,6 +349,8 @@ void Scene::setSceneMode(Scene::SceneMode sceneMode)
 
 	if (networkAgent)
 		networkAgent->isBlocking = false;
+
+	inputManager->default_owner = getNetworkOwnership();
 }
 
 bool Scene::isOnline()

@@ -62,6 +62,9 @@ void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_Renderer
 	// Set alpha value
 	SDL_SetTextureAlphaMod(mTexture, alpha);
 
+	// Set color mod
+	SDL_SetTextureColorMod(mTexture, color_mod.red, color_mod.green, color_mod.blue);
+
 	// Rotation center is taken the texture width and height as reference
 	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
 	{

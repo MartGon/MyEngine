@@ -45,6 +45,7 @@ public:
 	
 	// Methods
 	Animation* addAnimation(const char* prefixPath, MapRGB* colorKey, TextureRenderer* tRenderer, int lastFrame, int firstFrame = 1, Uint8 id = 0);
+	Animation* addAnimation(Animation* anim);
 	void setCurrentAnimation(Animation *animation);
 	void reset();
 

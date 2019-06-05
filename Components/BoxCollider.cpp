@@ -20,6 +20,11 @@ BoxCollider::BoxCollider(int width, int height) : Collider()
 	cHeight = height;
 }
 
+BoxCollider::~BoxCollider()
+{
+	destroy();
+}
+
 void BoxCollider::calculateColliderBoundaries()
 {
 	Vector2<float> position = gameObject->getAbsolutePosition();
@@ -101,12 +106,6 @@ void BoxCollider::drawCollisionBoundaries()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawRect(renderer, &rect);
-}
-
-void BoxCollider::destroy()
-{
-	//gColliders.erase(std::remove(gColliders.begin(), gColliders.end(), this), gColliders.end());
-	// TODO - Remove from collision manager list
 }
 
 Vector2<float> BoxCollider::getDimensions()

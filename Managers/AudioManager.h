@@ -14,14 +14,20 @@ public:
 	// Constructors
 	AudioManager();
 
+	// Member
+	int device = -1;
+
 	// Own methods
 	void init();
 	void enable();
 	void silence();
 
+	SDL_AudioFormat getFormat();
+
 	// Overrided methods
 	void manage() override;
 	void onAddComponent(AudioPlayer* aPlayer) override;
+	void destroy() override;
 
 private:
 	// Audio Hardware specs

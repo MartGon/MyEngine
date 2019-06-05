@@ -51,6 +51,9 @@ public:
 	void setAlpha(Uint8 alpha);
 	Uint8 getAlpha();
 
+	// Color Mod
+	MapRGB color_mod = {-1, -1, -1};
+
 	// Checking
 	bool isValid();
 

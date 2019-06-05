@@ -81,6 +81,10 @@ Uint16 InputManager::getFlagByScanCode(SDL_Scancode code)
 		return A_KEY_PRESSED;
 	else if (code == SDL_SCANCODE_D)
 		return D_KEY_PRESSED;
+	else if (code == SDL_SCANCODE_E)
+		return E_KEY_PRESSED;
+	else if (code == SDL_SCANCODE_Q)
+		return Q_KEY_PRESSED;
 
 	return 0;
 }
@@ -125,6 +129,10 @@ void InputManager::manage()
 		status.input_flags += D_KEY_PRESSED;
 	if (keyboard[SDL_SCANCODE_S])
 		status.input_flags += S_KEY_PRESSED;
+	if (keyboard[SDL_SCANCODE_E])
+		status.input_flags += E_KEY_PRESSED;
+	if (keyboard[SDL_SCANCODE_Q])
+		status.input_flags += Q_KEY_PRESSED;
 
 	// Save Mouse State
 	int x, y;
@@ -138,4 +146,9 @@ void InputManager::manage()
 	status.mouse_pos.y = y;
 
 	setInputStatus(status, SceneManager::scene->getNetworkOwnership());
+}
+
+InputManager* InputManager::get()
+{
+	return SceneManager::scene->inputManager;
 }

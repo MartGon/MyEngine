@@ -100,6 +100,23 @@ public:
 		return nullptr;
 	}
 
+	template <typename T>
+	std::vector<T*> getComponents()
+	{
+		// Vector
+		std::vector<T*> lComponents;
+
+		for(auto component : this->components)
+		{
+			if (T* subComponent = dynamic_cast<T*>(component))
+			{
+				lComponents.push_back(subComponent);
+			}
+		}
+
+		return lComponents;
+	}
+
 	Component* getComponentById(unsigned int id);
 
 	// State

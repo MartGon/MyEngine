@@ -30,6 +30,15 @@ Animation* Animator::addAnimation(const char* prefixPath, MapRGB* colorKey, Text
 	return animation;
 }
 
+Animation* Animator::addAnimation(Animation* anim)
+{
+	setAnimationID(anim, id);
+
+	animations.push_back(anim);
+
+	return anim;
+}
+
 void Animator::setCurrentAnimation(Animation *animation)
 {
 	currentAnimation = animation;

@@ -52,11 +52,8 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 		}
 
 		len = (len > audio_len ? audio_len : len);
-		//SDL_memcpy (stream, audio_pos, len); 					// simply copy from one buffer into the other
-		//SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
-		SDL_MixAudioFormat(stream, audio_pos, audioPlayer->current_audio_data->audio_spec.format, len, audioPlayer->volume);
-
-		//std::cout << "Memory address is " << (Uint32)audio_pos << " Next address should be " << Uint32(audio_pos + len) <<std::endl;
+		//SDL_MixAudioFormat(stream, audio_pos, audioPlayer->current_audio_data->audio_spec.format, len, audioPlayer->volume);
+		SDL_MixAudioFormat(stream, audio_pos, audioManager->getFormat(), len, audioPlayer->volume);
 
 		audioPlayer->wav_buffer += len;
 		audioPlayer->wav_length -= len;
@@ -93,22 +90,25 @@ void AudioManager::init()
 	desired_audio_spec->callback = AudioManagerNs::audio_callback;
 	desired_audio_spec->userdata = this;
 
-	if (SDL_OpenAudio(desired_audio_spec, NULL) < 0) {
-		std::cout << "SDL_OpenAudio: Could not open audio" << std::endl;
+	device = SDL_OpenAudioDevice(NULL, 0, desired_audio_spec, obtained_audio_spec, 0);
+
+	if (device == 0) {
+		std::cout << "SDL_OpenAudio: Could not open audio: " << SDL_GetError() << std::endl;
 		exit(-1);
 	}
 
 	isInitialized = true;
+	SDL_PauseAudioDevice(device, 0);
 }
 
 void AudioManager::enable()
 {
-	SDL_PauseAudio(0);
+	SDL_PauseAudioDevice(device, 0);
 }
 
 void AudioManager::silence() 
 {
-	SDL_PauseAudio(1);
+	SDL_PauseAudioDevice(device, 1);
 }
 
 // Overrided methods
@@ -120,4 +120,14 @@ void AudioManager::manage()
 void AudioManager::onAddComponent(AudioPlayer * aPlayer)
 {
 	//std::cout << "AduioPlayer added" << std::endl;
+}
+
+SDL_AudioFormat AudioManager::getFormat()
+{
+	return obtained_audio_spec->format;
+}
+
+void AudioManager::destroy()
+{
+	silence();
 }
