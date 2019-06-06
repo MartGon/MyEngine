@@ -4,6 +4,7 @@
 
 // Own
 #include "TimerHandler.h"
+#include "Component.h"
 
 // Standard C++
 #include <iostream>
@@ -23,4 +24,23 @@ public:
 	SDL_TimerID sdl_timer;
 	TimerHandler* timer_handler;
 	void* param;
+};
+
+class TimerComponent : public Component
+{
+public:
+	// Constructor
+	TimerComponent(Uint32 ms, Uint8 flag = 0) ;
+
+	// Attributes
+	Uint32 delay = 0;
+	Uint8 flag = 0;
+	Uint32 due_date = 0;
+	bool isOver = false;
+
+	// Methods
+	void reset();
+
+	// Overrided methods
+	void update() override;
 };

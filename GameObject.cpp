@@ -288,3 +288,10 @@ void GameObject::beforeAnimationFrame(Animation* anim, int frameNumber)
 {
 	//printf("Animation %i frame %i has finished\n", anim->id, frameNumber);
 }
+
+// Timer hooks
+
+void GameObject::onTimerEnd(Uint8 flag)
+{
+
+}

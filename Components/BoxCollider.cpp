@@ -84,9 +84,13 @@ bool BoxCollider::isCollidingWith(Collider* collider)
 		return checkCollision(box_collider);
 	else if (RotatableBoxCollider *rot_collider = dynamic_cast<RotatableBoxCollider*>(collider))
 	{
-		RotatableBoxCollider c1(this);
-		c1.gameObject = this->gameObject;
-		return c1.checkCollision(*rot_collider);
+		RotatableBoxCollider* c1 = new RotatableBoxCollider(this);
+		c1->gameObject = this->gameObject;
+		bool result = c1->checkCollision(*rot_collider);
+
+		delete c1;
+
+		return result;
 	}
 
 	return false;

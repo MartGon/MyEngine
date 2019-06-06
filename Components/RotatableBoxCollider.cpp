@@ -105,9 +105,12 @@ bool RotatableBoxCollider::isCollidingWith(Collider* collider)
 		return checkCollision(*c2);
 	else if (BoxCollider* col = dynamic_cast<BoxCollider*>(collider))
 	{
-		RotatableBoxCollider c2(col);
-		c2.gameObject = col->gameObject;
-		return checkCollision(c2);
+		RotatableBoxCollider* c2 = new RotatableBoxCollider(col);
+		c2->gameObject = col->gameObject;
+		bool result = checkCollision(*c2);
+		delete c2;
+
+		return result;
 	}
 
 	return false;

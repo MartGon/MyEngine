@@ -167,6 +167,8 @@ public:
 		// Animation
 	virtual void onAnimationFinished(Animation* anim);
 	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);
+		// Timer
+	virtual void onTimerEnd(Uint8 flag);
 
 private:
 
