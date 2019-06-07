@@ -39,6 +39,7 @@ public:
 	bool isOver = false;
 
 	// Methods
+	void extend(Uint32 amount);
 	Uint32 getTimeRemaining();
 	void reset();
 

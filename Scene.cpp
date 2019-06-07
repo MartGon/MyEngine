@@ -145,6 +145,13 @@ void Scene::update()
 	if (isPaused)
 		return;
 
+	// Init gameObjects
+	// This loops allows the list to be altered during the gameObjects' initialization
+	while (!gameObjectsToInitialize.empty())
+	{
+		initGameObject(gameObjectsToInitialize.front());
+	}
+
 	// Destroy objects that were set to be destroyed
 	while (!gameObjectsToDestroy.empty())
 	{
@@ -152,13 +159,6 @@ void Scene::update()
 		gameObjectsToDestroy.erase(gameObjectsToDestroy.begin());
 		removeGameObject(go);
 		delete go;
-	}
-
-	// Init gameObjects
-	// This loops allows the list to be altered during the gameObjects' initialization
-	while (!gameObjectsToInitialize.empty())
-	{
-		initGameObject(gameObjectsToInitialize.front());
 	}
 
 	// Establish connection

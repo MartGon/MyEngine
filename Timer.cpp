@@ -38,6 +38,12 @@ TimerComponent::TimerComponent(Uint32 ms, Uint8 flag) : Component()
 };
 
 // Methods
+
+void TimerComponent::extend(Uint32 amount)
+{
+	due_date += amount;
+}
+
 Uint32 TimerComponent::getTimeRemaining()
 {
 	Uint32 now = SDL_GetTicks();
