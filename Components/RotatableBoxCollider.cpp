@@ -49,7 +49,7 @@ Vector2<float> RotatableBoxCollider::rotateVertex(Vector2<int> rotationCenter, d
 void RotatableBoxCollider::setRotation(Vector2<int> rotationCenter, double angle)
 {
 	for(int i = 0; i < 4; i++)
-		vertex[i] = rotateVertex(rotationCenter, angle, roVertex[i]);
+		vertex[i] = rotateVertex(rotationCenter, angle + rotation_offset, roVertex[i]);
 }
 
 Vector2<int> RotatableBoxCollider::getColliderCenter()
@@ -159,8 +159,8 @@ void RotatableBoxCollider::drawCollisionBoundaries()
 	
 	for (int i = 0; i < 4; i++)
 	{
-		points[i].x = (vertex[i].x + gameObject->getAbsolutePosition().x - cam_pos.x) * scaler.x;
-		points[i].y = (vertex[i].y + gameObject->getAbsolutePosition().y - cam_pos.y) * scaler.y;
+		points[i].x = (vertex[i].x + gameObject->getAbsolutePosition().x + offset.x - cam_pos.x) * scaler.x;
+		points[i].y = (vertex[i].y + gameObject->getAbsolutePosition().y + offset.y - cam_pos.y) * scaler.y;
 	}
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);

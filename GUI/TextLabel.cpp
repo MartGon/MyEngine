@@ -124,8 +124,19 @@ Texture TextLabel::getTextureByChar(char c)
 
 std::string TextLabel::getTexturePath(char c)
 {
-	std::string path;
-	path = fonts_path + c + fonts_ext;
+	std::string name = "";
+
+	switch (c)
+	{
+	case '.':
+		name = "dot";
+		break;
+	default:
+		name += c;
+		break;
+	}
+
+	std::string path = fonts_path + name + fonts_ext;
 
 	return path;
 }

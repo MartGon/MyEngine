@@ -38,6 +38,12 @@ TimerComponent::TimerComponent(Uint32 ms, Uint8 flag) : Component()
 };
 
 // Methods
+Uint32 TimerComponent::getTimeRemaining()
+{
+	Uint32 now = SDL_GetTicks();
+	return isOver ? 0 : due_date - now;
+}
+
 void TimerComponent::reset()
 {
 	// Reset flag
@@ -61,10 +67,10 @@ void TimerComponent::update()
 	// Check for trigger
 	if (now > due_date)
 	{
-		// Call callback
-		gameObject->onTimerEnd(flag);
-
 		// Set Flag
 		isOver = true;
+
+		// Call callback
+		gameObject->onTimerEnd(flag);
 	}
 }

@@ -39,6 +39,7 @@ public:
 	bool isOver = false;
 
 	// Methods
+	Uint32 getTimeRemaining();
 	void reset();
 
 	// Overrided methods

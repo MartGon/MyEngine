@@ -13,6 +13,9 @@ public:
 	RotatableBoxCollider(BoxCollider* collider);
 	~RotatableBoxCollider();
 
+	// Attributes
+	double rotation_offset = 0;
+
 	// Vertex to apply logic
 	std::array<Vector2<float>, 4> vertex;
 
