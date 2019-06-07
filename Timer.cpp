@@ -1,6 +1,8 @@
 #include "Timer.h"
 #include "GameObject.h"
 
+#include "SceneManager.h"
+
 // Timer Namespace
 Uint32 TimerNs::timer_callback(Uint32 delay, void* params)
 {
@@ -33,11 +35,26 @@ TimerComponent::TimerComponent(Uint32 ms, Uint8 flag) : Component()
 
 	// Calculate due date
 	delay = ms;
-	Uint32 now = SDL_GetTicks();
+	Uint32 now = getCurrentTime();
 	due_date = now + delay;
 };
 
 // Methods
+
+Uint32 TimerComponent::getCurrentTime()
+{
+	Uint32 now = 0;
+
+	if (!isFrameBased)
+		now = SDL_GetTicks();
+	else
+	{
+		Uint32 frames = SceneManager::scene->frame_count;
+		now = (double)frames * (double)16.6666;
+	}
+
+	return now;
+}
 
 void TimerComponent::extend(Uint32 amount)
 {
@@ -46,7 +63,7 @@ void TimerComponent::extend(Uint32 amount)
 
 Uint32 TimerComponent::getTimeRemaining()
 {
-	Uint32 now = SDL_GetTicks();
+	Uint32 now = getCurrentTime();
 	return isOver ? 0 : due_date - now;
 }
 
@@ -56,7 +73,7 @@ void TimerComponent::reset()
 	isOver = false;
 
 	// Calculate new due date
-	Uint32 now = SDL_GetTicks();
+	Uint32 now = getCurrentTime();
 	due_date = now + delay;
 }
 
@@ -68,7 +85,7 @@ void TimerComponent::update()
 		return;
 
 	// Check diff
-	Uint32 now = SDL_GetTicks();
+	Uint32 now = getCurrentTime();
 
 	// Check for trigger
 	if (now > due_date)
@@ -79,4 +96,16 @@ void TimerComponent::update()
 		// Call callback
 		gameObject->onTimerEnd(flag);
 	}
+}
+
+// TimerObject class
+
+TimerObject::TimerObject(Uint32 ms, Uint8 flag) 
+{
+	timer = setComponent(new TimerComponent(ms, flag));
+}
+
+void TimerObject::onTimerEnd(Uint8 flag)
+{
+	callback(flag);
 }

@@ -158,6 +158,7 @@ void Scene::update()
 		GameObject* go = gameObjectsToDestroy.front();
 		gameObjectsToDestroy.erase(gameObjectsToDestroy.begin());
 		removeGameObject(go);
+		Utilities::removeFromVector(go, gameObjectsToInitialize);
 		delete go;
 	}
 
@@ -300,6 +301,10 @@ void Scene::update()
 
 	// Update hook
 	onUpdate();
+
+	// FrameCount for offline
+	if (!isOnline())
+		frame_count++;
 }
 
 void Scene::deactivateAllGameObjects()

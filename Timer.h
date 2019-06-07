@@ -5,9 +5,12 @@
 // Own
 #include "TimerHandler.h"
 #include "Component.h"
+#include "GameObject.h"
 
 // Standard C++
 #include <iostream>
+#include <functional>
+
 
 namespace TimerNs
 {
@@ -30,7 +33,7 @@ class TimerComponent : public Component
 {
 public:
 	// Constructor
-	TimerComponent(Uint32 ms, Uint8 flag = 0) ;
+	TimerComponent(Uint32 ms, Uint8 flag = 0);
 
 	// Attributes
 	Uint32 delay = 0;
@@ -38,11 +41,32 @@ public:
 	Uint32 due_date = 0;
 	bool isOver = false;
 
+	// Caculation method
+	bool isFrameBased = true;
+
 	// Methods
+	Uint32 getCurrentTime();
 	void extend(Uint32 amount);
 	Uint32 getTimeRemaining();
 	void reset();
 
 	// Overrided methods
 	void update() override;
+	void destroy() override {};
+};
+
+class TimerObject : public GameObject
+{
+public:
+	// Constructor
+	TimerObject(Uint32 ms, Uint8 flag = 0);
+
+	// Member
+	TimerComponent* timer = nullptr;
+
+	// Callback method
+	std::function<void(Uint8)> callback;
+
+	// Overrided methods
+	void onTimerEnd(Uint8 flag) override;
 };

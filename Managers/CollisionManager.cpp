@@ -45,6 +45,10 @@ void CollisionManager::manage()
 		{
 			Collider* c2 = resizableColliderVector[j];
 
+			// Don't check collisions if object is not active
+			if (!c2->gameObject->shouldBeLoaded())
+				continue;
+
             // Check if the other collider is enabled
             if (!c2->isEnabled)
                 continue;
