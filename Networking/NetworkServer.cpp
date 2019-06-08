@@ -1,5 +1,5 @@
 #include "NetworkServer.h"
-
+#include "Random.h"
 
 // Constructors
 
@@ -105,7 +105,7 @@ bool NetworkServer::establishConnection()
 			state = SERVER_STATE_SENDING;
 		break;
 	case SERVER_STATE_SENDING:
-		if (sendPacket(new Packet()))
+		if (sendPacket(new RngSyncPacket(Random::seed), false))
 			state = SERVER_STATE_CONNECTION_ESTABLISHED;
 		break;
 	case SERVER_STATE_RECEIVING:

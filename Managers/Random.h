@@ -23,6 +23,14 @@ public:
 		return uid(dre);
 	}
 
+	static void setSeed(uint64_t seed)
+	{
+		dre = std::mt19937(seed);
+		Random::seed = seed;
+	}
+
+	static uint64_t seed;
+
 private:
 	// Pseudo Random generator
 	static std::random_device rd;

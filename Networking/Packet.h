@@ -20,7 +20,8 @@ enum PacketType
 	EVENT_PACKET,
 	MOUSE_STATE_PACKET,
 	INPUT_STATUS_PACKET,
-	TIMESTAMP_PACKET
+	TIMESTAMP_PACKET,
+	RNG_SYNC_PACKET
 };
 
 enum ComponentPacketType
@@ -217,4 +218,17 @@ public:
 
 	// Methods
 	size_t getSize() override { return sizeof(TransformPacket); };
+};
+
+class RngSyncPacket : public Packet
+{
+public:
+	// Constructor
+	RngSyncPacket(uint64_t seed);
+
+	// Seed
+	uint64_t seed = 0;
+
+	// Overrided
+	size_t getSize() override { return sizeof(RngSyncPacket); };
 };

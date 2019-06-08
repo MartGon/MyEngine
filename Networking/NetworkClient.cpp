@@ -1,4 +1,5 @@
 #include "NetworkClient.h"
+#include "Random.h"
 
 // Constructors
 
@@ -75,15 +76,23 @@ bool NetworkClient::establishConnection()
 		break;
 	case CLIENT_OPENING_SOCKET:
 		if (openClientSocket())
-			state = CLIENT_CONNECTION_ESTABLISHED;
+			state = CLIENT_RECEIVING;
 		break;
 	case CLIENT_SENDING:
 		if (sendPacket(new Packet(), false))
 			state = CLIENT_CONNECTION_ESTABLISHED;
 		break;
 	case CLIENT_RECEIVING:
-		if (recvPacket())
-			state = CLIENT_CONNECTION_ESTABLISHED;
+		if (Packet* packt = recvPacket())
+		{
+			if (packt->packetType == PacketType::RNG_SYNC_PACKET)
+			{
+				RngSyncPacket* rng = static_cast<RngSyncPacket*>(packt);
+				Random::setSeed(rng->seed);
+
+				state = CLIENT_CONNECTION_ESTABLISHED;
+			}
+		}
 		break;
 	case CLIENT_CONNECTION_ESTABLISHED:
 		return true;

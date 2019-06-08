@@ -150,3 +150,10 @@ TransformPacket::TransformPacket(Transform* transform) : ComponentPacket(COMPONE
 	}
 }
 
+// RNG Sync Packet
+
+RngSyncPacket::RngSyncPacket(uint64_t seed) : Packet(RNG_SYNC_PACKET)
+{
+	this->seed = seed;
+}
+
