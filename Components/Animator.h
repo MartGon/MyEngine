@@ -35,7 +35,8 @@ public:
 	Animation *currentAnimation = nullptr;
 
 	// Time Tracking
-	Uint32 frameCount = 0;
+	float frame_speed = 1.f;
+	double frameCount = 0;
 	int currentIndex = 0;
 	bool isAnimationFinished = false;
 

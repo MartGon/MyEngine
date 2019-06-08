@@ -169,7 +169,12 @@ void Scene::update()
 		if (!connectionEstablished)
 		{
 			if (connectionEstablished = networkAgent->establishConnection())
+			{
+				if (networkAgent)
+					networkAgent->isBlocking = false;
+
 				handleConnectionEstablished();
+			}
 			return;
 		}
 	}
@@ -351,9 +356,6 @@ void Scene::setSceneMode(Scene::SceneMode sceneMode)
 		networkAgent = new NetworkServer();
 		break;
 	}
-
-	if (networkAgent)
-		networkAgent->isBlocking = false;
 
 	inputManager->default_owner = getNetworkOwnership();
 }

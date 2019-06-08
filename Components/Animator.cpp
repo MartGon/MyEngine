@@ -107,7 +107,7 @@ void Animator::update()
 	if (isAnimationFinished)
 		return;
 
-	frameCount++;
+	frameCount += frame_speed;
 	if (frameCount >= currentAnimation->frames.at(currentIndex)->duration)
 	{
 		frameCount = 0;
