@@ -60,6 +60,10 @@ void CollisionManager::manage()
 				c1->gameObject->onColliderEnter(c2);
 				c2->gameObject->onColliderEnter(c1);
 			}
+
+			// Break if C1 is no longer active
+			if (!c1->isEnabled || !c1->gameObject->isActive)
+				break;
 		}
 	}
 }

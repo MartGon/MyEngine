@@ -124,7 +124,8 @@ void Scene::initGameObject(GameObject *gameObject)
 
 void Scene::destroyGameObject(GameObject* gameObject)
 {
-	gameObjectsToDestroy.push_back(gameObject);
+	if(std::find(gameObjectsToDestroy.begin(), gameObjectsToDestroy.end(), gameObject) == gameObjectsToDestroy.end())
+		gameObjectsToDestroy.push_back(gameObject);
 }
 
 GameObject* Scene::getGameObjectById(int id)

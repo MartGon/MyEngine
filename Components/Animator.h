@@ -27,6 +27,7 @@ public:
 	// Constructors
 	Animator();
 	Animator(const char* prefixPath, MapRGB* colorKey, TextureRenderer* tRenderer, int lastFrame, int firstFrame = 1, Uint8 id = 0);
+	
 
 	// Animation vector
 	std::vector<Animation*> animations;

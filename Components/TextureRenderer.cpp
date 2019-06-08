@@ -86,6 +86,7 @@ void TextureRenderer::update()
 
 void TextureRenderer::destroy()
 {
+	//texture.free();
 	SceneManager::scene->removeComponentFromManager(this);
 }
 

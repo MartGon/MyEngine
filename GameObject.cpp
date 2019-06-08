@@ -236,6 +236,7 @@ void GameObject::onUpdate()
 
 void GameObject::destroy()
 {
+	isActive = false;
 	SceneManager::scene->destroyGameObject(this);
 }
 
