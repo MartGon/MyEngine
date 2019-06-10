@@ -61,6 +61,9 @@ void TextureRenderer::render()
 	x -= (cam_pos.x * scaler.x);
 	y -= (cam_pos.y * scaler.y);
 
+	// Texture set alpha
+	texture.setAlpha(alpha);
+
 	texture.render(x, y, angle, fCenter, flip);
 }
 
@@ -110,14 +113,13 @@ void TextureRenderer::setLayer(Uint8 layer)
 
 void TextureRenderer::vanish()
 {
-	Uint8 alpha = texture.getAlpha();
 	if (!alpha)
 	{
 		if (gameObject)
 			gameObject->onVanish();
 	}
 	else
-		texture.setAlpha(alpha - 1);
+		texture.setAlpha(alpha --);
 }
 
 // Misc
@@ -131,7 +133,7 @@ void TextureRenderer::setBlink(int framerate, int duration)
 
 void TextureRenderer::unsetBlink()
 {
-	texture.setAlpha(SDL_ALPHA_OPAQUE);
+	alpha = SDL_ALPHA_OPAQUE;
 	isBlinking = false;
 	blink_frame_count = 0;
 }
@@ -158,9 +160,8 @@ void TextureRenderer::blink()
 		return;
 
 	// Update alpha value
-	Uint8 alpha = texture.getAlpha();
 	if (alpha == SDL_ALPHA_OPAQUE)
-		texture.setAlpha(SDL_ALPHA_TRANSPARENT);
+		alpha = SDL_ALPHA_TRANSPARENT;
 	else
-		texture.setAlpha(SDL_ALPHA_OPAQUE);
+		alpha = SDL_ALPHA_OPAQUE;
 }

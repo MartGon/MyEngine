@@ -42,6 +42,7 @@ private:
 
 	// Attributes
 	Uint8 layer = 127;
+	Uint8 alpha = 255;
 
 	// Misc
 	bool isBlinking = false;
