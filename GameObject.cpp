@@ -22,12 +22,14 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	// Destroy every component
 	while (!components.empty())
 	{
 		Component* c = components.front();
 		components.erase(components.begin());
 		c->destroy();
 		delete c;
+		c = nullptr;
 	}
 }
 
@@ -237,7 +239,7 @@ void GameObject::onUpdate()
 void GameObject::destroy()
 {
 	isActive = false;
-	SceneManager::scene->destroyGameObject(this);
+	SceneManager::scene->setGameObjectToDestroy(this);
 }
 
 // Collider hooks

@@ -16,12 +16,14 @@ public:
 
 	void removeComponent(T component)
 	{
+		beforeRemoveComponent(component);
 		Utilities::removeFromVector(component, components);
 		onRemoveComponent(component);
 	}
 
 	virtual void onAddComponent(T component) {}
 	virtual void onRemoveComponent(T component) {}
+	virtual void beforeRemoveComponent(T component) {}
 
 	std::vector<T> getComponents()
 	{

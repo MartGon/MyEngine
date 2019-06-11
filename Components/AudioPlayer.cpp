@@ -22,14 +22,15 @@ AudioPlayer::AudioPlayer(std::string audio_file) : AudioPlayer()
 
 AudioPlayer::~AudioPlayer()
 {
-	destroy();
 }
 
 // Overrided methods
 void AudioPlayer::destroy()
 {
 	SceneManager::scene->removeComponentFromManager(this);
-	SDL_FreeWAV(wav_buffer);
+	for(auto audio_data : audio_list)
+		if(audio_data)
+			SDL_FreeWAV(audio_data->wav_buffer);
 }
 
 // Own methods

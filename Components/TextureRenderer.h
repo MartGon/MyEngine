@@ -13,6 +13,7 @@ public:
 	~TextureRenderer();
 
 	// Attributes
+	Uint8 alpha = 255;
 	Texture texture;
 	std::string tPath;
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -42,7 +43,7 @@ private:
 
 	// Attributes
 	Uint8 layer = 127;
-	Uint8 alpha = 255;
+
 
 	// Misc
 	bool isBlinking = false;

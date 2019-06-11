@@ -37,12 +37,7 @@ void Scene::loadMedia()
 
 void Scene::start()
 {
-
-}
-
-void Scene::beforeUpdate()
-{
-
+	Random::setSeed(std::random_device()());
 }
 
 void Scene::onUpdate()
@@ -52,16 +47,21 @@ void Scene::onUpdate()
 
 void Scene::destroy()
 {
-	//printf("Destroying scene\n");
-	for (auto &gameObject : gameObjectsToInitialize)
-		gameObject->destroy();
-
-	for (auto &gameObjectPair : gameObjectMap)
-		if (GameObject *gameObject = gameObjectPair.second)
-			gameObject->destroy();
-
 	for (auto manager : managers)
 		manager->destroy();
+
+	//printf("Destroying scene\n");
+	while(!gameObjectsToInitialize.empty())
+	{
+		GameObject* gameObject = *gameObjectsToInitialize.begin();
+		destroyGameObject(gameObject);
+	}
+
+	while (!gameObjectMap.empty())
+	{
+		if (GameObject *gameObject = gameObjectMap.begin()->second)
+			destroyGameObject(gameObject);
+	}
 
 	// Reset las id
 	lastGameObjectID = 0;
@@ -72,6 +72,71 @@ void Scene::destroy()
 	this->~Scene();
 }
 
+
+// GameObject Methods
+
+void Scene::addGameObject(GameObject *gameObject)
+{
+	gameObjectsToInitialize.push_back(gameObject);
+}
+
+void Scene::removeGameObject(GameObject *gameObject)
+{
+	if(gameObjectMap.find(gameObject->id) != gameObjectMap.end())
+		gameObjectMap.erase(gameObject->id);
+}
+
+void Scene::initGameObject(GameObject *gameObject)
+{
+	// Call start hook
+	gameObject->start();
+
+	// Remove from objects to init and add into gos map
+	gameObjectsToInitialize.erase(gameObjectsToInitialize.begin());
+	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
+}
+
+void Scene::setGameObjectToDestroy(GameObject* gameObject)
+{
+	if(std::find(gameObjectsToDestroy.begin(), gameObjectsToDestroy.end(), gameObject) == gameObjectsToDestroy.end())
+		gameObjectsToDestroy.push_back(gameObject);
+}
+
+void Scene::destroyGameObject(GameObject* go)
+{
+	// Remove from every list. Update, Start and Destroy
+	removeGameObject(go);
+	Utilities::removeFromVector(go, gameObjectsToInitialize);
+	if(std::find(gameObjectsToDestroy.begin(), gameObjectsToDestroy.end(), go) != gameObjectsToDestroy.end())
+		gameObjectsToDestroy.erase(gameObjectsToDestroy.begin());	
+
+	// Call destructor
+	delete go;
+}
+
+GameObject* Scene::getGameObjectById(int id)
+{
+	if (gameObjectMap.find(id) == gameObjectMap.end())
+		return nullptr;
+
+	GameObject *gameObject = gameObjectMap.at(id);
+
+	return gameObject;
+}
+
+void Scene::deactivateAllGameObjects()
+{
+	for (auto &gameObjectPair : gameObjectMap)
+		if (GameObject *gameObject = gameObjectPair.second)
+			gameObject->isActive = false;
+}
+
+void Scene::activateAllGameObjects()
+{
+	for (auto &gameObjectPair : gameObjectMap)
+		if (GameObject *gameObject = gameObjectPair.second)
+			gameObject->isActive = true;
+}
 
 GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 {
@@ -84,7 +149,7 @@ GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 		// Go is not active
 		if (!go->shouldBeLoaded())
 			continue;
-			
+
 		// Handle local event
 		if (go->handleEvent(event))
 			return go;
@@ -93,51 +158,70 @@ GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 	return nullptr;
 }
 
-// Methods
+// Network
 
-void Scene::addGameObject(GameObject *gameObject)
+void Scene::destroyNetworkAgent()
 {
-	gameObjectsToInitialize.push_back(gameObject);
-}
+	if (alreadyDestroyed)
+		return;
 
-void Scene::removeGameObject(GameObject *gameObject)
-{
-	gameObjectMap.erase(gameObject->id);
-}
-
-void Scene::initGameObject(GameObject *gameObject)
-{
-	gameObject->start();
-
-	// Send notification of a created gameObject
-	if (isOnline() && connectionEstablished)
-		if(!gameObject->netCreated)
-		{
-			Packet* packet = new GameObjectCreatePacket(gameObject);
-			//networkAgent->sendPacket(packet);
-			delete packet;
-		}
-
-	gameObjectsToInitialize.erase(gameObjectsToInitialize.begin());
-	gameObjectMap.insert_or_assign(gameObject->id, gameObject);
-}
-
-void Scene::destroyGameObject(GameObject* gameObject)
-{
-	if(std::find(gameObjectsToDestroy.begin(), gameObjectsToDestroy.end(), gameObject) == gameObjectsToDestroy.end())
-		gameObjectsToDestroy.push_back(gameObject);
-}
-
-GameObject* Scene::getGameObjectById(int id)
-{
-	if (gameObjectMap.find(id) == gameObjectMap.end())
+	if (isOnline())
 	{
-		//std::cout << "Packet id was not valid\n";
-		return nullptr;
-	}
-	GameObject *gameObject = gameObjectMap.at(id);
+		networkAgent->destroy();
 
-	return gameObject;
+		alreadyDestroyed = true;
+	}
+}
+
+void Scene::setSceneMode(Scene::SceneMode sceneMode)
+{
+	mode = sceneMode;
+
+	switch (sceneMode)
+	{
+	case Scene::ONLINE_CLIENT:
+		networkAgent = new NetworkClient();
+		break;
+	case Scene::ONLINE_SERVER:
+		networkAgent = new NetworkServer();
+		break;
+	}
+
+	inputManager->default_owner = getNetworkOwnership();
+}
+
+bool Scene::isOnline()
+{
+	return mode == ONLINE_CLIENT || mode == ONLINE_SERVER;
+}
+
+void Scene::disconnect()
+{
+	onDisconnect();
+
+	disconnected = true;
+}
+
+NetworkOwner Scene::getNetworkOwnership()
+{
+	if (mode == SceneMode::ONLINE_CLIENT)
+		return NetworkOwner::OWNER_CLIENT_1;
+	else
+		return NetworkOwner::OWNER_SERVER;
+}
+
+// Main
+
+void Scene::handle_events(std::deque<SDL_Event>& events, bool network)
+{
+	while (!event_deque.empty())
+	{
+		// Get and remove event
+		SDL_Event event = events.back();
+		events.pop_back();
+
+		handleEvent(event);
+	}
 }
 
 void Scene::update()
@@ -190,7 +274,7 @@ void Scene::update()
 	if (isOnline() && connectionEstablished)
 	{
 		bool update_frame = false;
-		
+
 		// Check if we can send the next packet
 		if (!stop_sending)
 		{
@@ -311,208 +395,4 @@ void Scene::update()
 	// FrameCount for offline
 	if (!isOnline())
 		frame_count++;
-}
-
-void Scene::deactivateAllGameObjects()
-{
-	for (auto &gameObjectPair : gameObjectMap)
-		if (GameObject *gameObject = gameObjectPair.second)
-			gameObject->isActive = false;
-}
-
-void Scene::activateAllGameObjects()
-{
-	for (auto &gameObjectPair : gameObjectMap)
-		if (GameObject *gameObject = gameObjectPair.second)
-			gameObject->isActive = true;
-}
-
-// Network
-
-void Scene::destroyNetworkAgent()
-{
-	if (alreadyDestroyed)
-		return;
-
-	if (isOnline())
-	{
-		networkAgent->destroy();
-
-		alreadyDestroyed = true;
-	}
-}
-
-void Scene::setSceneMode(Scene::SceneMode sceneMode)
-{
-	printf("Setting scene mode\n");
-
-	mode = sceneMode;
-
-	switch (sceneMode)
-	{
-	case Scene::ONLINE_CLIENT:
-		networkAgent = new NetworkClient();
-		break;
-	case Scene::ONLINE_SERVER:
-		networkAgent = new NetworkServer();
-		break;
-	}
-
-	inputManager->default_owner = getNetworkOwnership();
-}
-
-bool Scene::isOnline()
-{
-	return mode == ONLINE_CLIENT || mode == ONLINE_SERVER;
-}
-
-bool Scene::shouldSendGameObjectUpdate(GameObject* go)
-{
-	if (go->isNetworkUpdated())
-	{
-		if (mode == ONLINE_SERVER)
-		{
-			if (!go->isNetworkOwned())
-				return true;
-		}
-		else if (mode == ONLINE_CLIENT)
-		{
-			if (go->isNetworkOwned())
-				return true;
-		}
-	}
-
-	return false;
-}
-
-void Scene::sendGameObjectUpdate(GameObject* go)
-{
-	// GameObject State
-	
-	Packet* packet = go->toGameObjectUpdatePacket();
-	networkAgent->sendPacket(packet, false);
-	delete packet;
-
-	// Transform
-	packet = go->transform.toComponentPacket();
-	networkAgent->sendPacket(packet, false);
-	delete packet;
-
-	for (Component* component : go->components)
-	{
-		Packet* packet = component->toComponentPacket();
-		if(packet->packetType != PacketType::NULL_PACKET)
-			networkAgent->sendPacket(packet, false);
-		delete packet;
-	}
-
-	return;
-}
-
-void Scene::disconnect()
-{
-	onDisconnect();
-
-	disconnected = true;
-}
-
-bool Scene::handlePacket(Packet *packet)
-{
-	if (!packet)
-		return false;
-
-	switch (packet->packetType)
-	{
-		case PacketType::COMPONENT_PACKET:
-		{
-			ComponentPacket* component_packet = static_cast<ComponentPacket*>(packet);
-
-			// Get gameobject
-			int id = component_packet->gameobject_id;
-
-			if (GameObject* gameObject = getGameObjectById(id))
-			{
-				if (!shouldSendGameObjectUpdate(gameObject))
-					gameObject->updateGameObjectFromComponentPacket(component_packet);
-			}
-			break;
-		}
-		case PacketType::GAMEOBJECT_UPDATE_PACKET:
-		{
-			GameObjectUpdatePacket* gameobject_update_packet = static_cast<GameObjectUpdatePacket*>(packet);
-
-			// Get gameobject
-			int id = gameobject_update_packet->gameobject_id;
-
-			if (GameObject* gameObject = getGameObjectById(id))
-			{
-				gameObject->updateFromGameObjectUpdatePacket(gameobject_update_packet);
-			}
-			break;
-		}
-		case PacketType::GAMEOBJECT_CREATE_PACKET:
-		{
-			// Create Packet
-			GameObjectCreatePacket* gameobject_create_packet = static_cast<GameObjectCreatePacket*>(packet);
-
-			// Create the GameObject
-			int template_id = gameobject_create_packet->gameobject_template_id;
-			if (GameObject* go = createGameObjectByTemplateId(template_id))
-			{
-				// Set flag
-				go->netCreated = true;
-
-				// Error check
-				int desired_id = gameobject_create_packet->gameobject_id;
-				if (go->id != desired_id)
-				{
-					std::cout << "Id desync issue!!\n";
-					go->id = desired_id;
-				}
-			}
-			break;
-		}
-		case PacketType::EVENT_PACKET:
-		{
-			/*
-			EventPacket* event_packet = static_cast<EventPacket*>(packet);
-			if(GameObject* go = getGameObjectById(event_packet->gameobject_id))
-				go->handleEvent(event_packet->event);
-			break;
-			*/
-		}
-		case PacketType::MOUSE_STATE_PACKET:
-		{
-			MouseStatePacket* mouse_state_packet = static_cast<MouseStatePacket*>(packet);
-			//pair_mouse_state = mouse_state_packet->position;
-			break;
-		}
-		case PacketType::NULL_PACKET:
-			std::cout << "Null packet"; 
-			break;
-		default:
-			break;
-	}
-
-	return true;
-}
-
-void Scene::handle_events(std::deque<SDL_Event>& events, bool network)
-{
-	while (!event_deque.empty())
-	{
-		// Get and remove event
-		SDL_Event event = events.back();
-		events.pop_back();
-
-		handleEvent(event);
-	}
-}
-
-NetworkOwner Scene::getNetworkOwnership()
-{
-	if (mode == SceneMode::ONLINE_CLIENT)
-		return NetworkOwner::OWNER_CLIENT_1;
-	else
-		return NetworkOwner::OWNER_SERVER;
 }

@@ -27,7 +27,12 @@ public:
 	// Overrided methods
 	void manage() override;
 	void onAddComponent(AudioPlayer* aPlayer) override;
+	void beforeRemoveComponent(AudioPlayer* aPlayer) override;
+	void onRemoveComponent(AudioPlayer* aPlayer) override;
 	void destroy() override;
+
+	// Concurrency lock
+	SDL_mutex* mutex = nullptr;
 
 private:
 	// Audio Hardware specs

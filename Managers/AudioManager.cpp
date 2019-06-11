@@ -15,9 +15,15 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 	// Set to silence first, removing previous data
 	SDL_memset(stream, 0, len);
 
+	// Lock
+	SDL_LockMutex(audioManager->mutex);
+
 	std::vector<AudioPlayer*> audioPlayers = audioManager->getComponents();
 	for (auto audioPlayer : audioPlayers)
 	{
+		if (!audioPlayer)
+			continue;
+
 		// Check if audioPlayer is enabled
 		if (!audioPlayer->isEnabled)
 			continue;
@@ -59,6 +65,8 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 		audioPlayer->wav_length -= len;
 	}
 	
+	// Unlock
+	SDL_UnlockMutex(audioManager->mutex);
 }
 
 // Attributes
@@ -99,6 +107,9 @@ void AudioManager::init()
 
 	isInitialized = true;
 	SDL_PauseAudioDevice(device, 0);
+
+	// Crete mutex
+	mutex = SDL_CreateMutex();
 }
 
 void AudioManager::enable()
@@ -120,6 +131,18 @@ void AudioManager::manage()
 void AudioManager::onAddComponent(AudioPlayer * aPlayer)
 {
 	//std::cout << "AduioPlayer added" << std::endl;
+}
+
+void AudioManager::beforeRemoveComponent(AudioPlayer* aPlayer)
+{
+	// Lock mutex
+	SDL_LockMutex(mutex);
+}
+
+void AudioManager::onRemoveComponent(AudioPlayer* aPlayer)
+{
+	// Unock mutex
+	SDL_UnlockMutex(mutex);
 }
 
 SDL_AudioFormat AudioManager::getFormat()

@@ -38,16 +38,6 @@ public:
 	// Events
 	std::deque<SDL_Event> event_deque;
 
-	// Network stuff
-	NetworkAgent *networkAgent = nullptr;
-	InputStatusPacket* last_packet = nullptr;
-	std::unordered_map<Uint32, InputStatus> input_status_history;
-	bool connectionEstablished = false;
-	bool disconnected = false;
-	bool alreadyDestroyed = false;
-	bool stop_sending = false;
-	Uint32 frame_count = 0;
-
 	// Static last  gameObject id
 	static Uint16 lastGameObjectID;
 
@@ -57,13 +47,9 @@ public:
 	// Renderer
 	SDL_Renderer *renderer = nullptr;
 
-	// GameObject map
+	// GameObjects' lists
 	std::map<Uint16, GameObject*> gameObjectMap;
-
-	// GameObjects to initialize
 	std::vector<GameObject*> gameObjectsToInitialize;
-
-	// GameObjects to be destroy
 	std::vector<GameObject*> gameObjectsToDestroy;
 
 	// Managers
@@ -114,6 +100,16 @@ public:
         
     }
 
+	// Network stuff
+	NetworkAgent *networkAgent = nullptr;
+	InputStatusPacket* last_packet = nullptr;
+	std::unordered_map<Uint32, InputStatus> input_status_history;
+	bool connectionEstablished = false;
+	bool disconnected = false;
+	bool alreadyDestroyed = false;
+	bool stop_sending = false;
+	Uint32 frame_count = 0;
+
 	// Network Methods
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();
@@ -121,30 +117,29 @@ public:
 	virtual void onDisconnect() {};
 	virtual void handleConnectionEstablished() {};
 	bool isOnline();
-	bool shouldSendGameObjectUpdate(GameObject* go);
-	void sendGameObjectUpdate(GameObject* go);
-	bool handlePacket(Packet *packet);
 	NetworkOwner getNetworkOwnership();
 
 	// Overrided Methods
 	virtual void loadMedia();
 	virtual void start();
-	virtual void beforeUpdate();
 	virtual void onUpdate();
 	virtual void destroy();
 	GameObject* handleEvent(const SDL_Event& event, bool from_network = false);
 	virtual void OnHandleEvent(const SDL_Event& event) {};
 	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };
 
+	// GameObjects
 	void addGameObject(GameObject *gameObject);
 	void removeGameObject(GameObject *gameObject);
 	void initGameObject(GameObject *gameObject);
+	void setGameObjectToDestroy(GameObject *gameObject);
 	void destroyGameObject(GameObject *gameObject);
 	GameObject* getGameObjectById(int id);
-	void update();
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
 
+	// Main
+	void update();
 	void handle_events(std::deque<SDL_Event>& events, bool network = false);
 };
 
