@@ -98,7 +98,7 @@ int engine_main()
 				{
 					if (e.key.keysym.sym == SDLK_p)
 					{
-						slowmode = !slowmode;
+						//slowmode = !slowmode;
 					}
 				}
 				else
