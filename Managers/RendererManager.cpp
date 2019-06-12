@@ -92,10 +92,6 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
-	// Create frame texture
-	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
-	SDL_SetRenderTarget(renderer, texture);
-
 	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{
@@ -122,23 +118,10 @@ void RendererManager::manage()
 		}
 	}
 
-	// Create frame 
-	frame_buffer.push_back(texture);
 }
 
 // TODO - Poner layer a private. Hacer metodo setLayer que sortea el array cuando se cambia el layer
 // TODO - La layer se tiene en cuenta una vez que el objeto esta creado, por lo que es necesario ordenar el array en otro momento. Solucion: Hacer metodo start en la clase manager
-
-SDL_Texture* RendererManager::getFrameFromBuffer()
-{
-	if(frame_buffer.empty())
-		return nullptr;
-
-	SDL_Texture* frame = frame_buffer.front();
-	frame_buffer.pop_front();
-	
-	return frame;
-}
 
 int RendererManager::getMaxBufferSize()
 {

@@ -20,7 +20,6 @@ public:
 
 	// Buffering
 	int max_buffer_size = 0;
-	std::deque<SDL_Texture*> frame_buffer;
 
 	// Methods
 	static void init();
@@ -36,7 +35,6 @@ public:
 	// Non-static methods
 	void onAddComponent(TextureRenderer* tRenderer) override;
 	void manage() override;
-	SDL_Texture* getFrameFromBuffer();
 	int getMaxBufferSize();
 
 private:

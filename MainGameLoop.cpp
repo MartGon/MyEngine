@@ -70,9 +70,6 @@ int engine_main()
 		// Create quit flag
 		bool& quit = SceneManager::quit;
 
-		// Get renderer manager and generate frames
-		RendererManager* renderer_manager = static_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
-
 		//While application is running
 		SDL_Texture* frame_to_render = nullptr;
 		bool slowmode = false;
@@ -80,10 +77,7 @@ int engine_main()
 		{
 			// Check for next scene
 			if (SceneManager::canLoadNextScene())
-			{
 				SceneManager::loadScene();
-				renderer_manager = static_cast<RendererManager*>(SceneManager::scene->getManager<TextureRenderer*>());
-			}
 
 			//Handle events on queue
 			SDL_Event e;
@@ -118,29 +112,9 @@ int engine_main()
 					continue;
 			}
 
-			// Get a frame to render from the buffer
-			if (SDL_Texture* frame = renderer_manager->getFrameFromBuffer())
-			{
-				// Check if it is not first frame
-				if (frame_to_render)
-				{
-					SDL_SetRenderTarget(renderer, nullptr);
-					SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
-					SDL_DestroyTexture(frame_to_render);
-				}
-				// Set frame to render
-				frame_to_render = frame;
-			}
-			// If no frames left, render previous one
-			else if(frame_to_render)
-			{
-				SDL_SetRenderTarget(renderer, nullptr);
-				SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
-			}
-
 			// Render if frame buffer is enough
 			SDL_RenderPresent(renderer);
-			SDL_RenderClear(renderer);
+			//SDL_RenderClear(renderer);
 
 			if(slowmode)
 				SDL_Delay(1000);
