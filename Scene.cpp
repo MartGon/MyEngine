@@ -402,7 +402,14 @@ void Scene::update()
 					std::cout << "I recv packet from " << owner << " with frame " << frame << "\n";
 
 					// Set last recv packet list
-					last_packets.at(owner) = input_packet;
+					if (Packet* last_packet = last_packets.at(owner))
+					{
+						// Set new packet
+						last_packets.at(owner) = input_packet;
+
+						// Free old one
+						std::free(last_packet);
+					}
 
 					// Inset input status recv
 					InputHistory input_history = input_histories.at(owner);
@@ -410,8 +417,11 @@ void Scene::update()
 					input_histories.at(owner) = input_history;
 
 					// If server, send packet to pairs
-					if(getNetworkOwnership() == NetworkOwner::OWNER_SERVER)
-						networkAgent->sendPacket(input_packet, false);
+					if (getNetworkOwnership() == NetworkOwner::OWNER_SERVER)
+					{
+						InputStatusPacket re_packet = InputStatusPacket(*input_packet);
+						networkAgent->sendPacket(&re_packet, false);
+					}
 				}
 				
 			}

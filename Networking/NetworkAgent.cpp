@@ -102,7 +102,7 @@ bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet, bool buffered)
 	}
 
 	// Should not do this
- 	size_t len = packet->getSize();
+	size_t len = packet->getSize();
 	int result = 0;
 
 	// Add to the data buffer
