@@ -204,10 +204,78 @@ void Scene::disconnect()
 
 NetworkOwner Scene::getNetworkOwnership()
 {
+	NetworkOwner owner = NetworkOwner::OWNER_SERVER;
 	if (mode == SceneMode::ONLINE_CLIENT)
-		return NetworkOwner::OWNER_CLIENT_1;
-	else
-		return NetworkOwner::OWNER_SERVER;
+	{
+		owner = (NetworkOwner)networkAgent->pair_identity;
+	}
+	
+	return owner;
+}
+
+bool Scene::canCalculateFrame(Uint32 frame)
+{
+	bool update_frame = true;
+	for (int i = 0; i < networkAgent->player_amount; i++)
+	{
+		// Get input history for pair i
+		NetworkOwner o = (NetworkOwner)i;
+		InputHistory input_history = input_histories.at(o);
+
+		// Check if packet exists
+		if (input_history.find(frame) == input_history.end())
+		{
+			// Cannot calculate this frame if a packet is missing
+			update_frame = false;
+			break;
+		}
+	}
+
+	return update_frame;
+}
+
+InputStatusPacket* Scene::getOldestLastPacket()
+{
+	InputStatusPacket* oldest_packet = nullptr;
+	for (auto pair : last_packets)
+	{
+		InputStatusPacket* packet = pair.second;
+
+		if (packet)
+		{
+			if (oldest_packet)
+			{
+				if (packet->frame_count < oldest_packet->frame_count)
+					oldest_packet = packet;
+			}
+			else
+				oldest_packet = packet;
+		}
+	}
+
+	return oldest_packet;
+}
+
+bool Scene::shouldStopSending()
+{
+	bool stop_sending = false;
+
+	for (auto pair : last_packets)
+	{
+		InputStatusPacket* last_packet = pair.second;
+
+		if (last_packet)
+		{
+			// If last recv packet is 10 frames old, wait for sync
+			if (std::abs((int)(frame_count - last_packet->frame_count)) >= networkAgent->max_buffer_size)
+			{
+				stop_sending = true;
+				std::cout << "Timeout Ocurred, need to ReSync\n";
+			}
+		}
+	}
+
+	return stop_sending;
 }
 
 // Main
@@ -258,6 +326,14 @@ void Scene::update()
 				if (networkAgent)
 					networkAgent->isBlocking = false;
 
+				// Creat input histories
+				for (int i = 0; i < networkAgent->player_amount; i++)
+					input_histories.insert({ (NetworkOwner)i, std::unordered_map<Uint32, InputStatus>() });
+
+				// Create last packets
+				for (int i = 0; i < networkAgent->player_amount; i++)
+					last_packets.insert({ (NetworkOwner)i , nullptr });
+
 				handleConnectionEstablished();
 			}
 			return;
@@ -281,12 +357,19 @@ void Scene::update()
 			// Get Input Status
 			InputStatus input_status = inputManager->getInputStatus(getNetworkOwnership());
 
+			// Get input history
+			InputHistory input_history = input_histories.at(getNetworkOwnership());
+
 			// Add inputstatus to history
-			input_status_history.insert({ frame_count, input_status });
+			input_history.insert( { frame_count, input_status } );
+
+			// Set back
+			input_histories.at(getNetworkOwnership()) = input_history;
 
 			// Craft Packet to send
 			InputStatusPacket* packet = new InputStatusPacket(frame_count, input_status.input_flags);
 			packet->mouse_pos = input_status.mouse_pos;
+			packet->owner_identity = getNetworkOwnership();
 
 			// Send Packet
 			networkAgent->sendPacket(packet, false);
@@ -296,77 +379,98 @@ void Scene::update()
 			frame_count++;
 		}
 
-		// Wait for packet
-		if (Packet* recv_packet = networkAgent->recvPacket())
+		// Wait for packets
+		std::vector<Packet*> recv_packets = networkAgent->recvPackets();
+		for (auto recv_packet : recv_packets)
 		{
-			if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
+			if (recv_packet)
 			{
-				InputStatusPacket* input_packet = static_cast<InputStatusPacket*>(recv_packet);
-
-				// Get pair input status
-				InputStatus input_status;
-				input_status.input_flags = input_packet->input_flags;
-				input_status.mouse_pos = input_packet->mouse_pos;
-
-				// Get pair identity
-				NetworkOwner owner = mode == ONLINE_SERVER ? NetworkOwner::OWNER_CLIENT_1 : NetworkOwner::OWNER_SERVER;
-
-				// Add to input status
-				inputManager->setInputStatus(input_status, owner);
-
-				// Revert previously sent input status
-				if (input_status_history.find(input_packet->frame_count) != input_status_history.end())
+				if (recv_packet->packetType == PacketType::INPUT_STATUS_PACKET)
 				{
-					InputStatus prev_input_status = input_status_history.at(input_packet->frame_count);
-					inputManager->setInputStatus(prev_input_status, getNetworkOwnership());
+					// Get packet
+					InputStatusPacket* input_packet = static_cast<InputStatusPacket*>(recv_packet);
+
+					// Get pair input status
+					InputStatus input_status;
+					input_status.input_flags = input_packet->input_flags;
+					input_status.mouse_pos = input_packet->mouse_pos;
+					Uint32 frame = input_packet->frame_count;
+
+					// Get pair identity
+					NetworkOwner owner = (NetworkOwner)recv_packet->owner_identity;
+
+					std::cout << "I recv packet from " << owner << " with frame " << frame << "\n";
+
+					// Set last recv packet list
+					last_packets.at(owner) = input_packet;
+
+					// Inset input status recv
+					InputHistory input_history = input_histories.at(owner);
+					input_history.insert({ frame, input_status });
+					input_histories.at(owner) = input_history;
+
+					// If server, send packet to pairs
+					if(getNetworkOwnership() == NetworkOwner::OWNER_SERVER)
+						networkAgent->sendPacket(input_packet, false);
 				}
-
-				// Revert also one frame before if not the first frame
-				int prev_frame = last_packet ? last_packet->frame_count : 0;
-				if (input_status_history.find(prev_frame) != input_status_history.end())
-				{
-					InputStatus prev_bis_input_status = input_status_history.at(prev_frame);
-					inputManager->setPrevInputStatus(prev_bis_input_status, getNetworkOwnership());
-				}
-
-				// Set last_packet
-				last_packet = input_packet;
-
-				// Set flag
-				update_frame = true;
+				
 			}
-
-			// Check if we can start sending packets again
-			if (stop_sending)
+			// No packet was received
+			else
 			{
-				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
-				{
-					stop_sending = false;
-				}
+				//std::cout << "There were no packets to recv \n";
+
+				// Check how many frames we are off
 			}
 		}
-		// No packet was received
-		else
-		{
-			std::cout << "There were no packets to recv \n";
 
-			// Check how many frames we are off
-			if (!stop_sending)
+		// Check if we can calculate the frame we recieved
+		// Set Flag
+		update_frame = canCalculateFrame(calc_frame_count);
+
+		// Revert input_statuses to frame_checked
+		if (update_frame)
+		{
+			std::cout << "Calculating frame " << calc_frame_count << "\n";
+
+			for (int i = 0; i < networkAgent->player_amount; i++)
 			{
-				if (RendererManager* renderer_manager = static_cast<RendererManager*>(getManager<TextureRenderer*>()))
-				{
-					if (last_packet)
-					{
-						// If last recv packet is 10 frames old, wait for sync
-						if (std::abs((int)(frame_count - last_packet->frame_count)) >= renderer_manager->getMaxBufferSize())
-						{
-							stop_sending = true;
-							std::cout << "Timeout Ocurred, need to ReSync\n";
-						}
-					}
-				}
+				// Parse to Owner
+				NetworkOwner o = (NetworkOwner)i;
+
+				// Get input history of owner
+				InputHistory i_history = input_histories.at(o);
+
+				// Recover i_status of frame @frame
+				InputStatus i_status = i_history.at(calc_frame_count);
+
+				// Set Input status
+				inputManager->setInputStatus(i_status, o);
+
+				// Recover prev input status of frame @frame
+				Uint32 prev_frame = calc_frame_count > 0 ? calc_frame_count - 1 : 0;
+				InputStatus prev_i_status = i_history.at(prev_frame);
+
+				// Delete entry
+				if (prev_frame)
+					i_history.erase(prev_frame);
+
+				// Re-insert
+				input_histories.at(o) = i_history;
+
+				// Set prev input status
+				inputManager->setPrevInputStatus(prev_i_status, o);
 			}
+
+			// Update calculated frame counter
+			calc_frame_count++;
+
+			// Frame was updated, we can continue sending packets
+			stop_sending = false;
 		}
+
+		if (!stop_sending)
+			stop_sending = shouldStopSending();
 
 		if (!update_frame)
 			return;

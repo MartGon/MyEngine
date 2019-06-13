@@ -21,7 +21,7 @@ enum PacketType
 	MOUSE_STATE_PACKET,
 	INPUT_STATUS_PACKET,
 	TIMESTAMP_PACKET,
-	RNG_SYNC_PACKET
+	SYNC_PACKET
 };
 
 enum ComponentPacketType
@@ -48,6 +48,9 @@ public:
 	Packet();
 	Packet(PacketType type);
 	~Packet();
+
+	// Packet's owner identity
+	Uint8 owner_identity = 0;
 
 	// Packet data
 	PacketType packetType = NULL_PACKET;
@@ -220,15 +223,18 @@ public:
 	size_t getSize() override { return sizeof(TransformPacket); };
 };
 
-class RngSyncPacket : public Packet
+class SyncPacket : public Packet
 {
 public:
 	// Constructor
-	RngSyncPacket(uint64_t seed);
+	SyncPacket(Uint8 identity, uint64_t seed);
+
+	// Indentity
+	Uint8 identity_to_set = 0;
 
 	// Seed
 	uint64_t seed = 0;
 
 	// Overrided
-	size_t getSize() override { return sizeof(RngSyncPacket); };
+	size_t getSize() override { return sizeof(SyncPacket); };
 };

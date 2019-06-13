@@ -12,14 +12,10 @@ class RendererManager : public Manager<TextureRenderer*>
 public:
 	// Constructor
 	RendererManager();
-	RendererManager(int buffer_size);
 
 	// Attributes
 	static Texture nullTexture;
 	static SDL_Renderer* renderer;
-
-	// Buffering
-	int max_buffer_size = 0;
 
 	// Methods
 	static void init();
@@ -35,7 +31,6 @@ public:
 	// Non-static methods
 	void onAddComponent(TextureRenderer* tRenderer) override;
 	void manage() override;
-	int getMaxBufferSize();
 
 private:
 	static int nativeWidthResolution;

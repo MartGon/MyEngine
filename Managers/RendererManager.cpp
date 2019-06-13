@@ -17,13 +17,6 @@ RendererManager::RendererManager()
 {
 }
 
-RendererManager::RendererManager(int buffer_size) : RendererManager()
-{
-	max_buffer_size = buffer_size;
-	for (int i = 0; i < getMaxBufferSize(); i++)
-		manage();
-}
-
 void RendererManager::setNativeResolution(int width, int height)
 {
 	nativeHeightResolution = width;
@@ -122,8 +115,3 @@ void RendererManager::manage()
 
 // TODO - Poner layer a private. Hacer metodo setLayer que sortea el array cuando se cambia el layer
 // TODO - La layer se tiene en cuenta una vez que el objeto esta creado, por lo que es necesario ordenar el array en otro momento. Solucion: Hacer metodo start en la clase manager
-
-int RendererManager::getMaxBufferSize()
-{
-	return max_buffer_size;
-}

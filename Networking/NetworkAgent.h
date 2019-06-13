@@ -38,6 +38,15 @@ public:
 	// Attributes
 	NetworkBuffer buffer = NetworkBuffer(1460);
 
+	// Pair identity
+	Uint8 pair_identity = 0;
+
+	// Player number
+	int player_amount = 2;
+
+	// Frame window size
+	int max_buffer_size = 0;
+
 	// Socket Set
 	SDLNet_SocketSet socket_set;
 
@@ -59,6 +68,10 @@ public:
 	// Communication
 	virtual bool sendPacket(Packet* packet, bool buffered = true);
 	virtual Packet* recvPacket();
+	virtual std::vector<Packet*> recvPackets() { return std::vector<Packet*>(); };
+
+	// Convenience
+	int getPairsAmount() { return player_amount - 1; };
 
 	// Other
 	void destroy();

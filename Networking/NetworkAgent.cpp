@@ -59,11 +59,11 @@ void NetworkBuffer::clear()
 
 NetworkAgent::NetworkAgent()
 {
-		std::cout << "Inicializando networking\n";
-		initNetworking();
+	std::cout << "Inicializando networking\n";
+	initNetworking();
 
-		// Allocat a socket set
-		socket_set = SDLNet_AllocSocketSet(1);
+	// Allocat a socket set
+	socket_set = SDLNet_AllocSocketSet(1);
 }
 
 NetworkAgent::~NetworkAgent()
@@ -101,7 +101,8 @@ bool NetworkAgent::sendPacket(TCPsocket socket, Packet* packet, bool buffered)
 		return false;
 	}
 
-	size_t len = packet->getSize();
+	// Should not do this
+ 	size_t len = packet->getSize();
 	int result = 0;
 
 	// Add to the data buffer

@@ -30,7 +30,7 @@ public:
 	Uint16 serverPort;
 
 		// Client side
-	TCPsocket clientSocket = nullptr;
+	std::vector<TCPsocket> client_sockets;
 
 	// Methods
 		// Uppper
@@ -42,8 +42,11 @@ public:
 	bool pairWithClient();
 
 		// Communication
-	virtual bool sendPacket(Packet* packet, bool buffered = true) override;
-	virtual Packet* recvPacket();
+	bool sendPacket(Packet* packet, bool buffered = true) override;
+	bool sendPacket(int client_index, Packet* packet, bool buffered = true);
+	Packet* recvPacket() override;
+	Packet* recvPacket(int client_index);
+	std::vector<Packet*> recvPackets() override;
 
 	// Other
 	virtual void beforeDestroy();

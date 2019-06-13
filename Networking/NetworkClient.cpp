@@ -36,6 +36,19 @@ bool NetworkClient::readConfigFile()
 	serverPort = std::stoi(line);
 	std::cout << "Server port " << serverPort << "\n";
 
+	// Read frame window size
+	std::getline(configFile, line);
+	max_buffer_size = std::stoi(line);
+	std::cout << "Frame buffer size: " << max_buffer_size << "\n";
+
+	// Read player amount
+	std::getline(configFile, line);
+	player_amount = std::stoi(line);
+	std::cout << "Player amount: " << player_amount << "\n";
+
+	// Allocat a socket set
+	socket_set = SDLNet_AllocSocketSet(1);
+
 	return true;
 }
 
@@ -85,12 +98,19 @@ bool NetworkClient::establishConnection()
 	case CLIENT_RECEIVING:
 		if (Packet* packt = recvPacket())
 		{
-			if (packt->packetType == PacketType::RNG_SYNC_PACKET)
+			if (packt->packetType == PacketType::SYNC_PACKET)
 			{
-				RngSyncPacket* rng = static_cast<RngSyncPacket*>(packt);
-				Random::setSeed(rng->seed);
+				if (SyncPacket* syn = static_cast<SyncPacket*>(packt))
+				{
+					// Set identity
+					pair_identity = syn->identity_to_set;
+					std::cout << "My pair identity is: " << (int)pair_identity << "\n";
 
-				state = CLIENT_CONNECTION_ESTABLISHED;
+					// Set RNG Seed
+					Random::setSeed(syn->seed);
+
+					state = CLIENT_CONNECTION_ESTABLISHED;
+				}
 			}
 		}
 		break;
@@ -111,6 +131,19 @@ bool NetworkClient::sendPacket(Packet* packet, bool buffered)
 Packet* NetworkClient::recvPacket()
 {
 	return NetworkAgent::recvPacket(clientSocket);
+}
+
+std::vector<Packet*> NetworkClient::recvPackets()
+{
+	std::vector<Packet*> packets;
+
+	for (int i = 0; i < getPairsAmount(); i++)
+	{
+		Packet* packet = recvPacket();
+		packets.push_back(packet);
+	}
+
+	return packets;
 }
 
 void NetworkClient::beforeDestroy()

@@ -114,7 +114,7 @@ int engine_main()
 
 			// Render if frame buffer is enough
 			SDL_RenderPresent(renderer);
-			//SDL_RenderClear(renderer);
+			SDL_RenderClear(renderer);
 
 			if(slowmode)
 				SDL_Delay(1000);

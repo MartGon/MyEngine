@@ -100,14 +100,17 @@ public:
         
     }
 
+	using InputHistory = std::unordered_map<Uint32, InputStatus>;
+
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
-	InputStatusPacket* last_packet = nullptr;
-	std::unordered_map<Uint32, InputStatus> input_status_history;
+	std::unordered_map<NetworkOwner, InputStatusPacket*> last_packets;
+	std::unordered_map<NetworkOwner, InputHistory> input_histories;
 	bool connectionEstablished = false;
 	bool disconnected = false;
 	bool alreadyDestroyed = false;
 	bool stop_sending = false;
+	Uint32 calc_frame_count = 0;
 	Uint32 frame_count = 0;
 
 	// Network Methods
@@ -118,6 +121,10 @@ public:
 	virtual void handleConnectionEstablished() {};
 	bool isOnline();
 	NetworkOwner getNetworkOwnership();
+
+	bool canCalculateFrame(Uint32 frame);
+	InputStatusPacket* getOldestLastPacket();
+	bool shouldStopSending();
 
 	// Overrided Methods
 	virtual void loadMedia();

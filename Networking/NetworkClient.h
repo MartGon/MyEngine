@@ -40,6 +40,7 @@ public:
 			// Communication
 	virtual bool sendPacket(Packet* packet, bool buffered = true) override;
 	virtual Packet* recvPacket();
+	std::vector<Packet*> recvPackets() override;
 
 		// Own
 	bool openClientSocket();
