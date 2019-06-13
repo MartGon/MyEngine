@@ -85,6 +85,18 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
+	
+
+	// Free previous
+	if (SDL_Texture* texture = SceneManager::scene->frame_to_render)
+		SDL_DestroyTexture(texture);
+
+	// Create frame texture
+	SceneManager::scene->frame_to_render = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	// Set render target to that texture
+	SDL_SetRenderTarget(renderer, SceneManager::scene->frame_to_render);
+
 	// Draw sprites
 	for (int i = 0; i < components.size(); i++)
 	{

@@ -102,6 +102,9 @@ public:
 
 	using InputHistory = std::unordered_map<Uint32, InputStatus>;
 
+	// Rendering stuff
+	SDL_Texture* frame_to_render = nullptr;
+
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
 	std::unordered_map<NetworkOwner, InputStatusPacket*> last_packets;

@@ -71,7 +71,6 @@ int engine_main()
 		bool& quit = SceneManager::quit;
 
 		//While application is running
-		SDL_Texture* frame_to_render = nullptr;
 		bool slowmode = false;
 		while (!(quit))
 		{
@@ -110,6 +109,13 @@ int engine_main()
 			{
 				if (!SceneManager::scene->connectionEstablished)
 					continue;
+			}
+
+			// Render frame
+			if (SDL_Texture* frame_to_render = SceneManager::scene->frame_to_render)
+			{
+				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
 			}
 
 			// Render if frame buffer is enough

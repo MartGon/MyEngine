@@ -401,15 +401,15 @@ void Scene::update()
 
 					std::cout << "I recv packet from " << owner << " with frame " << frame << "\n";
 
-					// Set last recv packet list
+					// Free last packet if it exists
 					if (Packet* last_packet = last_packets.at(owner))
 					{
-						// Set new packet
-						last_packets.at(owner) = input_packet;
-
 						// Free old one
 						std::free(last_packet);
 					}
+					// Set new packet
+					last_packets.at(owner) = input_packet;
+
 
 					// Inset input status recv
 					InputHistory input_history = input_histories.at(owner);
