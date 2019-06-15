@@ -95,6 +95,30 @@ bool RotatableBoxCollider::checkCollision(RotatableBoxCollider collider)
         }
     }
 
+	// Check for center
+	Vector2<float> center = { collider.vertex[3].x / 2, collider.vertex[3].y / 2 };
+
+	for (Uint8 j = 0; j < 2; j++)
+	{
+		// Origin to other collider vertex vector
+		Vector2<float> point = (center + collider.gameObject->getAbsolutePosition() + collider.offset * collider.gameObject->transform.scale);
+		Vector2<float> axisCenter = (vertex[0] + gameObject->getAbsolutePosition() + offset * gameObject->transform.scale);
+		Vector2<float> op = point - axisCenter;
+
+		// Project op onto side
+		float proj = op.project(sides[j]);
+		float sideLength = sides[j].getModule();
+
+		// Check if this vertex is not inside the box
+		if (proj > sideLength || proj < 0)
+			break;
+
+		// If we have checked both sides, and it is in both of them,
+		// then the point is inside the box
+		if (j)
+			return true;
+	}
+
     return false;
 }
 
