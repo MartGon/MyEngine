@@ -52,7 +52,7 @@ public:
 	Uint8 getAlpha();
 
 	// Color Mod
-	MapRGB color_mod = {-1, -1, -1};
+	MapRGB color_mod = {255, 255, 255};
 
 	// Checking
 	bool isValid();

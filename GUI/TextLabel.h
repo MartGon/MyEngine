@@ -17,6 +17,9 @@ public:
 	void setTextScale(Vector2<float> scale);
 	Vector2<float> getTextScale();
 
+	// Set text color
+	void setTextColor(MapRGB color);
+
 private:
 	// Attributes
 	std::string text;

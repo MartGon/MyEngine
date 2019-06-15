@@ -77,6 +77,14 @@ Vector2<float> TextLabel::getTextScale()
 	return transform.scale;
 }
 
+void TextLabel::setTextColor(MapRGB color)
+{
+	for (auto tRenderer : font_tRenderers)
+	{
+		tRenderer->texture.color_mod = color;
+	}
+}
+
 // Private methods
 void TextLabel::fixCharPositions()
 {
