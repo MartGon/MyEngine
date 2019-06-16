@@ -29,6 +29,16 @@ public:
 		Random::seed = seed;
 	}
 
+	static bool getBoolWithChance(float chance)
+	{
+		int lLimit = 1;
+		int rLimit = 1 / chance;
+
+		int result = getRandomUniformInteger(lLimit, rLimit);
+
+		return result;
+	}
+
 	static uint64_t seed;
 
 private:
