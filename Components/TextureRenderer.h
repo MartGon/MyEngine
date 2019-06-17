@@ -1,7 +1,16 @@
 #pragma once
 #include "Component.h"
 #include "Texture.h"
+
 #include <string>
+#include <deque>
+
+struct RenderData
+{
+	Vector2<float> pos;
+	SDL_Point* r_center;
+	double angle;
+};
 
 class TextureRenderer : public Component
 {
@@ -20,7 +29,9 @@ public:
 	SDL_Renderer *renderer = nullptr;
 
 	// Misc
+	int trail_size = 5;
 	bool isVanishing = false;
+	bool hasTrailEffect = false;
 	
 	void setBlink(int framerate, int duration);
 	void unsetBlink();
@@ -44,14 +55,17 @@ private:
 	// Attributes
 	Uint8 layer = 127;
 
-
 	// Misc
 	bool isBlinking = false;
 	int blink_frame_duration = 0;
 	int blink_rate = 2;
 	int blink_frame_count = 0;
 
+	std::deque<RenderData> trail_pos;
+
 	// Own methods
 	void vanish();
 	void blink();
+	void update_trail(Vector2<float> pos, SDL_Point* r_center, double angle);
+	void render_trail();
 };

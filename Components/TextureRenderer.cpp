@@ -61,10 +61,18 @@ void TextureRenderer::render()
 	x -= (cam_pos.x * scaler.x);
 	y -= (cam_pos.y * scaler.y);
 
+	// Render trail effect
+	if (hasTrailEffect)
+		render_trail();
+
 	// Texture set alpha
 	texture.setAlpha(alpha);
 
 	texture.render(x, y, angle, fCenter, flip);
+
+	// Update trail
+	if (hasTrailEffect)
+		update_trail(Vector2<float>(x, y), fCenter, angle);
 }
 
 SDL_Point* TextureRenderer::getSDLPointFromVector(Vector2<int> center)
@@ -164,4 +172,36 @@ void TextureRenderer::blink()
 		alpha = SDL_ALPHA_TRANSPARENT;
 	else
 		alpha = SDL_ALPHA_OPAQUE;
+}
+
+void TextureRenderer::update_trail(Vector2<float> pos, SDL_Point* r_center, double angle)
+{
+	RenderData r_data = { pos, r_center, angle };
+
+	// Remove first one when too big
+	if (trail_pos.size() > trail_size)
+		trail_pos.pop_back();
+
+	// Get pos and add to the list
+	trail_pos.push_front(r_data);
+}
+
+void TextureRenderer::render_trail()
+{
+	for (int i = 0; i < trail_pos.size(); i ++)
+	{
+		RenderData r_data = trail_pos[i];
+
+		// Texture set alpha
+		Uint8 render_alpha = alpha / (i + 1);
+		texture.setAlpha(render_alpha);
+
+		// Fill render data
+		int x = r_data.pos.x;
+		int y = r_data.pos.y;
+		double angle = r_data.angle;
+		SDL_Point* fCenter = r_data.r_center;
+
+		texture.render(x, y, angle, fCenter, flip);
+	}
 }
