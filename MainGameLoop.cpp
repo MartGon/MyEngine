@@ -87,13 +87,6 @@ int engine_main()
 				{
 					quit = true;
 				}
-				if(e.type == SDL_KEYDOWN)
-				{
-					if (e.key.keysym.sym == SDLK_p)
-					{
-						slowmode = !slowmode;
-					}
-				}
 				else
 				{
 					// Add to scene event list
@@ -103,13 +96,6 @@ int engine_main()
 
 			// Update scene
 			SceneManager::scene->update();
-
-			// Don't render while waiting for connection
-			if (SceneManager::scene->isOnline())
-			{
-				if (!SceneManager::scene->connectionEstablished)
-					continue;
-			}
 
 			// Render frame
 			if (SDL_Texture* frame_to_render = SceneManager::scene->frame_to_render)
@@ -121,9 +107,6 @@ int engine_main()
 			// Render if frame buffer is enough
 			SDL_RenderPresent(renderer);
 			SDL_RenderClear(renderer);
-
-			if(slowmode)
-				SDL_Delay(1000);
 		}
 	}
 

@@ -20,6 +20,8 @@ public:
 	// Set text color
 	void setTextColor(MapRGB color);
 
+	Vector2<float> getNextCharPos(int index);
+
 private:
 	// Attributes
 	std::string text;

@@ -11,6 +11,7 @@ Button::Button(Texture texture) : GameObject(texture)
 {
 	// Set collider
 	collider = setComponent(new BoxCollider(texture));
+	tRenderer = getComponent<TextureRenderer>();
 
 	// Init tLabel
 	tLabel = new TextLabel();

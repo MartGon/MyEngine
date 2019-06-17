@@ -275,7 +275,7 @@ void GameObject::afterMove()
 
 // Event hooks
 
-bool GameObject::handleEvent(const SDL_Event &event, bool from_network)
+bool GameObject::handleEvent(const SDL_Event &event)
 {
 	return OnHandleEvent(event);
 }

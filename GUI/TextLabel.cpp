@@ -29,6 +29,7 @@ void TextLabel::setText(std::string text)
 	{
 		TextureRenderer* tRenderer = font_tRenderers.at(i);
 		tRenderer->texture = getTextureByChar(text.at(i));
+		tRenderer->isEnabled = true;
 	}
 
 	// We may need to create more tRenderers
@@ -85,23 +86,33 @@ void TextLabel::setTextColor(MapRGB color)
 	}
 }
 
+Vector2<float> TextLabel::getNextCharPos(int index)
+{
+	Vector2<float> v_offset(-1, -1);
+
+	if (font_tRenderers.empty())
+		return v_offset;
+
+	if (index == 0)
+		return font_tRenderers.at(0)->render_offset;
+
+	TextureRenderer* prev_tRenderer = font_tRenderers.at(index - 1);
+	int prev_font_w = prev_tRenderer->texture.mWidth * transform.scale.x;
+	Vector2<float> prev_offset = prev_tRenderer->render_offset;
+	int offset = prev_offset.x + prev_font_w + 1 * transform.scale.x;
+
+	v_offset = Vector2<float>( offset, prev_offset.y );
+
+	return v_offset;
+}
+
 // Private methods
 void TextLabel::fixCharPositions()
 {
 	for (int i = 1; i < font_tRenderers.size(); i++)
 	{
 		TextureRenderer* tRenderer = font_tRenderers.at(i);
-
-		if (!tRenderer->isEnabled)
-			continue;
-
-		TextureRenderer* prev_tRenderer = font_tRenderers.at(i - 1);
-		int prev_font_w = prev_tRenderer->texture.mWidth * transform.scale.x;
-		Vector2<float> prev_offset = prev_tRenderer->render_offset;
-		int offset = prev_offset.x + prev_font_w + 1 * transform.scale.x;
-
-		tRenderer->render_offset = Vector2<float>(offset, prev_offset.y);
-
+		tRenderer->render_offset = getNextCharPos(i);
 	}
 }
 

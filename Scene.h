@@ -148,6 +148,23 @@ public:
 	void deactivateAllGameObjects();
 	void activateAllGameObjects();
 
+	template<typename T>
+	std::vector<T> getGameObjects() 
+	{
+		std::vector<T> gos;
+
+		for (auto go_p : gameObjectMap)
+		{
+			if (GameObject* go = go_p.second)
+			{
+				if (T t = dynamic_cast<T>(go))
+					gos.push_back(t);
+			}
+		}
+
+		return gos;
+	}
+
 	// Main
 	void update();
 	void handle_events(std::deque<SDL_Event>& events, bool network = false);

@@ -174,7 +174,7 @@ public:
 	virtual void beforeMove();
 	virtual void afterMove();
 		// Events
-	bool handleEvent(const SDL_Event& event, bool from_network = false);
+	bool handleEvent(const SDL_Event& event);
 	virtual bool OnHandleEvent(const SDL_Event& event) { return false; };
 		// Animation
 	virtual void onAnimationFinished(Animation* anim);
