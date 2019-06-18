@@ -28,7 +28,7 @@ Timer::Timer(int delay, TimerHandler* timer_handler, void* param) : timer_handle
 // TimerComponent
 
 // Constructor
-TimerComponent::TimerComponent(Uint32 ms, Uint8 flag) : Component()
+TimerComponent::TimerComponent(Uint32 ms, Uint32 flag) : Component()
 {
 	// Set param
 	this->flag = flag;
@@ -100,12 +100,12 @@ void TimerComponent::update()
 
 // TimerObject class
 
-TimerObject::TimerObject(Uint32 ms, Uint8 flag) 
+TimerObject::TimerObject(Uint32 ms, Uint32 flag) 
 {
 	timer = setComponent(new TimerComponent(ms, flag));
 }
 
-void TimerObject::onTimerEnd(Uint8 flag)
+void TimerObject::onTimerEnd(Uint32 flag)
 {
 	callback(flag);
 }

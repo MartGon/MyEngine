@@ -14,14 +14,18 @@ public:
 	void setText(std::string text);
 	std::string getText();
 
+	// Scale
 	void setTextScale(Vector2<float> scale);
 	Vector2<float> getTextScale();
 
 	// Set text color
 	void setTextColor(MapRGB color);
 
+	// Char pos
 	Vector2<float> getNextCharPos(int index);
 
+	// Override
+	Vector2<float> getDimensions() override;
 private:
 	// Attributes
 	std::string text;

@@ -13,7 +13,7 @@ TextInput::TextInput(Texture background, std::string placeholder) : Button(backg
 	MapRGB colorKey{0, 255, 0};
 	cursor_Renderer = setComponent(new TextureRenderer("fonts/cursor.png", &colorKey));
 	cursor_Renderer->isEnabled = false;
-	cursor_Renderer->setBlink(4, -1);
+	cursor_Renderer->setBlink(8, -1);
 }
 
 // Methods
@@ -44,6 +44,17 @@ void TextInput::OnClick()
 	setSelected(true);
 }
 
+std::string TextInput::getText()
+{
+	return tLabel->getText();
+}
+
+void TextInput::setText(std::string text)
+{
+	tLabel->setText(text);
+	tLabel->setCenteredWithinParent();
+}
+
 // Overrided methods
 
 bool TextInput::OnHandleEvent(const SDL_Event& event)
@@ -53,34 +64,51 @@ bool TextInput::OnHandleEvent(const SDL_Event& event)
 	if (!isSelected)
 		return result;
 
-	if (event.type == SDL_KEYDOWN)
+	std::string next_text = tLabel->getText();
+
+	if (event.type == SDL_TEXTINPUT)
 	{
-		// Update text
-		SDL_Keycode code = event.key.keysym.sym;
+		// Get input text
+		std::string new_text = std::string(event.edit.text);
 
-		std::string next_text = tLabel->getText();
-		if (next_text.size() < text_limit)
+		// Append chars until limit is reached
+		for (int i = 0; i < new_text.size(); i++)
 		{
-			if (code == '\b')
-			{
-				if (!next_text.empty())
-					next_text.erase(next_text.size() - 1, 1);
-			}
-			else if (code >= '0' && code <= '9' || code == '.')
-				next_text += (char)code;
-
-			// Update text
-			tLabel->setText(next_text);
-
-			// Update cursor
-			int index = next_text.size();
-			auto last_char_pos = tLabel->getNextCharPos(index);
-			updateCursor(last_char_pos);
+			if (next_text.size() < text_limit)
+				next_text.append(std::string(1, new_text[i]));
+			else
+				break;
 		}
 
 		// Update flag
 		result = true;
 	}
+	else if (event.type == SDL_KEYDOWN)
+	{
+		SDL_Keycode code = event.key.keysym.sym;
+
+		switch (code)
+		{
+		case SDLK_BACKSPACE:
+			if (!next_text.empty())
+				next_text.erase(next_text.size() - 1, 1);
+
+			// Update flag
+			result = true;
+			break;
+		case SDLK_RETURN:
+			setSelected(false);
+			break;
+		}
+	}
+
+	// Update text and format
+	tLabel->setText(next_text);
+
+	// Update cursor
+	int index = tLabel->getText().size();
+	auto last_char_pos = tLabel->getNextCharPos(index);
+	updateCursor(last_char_pos);
 
 	return result;
 }

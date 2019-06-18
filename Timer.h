@@ -33,11 +33,11 @@ class TimerComponent : public Component
 {
 public:
 	// Constructor
-	TimerComponent(Uint32 ms, Uint8 flag = 0);
+	TimerComponent(Uint32 ms, Uint32 flag = 0);
 
 	// Attributes
 	Uint32 delay = 0;
-	Uint8 flag = 0;
+	Uint32 flag = 0;
 	Uint32 due_date = 0;
 	bool isOver = false;
 
@@ -59,14 +59,14 @@ class TimerObject : public GameObject
 {
 public:
 	// Constructor
-	TimerObject(Uint32 ms, Uint8 flag = 0);
+	TimerObject(Uint32 ms, Uint32 flag = 0);
 
 	// Member
 	TimerComponent* timer = nullptr;
 
 	// Callback method
-	std::function<void(Uint8)> callback;
+	std::function<void(Uint32)> callback;
 
 	// Overrided methods
-	void onTimerEnd(Uint8 flag) override;
+	void onTimerEnd(Uint32 flag) override;
 };

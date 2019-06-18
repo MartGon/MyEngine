@@ -106,6 +106,26 @@ Vector2<float> TextLabel::getNextCharPos(int index)
 	return v_offset;
 }
 
+
+Vector2<float> TextLabel::getDimensions()
+{
+	Vector2<float> i_dim;
+
+	// Get any texture height
+	if (!font_tRenderers.empty())
+	{
+		if (TextureRenderer* tRenderer = font_tRenderers.back())
+		{
+			Texture texture = tRenderer->texture;
+
+			float height = texture.mHeight * transform.scale.y;
+			i_dim = Vector2<float>(getNextCharPos(text.size()).x, height);
+		}
+	}
+
+	return i_dim;
+}
+
 // Private methods
 void TextLabel::fixCharPositions()
 {
@@ -149,6 +169,9 @@ std::string TextLabel::getTexturePath(char c)
 	{
 	case '.':
 		name = "dot";
+		break;
+	case ':':
+		name = "colon";
 		break;
 	default:
 		name += c;

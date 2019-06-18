@@ -29,6 +29,24 @@ enum NetworkOwner
 	OWNER_CLIENT_15
 };
 
+enum HorizontalAlign
+{
+	ALIGN_FROM_LEFT = 0,
+	ALIGN_FROM_RIGHT = 1
+};
+
+enum VerticalAlign
+{
+	ALIGN_FROM_TOP = 0,
+	ALIGN_FROM_BOTTOM = 2
+};
+
+struct AlignStruct
+{
+	HorizontalAlign h_align = ALIGN_FROM_LEFT;
+	VerticalAlign v_align = ALIGN_FROM_TOP;
+};
+
 class Component;
 class GameObject : public Updateable
 {
@@ -41,7 +59,7 @@ public:
 	NetworkOwner network_owner = OWNER_SERVER;
 	bool netCreated = false;
 
-	/*	This gameobject is part of the scenery and 
+	/*	This gameobject is part of the scenery and
 		therefore should not be updated through the network
 	*/
 	bool isNetworkStatic = true;
@@ -118,7 +136,7 @@ public:
 		// Vector
 		std::vector<T*> lComponents;
 
-		for(auto component : this->components)
+		for (auto component : this->components)
 		{
 			if (T* subComponent = dynamic_cast<T*>(component))
 			{
@@ -139,6 +157,14 @@ public:
 	void setRelativePosition(Vector2<float> pos);
 	// Get absolute position
 	Vector2<float> getAbsolutePosition();
+	// Set centered within outer limits
+	void setCentered(Vector2<float> pos, Vector2<float> dim);
+	void setCenteredWithinParent(Vector2<float> offset = Vector2<float>(0,0));
+	// Set relative with margin
+	// Align
+	// x == true -> From left
+	// y == true -> From up
+	virtual void setRelativePosition(Vector2<float> pos, Vector2<float> dim, Vector2<float> margin_percent, AlignStruct align);
 
     // Rotation
     Vector2<int> getAbsoluteRotationCenter();
@@ -165,6 +191,7 @@ public:
 		// Collisions
 	virtual void onColliderEnter(Collider *collider);
 	//virtual void onColliderEnter(RotatableBoxCollider* collider);
+	virtual Vector2<float> getDimensions();
 
 		// Texture Renderer
 	virtual void onVanish();
@@ -180,7 +207,7 @@ public:
 	virtual void onAnimationFinished(Animation* anim);
 	virtual void beforeAnimationFrame(Animation* anim, int frameNumber);
 		// Timer
-	virtual void onTimerEnd(Uint8 flag);
+	virtual void onTimerEnd(Uint32 flag);
 
 private:
 

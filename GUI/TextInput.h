@@ -16,10 +16,13 @@ public:
 	void updateCursor(Vector2<float> last_char_pos);
 	void OnClick();
 
+	std::string getText();
+	void setText(std::string text);
+
 	// Overrided methods
 	bool OnHandleEvent(const SDL_Event& event) override;
 
 	// Attributes
 	bool isSelected = false;
-	int text_limit = 16;
+	int text_limit = 21;
 };

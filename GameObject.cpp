@@ -139,6 +139,70 @@ Vector2<float> GameObject::getAbsolutePosition()
 	return position;
 }
 
+void GameObject::setCentered(Vector2<float> pos, Vector2<float> dim)
+{
+	auto i_dim = getDimensions();
+
+	// Get outer object half point
+	Vector2<float> half_point = pos + dim / 2;
+
+	// Set halfway
+	auto final_pos = half_point - i_dim / 2;
+
+	if (transform.parent)
+		transform.position = final_pos - transform.parent->position;
+	else
+		transform.position = final_pos;
+}
+
+void GameObject::setCenteredWithinParent(Vector2<float> offset)
+{
+	if (transform.parent)
+	{
+		GameObject* go = transform.parent->gameObject;
+
+		auto dim = go->getDimensions();
+		auto pos = go->transform.position;
+
+		setCentered(pos, dim);
+
+		transform.position = transform.position + offset;
+	}
+}
+
+void GameObject::setRelativePosition(Vector2<float> pos, Vector2<float> dim, Vector2<float> margin_percent, AlignStruct align)
+{
+	Vector2<float> offset = dim * margin_percent / 100.f;
+	Vector2<float> final_pos;
+
+	if (align.h_align == ALIGN_FROM_RIGHT)
+	{
+		auto i_dim = getDimensions();
+		float pre_xpos = pos.x + dim.x - offset.x - i_dim.x;
+		final_pos.x = pre_xpos;
+	}
+	else
+	{
+		final_pos.x = pos.x + offset.x;
+	}
+
+	if (align.v_align == ALIGN_FROM_BOTTOM)
+	{
+		auto i_dim = getDimensions();
+		float pre_ypos = pos.y + dim.y - offset.y - i_dim.y;
+		final_pos.y = pre_ypos;
+	}
+	else
+	{
+		final_pos.y = pos.y + offset.y;
+	}
+
+	if (transform.parent)
+		transform.position = final_pos - transform.parent->position;
+	else
+		transform.position = final_pos;
+}
+
 // Rotation
 
 Vector2<int> GameObject::getAbsoluteRotationCenter()
@@ -249,6 +313,31 @@ void GameObject::onColliderEnter(Collider *collider)
 	//printf("%i: Collision detectada con %i\n", id, collider->gameObject->id);
 }
 
+Vector2<float> GameObject::getDimensions()
+{
+	Vector2<float> dim;
+
+	auto colliders = getComponents<BoxCollider>();
+	if (!colliders.empty())
+	{
+		auto collider = colliders.back();
+		dim = collider->getDimensions();
+	}
+	else
+	{
+		// Get from texture
+		std::vector<TextureRenderer*> renderers = getComponents<TextureRenderer>();
+		if (!renderers.empty())
+		{
+			TextureRenderer* tRenderer = renderers.front();
+			Texture texture = tRenderer->texture;
+			dim = Vector2<float>(texture.mWidth, texture.mHeight) * transform.scale;
+		}
+	}
+
+	return dim;
+}
+
 // TextureRenderer
 
 void GameObject::onVanish()
@@ -294,7 +383,7 @@ void GameObject::beforeAnimationFrame(Animation* anim, int frameNumber)
 
 // Timer hooks
 
-void GameObject::onTimerEnd(Uint8 flag)
+void GameObject::onTimerEnd(Uint32 flag)
 {
 
 }
