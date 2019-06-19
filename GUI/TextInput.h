@@ -2,6 +2,8 @@
 #include "Button.h"
 #include "TextLabel.h"
 
+#include <regex>
+
 class TextInput : public Button
 {
 public:
@@ -25,4 +27,6 @@ public:
 	// Attributes
 	bool isSelected = false;
 	int text_limit = 21;
+
+	std::regex valid_inputs{R"(.*)"};
 };

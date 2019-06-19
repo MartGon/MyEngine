@@ -1,5 +1,7 @@
 #include "TextInput.h"
 
+#include <regex>
+
 // Constructors
 TextInput::TextInput(Texture background, std::string placeholder) : Button(background)
 {
@@ -71,17 +73,21 @@ bool TextInput::OnHandleEvent(const SDL_Event& event)
 		// Get input text
 		std::string new_text = std::string(event.edit.text);
 
-		// Append chars until limit is reached
-		for (int i = 0; i < new_text.size(); i++)
+		if (std::regex_match(new_text, valid_inputs))
 		{
-			if (next_text.size() < text_limit)
-				next_text.append(std::string(1, new_text[i]));
-			else
-				break;
-		}
 
-		// Update flag
-		result = true;
+			// Append chars until limit is reached
+			for (int i = 0; i < new_text.size(); i++)
+			{
+				if (next_text.size() < text_limit)
+					next_text.append(std::string(1, new_text[i]));
+				else
+					break;
+			}
+
+			// Update flag
+			result = true;
+		}
 	}
 	else if (event.type == SDL_KEYDOWN)
 	{
@@ -102,13 +108,16 @@ bool TextInput::OnHandleEvent(const SDL_Event& event)
 		}
 	}
 
-	// Update text and format
-	tLabel->setText(next_text);
+	if (result)
+	{
+		// Update text and format
+		setText(next_text);
 
-	// Update cursor
-	int index = tLabel->getText().size();
-	auto last_char_pos = tLabel->getNextCharPos(index);
-	updateCursor(last_char_pos);
+		// Update cursor
+		int index = tLabel->getText().size();
+		auto last_char_pos = tLabel->getNextCharPos(index);
+		updateCursor(last_char_pos);
+	}
 
 	return result;
 }
