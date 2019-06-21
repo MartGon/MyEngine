@@ -33,6 +33,9 @@ void TextInput::setSelected(bool select)
 		int index = tLabel->getText().size();
 		auto last_char_pos = tLabel->getNextCharPos(index);
 		updateCursor(last_char_pos);
+
+		// OnSelect hook
+		onSelect();
 	}
 }
 

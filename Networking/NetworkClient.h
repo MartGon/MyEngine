@@ -36,6 +36,7 @@ public:
 		// Upper
 	virtual bool readConfigFile();
 	virtual bool establishConnection();
+	void handleDisconnect(TCPsocket socket) override;
 
 			// Communication
 	virtual bool sendPacket(Packet* packet, bool buffered = true) override;

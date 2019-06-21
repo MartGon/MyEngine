@@ -111,7 +111,6 @@ public:
 	std::unordered_map<NetworkOwner, InputHistory> input_histories;
 	bool connectionEstablished = false;
 	bool disconnected = false;
-	bool alreadyDestroyed = false;
 	bool stop_sending = false;
 	Uint32 calc_frame_count = 0;
 	Uint32 frame_count = 0;
@@ -133,7 +132,8 @@ public:
 	virtual void loadMedia();
 	virtual void start();
 	virtual void onUpdate();
-	virtual void destroy();
+	virtual void onDestroy() {};
+	void destroy();
 	GameObject* handleEvent(const SDL_Event& event, bool from_network = false);
 	virtual void OnHandleEvent(const SDL_Event& event) {};
 	virtual GameObject* createGameObjectByTemplateId(int template_id) { return nullptr; };

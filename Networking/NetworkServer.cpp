@@ -10,6 +10,7 @@ NetworkServer::NetworkServer() : NetworkAgent()
 
 NetworkServer::~NetworkServer()
 {
+	beforeDestroy();
 }
 
 bool NetworkServer::readConfigFile()
@@ -81,7 +82,7 @@ bool NetworkServer::pairWithClient()
 	if (client_sockets.size() == getPairsAmount())
 	{
 		std::cout << "Client already paired \n";
-		return false;
+		return true;
 	}
 
 	TCPsocket clientSocket = nullptr;
@@ -120,9 +121,21 @@ bool NetworkServer::establishConnection()
 		break;
 	case SERVER_STATE_PAIRING:
 		if (pairWithClient())
+		{
+			// Send identity
+			int client_index = client_sockets.size();
+			SyncPacket sync(client_index, Random::seed);
+			sync.frame_buffer = max_buffer_size;
+			sync.player_amount = player_amount;
+			sendPacket(client_index - 1, &sync, false);
+
 			// Go to next step when paired with all expected clients
-			if(client_sockets.size() == getPairsAmount())
-				state = SERVER_STATE_SENDING;
+			if (client_sockets.size() == getPairsAmount())
+				state = SERVER_STATE_CONNECTION_ESTABLISHED;
+
+			// Call handler
+			callHandleNAEvent(EVENT_PAIR_CONNECTED);
+		}
 		break;
 	case SERVER_STATE_SENDING:
 		// Give each pair each identity
@@ -140,6 +153,18 @@ bool NetworkServer::establishConnection()
 	}
 
 	return false;
+}
+
+void NetworkServer::handleDisconnect(TCPsocket socket)
+{
+	// Remove socket from list
+	auto to_remove = std::find(client_sockets.begin(), client_sockets.end(), socket);
+
+	if(to_remove != client_sockets.end())
+	{
+
+		client_sockets.erase(to_remove);
+	}
 }
 
 bool NetworkServer::sendPacket(int client_index, Packet *packet, bool buffered)
@@ -169,6 +194,7 @@ Packet* NetworkServer::recvPacket()
 Packet* NetworkServer::recvPacket(int client_index)
 {
 	TCPsocket clientSocket = client_sockets.at(client_index);
+
 	return NetworkAgent::recvPacket(clientSocket);
 }
 
@@ -176,9 +202,18 @@ std::vector<Packet*> NetworkServer::recvPackets()
 {
 	std::vector<Packet*> packets;
 
-	for (int client_index = 0; client_index < client_sockets.size(); client_index++)
+	int client_index = 0;
+	while(client_index < client_sockets.size())
 	{
 		Packet* packet = recvPacket(client_index);
+
+		// If packet is not null
+		if (!packet)
+		{
+			if(last_event == EVENT_NO_ACTIVITY)
+				client_index++;
+		}
+
 		packets.push_back(packet);
 	}
 
@@ -187,11 +222,11 @@ std::vector<Packet*> NetworkServer::recvPackets()
 
 void NetworkServer::beforeDestroy()
 {
+	// Destroy server socket
 	SDLNet_TCP_Close(serverSocket);
 
-	if (state == SERVER_STATE_CONNECTION_ESTABLISHED)
-	{
-		for(auto clientSocket : client_sockets)
+	// Destroy client sockets
+	for(auto clientSocket : client_sockets)
+		if(clientSocket)
 			SDLNet_TCP_Close(clientSocket);
-	}
 }

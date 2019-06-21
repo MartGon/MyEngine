@@ -18,6 +18,9 @@ public:
 	void updateCursor(Vector2<float> last_char_pos);
 	void OnClick();
 
+	// OnSelect hook
+	std::function<void()> onSelect;
+
 	std::string getText();
 	void setText(std::string text);
 

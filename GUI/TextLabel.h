@@ -1,11 +1,11 @@
-#include "GameObject.h"
+#include "GUIComponent.h"
 
 #include <unordered_map>
 #include <vector>
 
 #pragma once
 
-class TextLabel : public GameObject 
+class TextLabel : public GUIComponent
 {
 public:
 	TextLabel();
@@ -29,6 +29,7 @@ public:
 private:
 	// Attributes
 	std::string text;
+	MapRGB text_color{255, 255, 255};
 
 	// Texture renderers used for loading fonts
 	std::vector<TextureRenderer*> font_tRenderers;

@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject.h"
+#include "GUIComponent.h"
 
 #include "TextureRenderer.h"
 
@@ -7,7 +7,7 @@
 
 #include <functional>
 
-class Button : public GameObject
+class Button : public GUIComponent
 {
 public:
 	// Constructors
@@ -17,7 +17,6 @@ public:
 
 	// Attributes
 	bool isEnabled = true;
-	Uint8 layer = 0;
 
 	BoxCollider *collider = nullptr;
 	TextureRenderer *tRenderer = nullptr;

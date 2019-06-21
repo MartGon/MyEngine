@@ -57,6 +57,9 @@ void TextLabel::setText(std::string text)
 	// Fix positions
 	fixCharPositions();
 
+	// Set text color
+	setTextColor(text_color);
+
 	return;
 }
 
@@ -80,6 +83,8 @@ Vector2<float> TextLabel::getTextScale()
 
 void TextLabel::setTextColor(MapRGB color)
 {
+	text_color = color;
+
 	for (auto tRenderer : font_tRenderers)
 	{
 		tRenderer->texture.color_mod = color;
@@ -172,6 +177,12 @@ std::string TextLabel::getTexturePath(char c)
 		break;
 	case ':':
 		name = "colon";
+		break;
+	case '!':
+		name = "Exclamation";
+		break;
+	case '/':
+		name = "Slash";
 		break;
 	default:
 		name += c;

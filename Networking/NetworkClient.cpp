@@ -6,10 +6,14 @@
 NetworkClient::NetworkClient() : NetworkAgent()
 {
 	state = CLIENT_READ_CONFIG_FILE;
+
+	// Allocat a socket set
+	socket_set = SDLNet_AllocSocketSet(1);
 }
 
 NetworkClient::~NetworkClient()
 {
+	beforeDestroy();
 }
 
 bool NetworkClient::readConfigFile()
@@ -109,6 +113,12 @@ bool NetworkClient::establishConnection()
 					// Set RNG Seed
 					Random::setSeed(syn->seed);
 
+					// Set buffer size
+					max_buffer_size = syn->frame_buffer;
+
+					// Set player amount
+					player_amount = syn->player_amount;
+
 					state = CLIENT_CONNECTION_ESTABLISHED;
 				}
 			}
@@ -121,6 +131,14 @@ bool NetworkClient::establishConnection()
 	}
 
 	return false;
+}
+
+void NetworkClient::handleDisconnect(TCPsocket socket)
+{
+	state = CLIENT_OPENING_SOCKET;
+
+	SDLNet_TCP_Close(socket);
+	socket = nullptr;
 }
 
 bool NetworkClient::sendPacket(Packet* packet, bool buffered)

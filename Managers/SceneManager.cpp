@@ -4,7 +4,6 @@ Scene* SceneManager::scene = nullptr;
 Scene* SceneManager::next_scene = nullptr;
 
 bool SceneManager::quit = false;
-bool SceneManager::load_next_scene = false;
 
 SceneManager::SceneManager()
 {
@@ -17,7 +16,6 @@ SceneManager::~SceneManager()
 void SceneManager::loadNextScene(Scene* s)
 {
 	next_scene = s;
-	load_next_scene = true;
 }
 
 void SceneManager::quitGame()
@@ -27,13 +25,16 @@ void SceneManager::quitGame()
 
 bool SceneManager::canLoadNextScene()
 {
-	return load_next_scene;
+	return next_scene;
 }
 
 void SceneManager::loadScene() 
 {
 	if (scene)
+	{
 		scene->destroy();
+		delete scene;
+	}
 
 	// Set next scene as current scene
 	scene = next_scene;
@@ -44,5 +45,4 @@ void SceneManager::loadScene()
 
 	// Set next_scene to null
 	next_scene = nullptr;
-	load_next_scene = false;
 }

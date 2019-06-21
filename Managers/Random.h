@@ -29,6 +29,11 @@ public:
 		Random::seed = seed;
 	}
 
+	static uint64_t getSeed()
+	{
+		return Random::seed;
+	}
+
 	static bool getBoolWithChance(float chance)
 	{
 		int lLimit = 1;

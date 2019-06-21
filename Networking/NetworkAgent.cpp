@@ -61,13 +61,11 @@ NetworkAgent::NetworkAgent()
 {
 	std::cout << "Inicializando networking\n";
 	initNetworking();
-
-	// Allocat a socket set
-	socket_set = SDLNet_AllocSocketSet(1);
 }
 
 NetworkAgent::~NetworkAgent()
 {
+	this->destroy();
 }
 
 // Methods
@@ -171,6 +169,9 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		if (result == 0)
 		{
 			//std::cout << "SDLNet_CheckSockets: No activiy ";
+
+			last_event = EVENT_NO_ACTIVITY;
+
 			return nullptr;
 		}
 		if (!SDLNet_SocketReady(socket))
@@ -193,6 +194,17 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 	if (data_read <= 0)
 	{
 		std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";
+		
+		// Call handler
+		callHandleNAEvent(EVENT_PAIR_DISCONNECTED);
+		handleDisconnect(socket);
+
+		last_event = EVENT_PAIR_DISCONNECTED;
+
+		// Close socket
+		SDLNet_TCP_DelSocket(socket_set, socket);
+		SDLNet_TCP_Close(socket);
+
 		return nullptr;
 	}
 
@@ -219,20 +231,22 @@ Packet* NetworkAgent::recvPacket()
 
 void NetworkAgent::destroy()
 {
-	// Virtual hook
-	beforeDestroy();
-
 	// Reset flag
 	printf("Destroying network agent\n");
 
 	// Calling SDL
 	SDLNet_Quit();
 
-	// Destroying pointer
-	this->~NetworkAgent();
+	// Destroy socket set
+	if (socket_set)
+	{
+		SDLNet_FreeSocketSet(socket_set);
+		socket_set = nullptr;
+	}
 }
 
-void NetworkAgent::beforeDestroy()
+void NetworkAgent::callHandleNAEvent(NetworkAgentEvent event)
 {
-	printf("Parent method\n");
+	if (HandleNAEvent)
+		HandleNAEvent(event);
 }

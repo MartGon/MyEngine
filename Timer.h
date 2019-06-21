@@ -64,6 +64,10 @@ public:
 	// Member
 	TimerComponent* timer = nullptr;
 
+	// Flag getters and setters
+	void setFlag(Uint32 flag);
+	Uint32 getFlag();
+
 	// Callback method
 	std::function<void(Uint32)> callback;
 

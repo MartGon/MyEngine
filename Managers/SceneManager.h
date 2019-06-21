@@ -21,8 +21,6 @@ public:
 	static bool canLoadNextScene();
 
 private:
-	// load next scene flag
-	static bool load_next_scene;
 	static Scene* next_scene;
 };
 

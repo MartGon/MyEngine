@@ -105,6 +105,16 @@ TimerObject::TimerObject(Uint32 ms, Uint32 flag)
 	timer = setComponent(new TimerComponent(ms, flag));
 }
 
+void TimerObject::setFlag(Uint32 flag)
+{
+	timer->flag = flag;
+}
+
+Uint32 TimerObject::getFlag() 
+{
+	return timer->flag;
+}
+
 void TimerObject::onTimerEnd(Uint32 flag)
 {
 	callback(flag);

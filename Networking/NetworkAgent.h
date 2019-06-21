@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Packet.h"
 #include <chrono>
+#include <functional>
 #pragma once
 
 class NetworkBuffer
@@ -31,6 +32,15 @@ public:
 class NetworkAgent
 {
 public:
+
+	enum NetworkAgentEvent
+	{
+		EVENT_NULL,
+		EVENT_PAIR_CONNECTED,
+		EVENT_PAIR_DISCONNECTED,
+		EVENT_NO_ACTIVITY
+	};
+
 	// Constructors
 	NetworkAgent();
 	~NetworkAgent();
@@ -66,20 +76,29 @@ public:
 	virtual bool establishConnection();
 
 	// Communication
-	virtual bool sendPacket(Packet* packet, bool buffered = true);
+	virtual bool sendPacket(Packet* packet, bool buffered = false);
 	virtual Packet* recvPacket();
 	virtual std::vector<Packet*> recvPackets() { return std::vector<Packet*>(); };
 
 	// Convenience
 	int getPairsAmount() { return player_amount - 1; };
 
+	// Callbacks
+	void callHandleNAEvent(NetworkAgentEvent event);
+	std::function<void(NetworkAgentEvent)> HandleNAEvent;
+
+	// Error handling
+	virtual void handleDisconnect(TCPsocket sock) {};
+
 	// Other
 	void destroy();
-	virtual void beforeDestroy();
+	virtual void beforeDestroy() {};
 
 protected:
 		// Communication
 	bool sendPacket(TCPsocket socket, Packet* packet, bool buffered = true);
 	Packet* recvPacket(TCPsocket socket);
+
+	NetworkAgentEvent last_event = EVENT_NULL;
 };
 

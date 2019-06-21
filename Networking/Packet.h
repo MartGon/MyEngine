@@ -21,7 +21,8 @@ enum PacketType
 	MOUSE_STATE_PACKET,
 	INPUT_STATUS_PACKET,
 	TIMESTAMP_PACKET,
-	SYNC_PACKET
+	SYNC_PACKET,
+	GAME_START_PACKET
 };
 
 enum ComponentPacketType
@@ -235,6 +236,22 @@ public:
 	// Seed
 	uint64_t seed = 0;
 
+	// Player amount
+	Uint32 player_amount = 0;
+
+	// Frame buffer
+	Uint32 frame_buffer = 0;
+
 	// Overrided
 	size_t getSize() override { return sizeof(SyncPacket); };
+};
+
+class GameStartPacket : public Packet
+{
+public:
+	// Constructor
+	GameStartPacket() : Packet(GAME_START_PACKET){};
+
+	// Overrided
+	size_t getSize() override { return sizeof(GameStartPacket); };
 };

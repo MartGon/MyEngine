@@ -36,6 +36,7 @@ public:
 		// Uppper
 	virtual bool readConfigFile();
 	virtual bool establishConnection();
+	void handleDisconnect(TCPsocket socket) override;
 
 		// Own
 	bool openServerSocket();

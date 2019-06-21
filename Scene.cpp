@@ -37,7 +37,7 @@ void Scene::loadMedia()
 
 void Scene::start()
 {
-	Random::setSeed(std::random_device()());
+	Random::setSeed(Random::seed);
 }
 
 void Scene::onUpdate()
@@ -53,14 +53,27 @@ void Scene::destroy()
 	//printf("Destroying scene\n");
 	while(!gameObjectsToInitialize.empty())
 	{
-		GameObject* gameObject = *gameObjectsToInitialize.begin();
-		destroyGameObject(gameObject);
+		if (GameObject* gameObject = *gameObjectsToInitialize.begin())
+		{
+			destroyGameObject(gameObject);
+		}
 	}
 
 	while (!gameObjectMap.empty())
 	{
 		if (GameObject *gameObject = gameObjectMap.begin()->second)
+		{
 			destroyGameObject(gameObject);
+		}
+	}
+
+	// Destroy objects that were set to be destroyed
+	while (!gameObjectsToDestroy.empty())
+	{
+		if (GameObject* go = gameObjectsToDestroy.front())
+		{
+			destroyGameObject(go);
+		}
 	}
 
 	// Reset las id
@@ -69,7 +82,8 @@ void Scene::destroy()
 	// Destroy network agent
 	destroyNetworkAgent();
 
-	this->~Scene();
+	// Call hook
+	onDestroy();
 }
 
 
@@ -162,14 +176,10 @@ GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 
 void Scene::destroyNetworkAgent()
 {
-	if (alreadyDestroyed)
-		return;
-
-	if (isOnline())
+	if (networkAgent)
 	{
-		networkAgent->destroy();
-
-		alreadyDestroyed = true;
+		delete networkAgent;
+		networkAgent = nullptr;
 	}
 }
 
@@ -180,10 +190,12 @@ void Scene::setSceneMode(Scene::SceneMode sceneMode)
 	switch (sceneMode)
 	{
 	case Scene::ONLINE_CLIENT:
-		networkAgent = new NetworkClient();
+		if(!networkAgent)
+			networkAgent = new NetworkClient();
 		break;
 	case Scene::ONLINE_SERVER:
-		networkAgent = new NetworkServer();
+		if(!networkAgent)
+			networkAgent = new NetworkServer();
 		break;
 	}
 
