@@ -15,5 +15,3 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer);
 void closeGame();
 
 int engine_main();
-
-

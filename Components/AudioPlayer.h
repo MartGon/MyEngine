@@ -2,6 +2,7 @@
 #include "Component.h"
 
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 
@@ -59,6 +60,8 @@ public:
 
 	// Audio List
 	std::vector<AudioData*> audio_list;
+
+	static std::unordered_map<std::string, AudioData*> audios;
 
 private:
 	const std::string resource_path = "resources/audio/";

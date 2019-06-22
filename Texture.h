@@ -5,6 +5,8 @@
 #include <string>
 #include "Vector2.h"
 
+#include <unordered_map>
+
 struct MapRGB
 {
 	MapRGB() {}
@@ -16,20 +18,26 @@ struct MapRGB
 	Uint8 blue = 0;
 };
 
+struct TextureData
+{
+	SDL_Texture* texture = nullptr;
+	int w = 0;
+	int h = 0;
+};
+
 class Texture
 {
 public:
 	// Constructors
 	Texture();
 	Texture(const char* resourcePath);
-	Texture(const char* resourcePath, SDL_Surface* screenSurface);
 	Texture(const char* resourcePath, SDL_Renderer* renderer);
 	Texture(const char* resourcePath, SDL_Renderer* renderer, MapRGB *colorKey);
 	~Texture();
 	
 	// SDL Stuff
 	SDL_Texture *mTexture = nullptr;
-	SDL_Surface *optimizedSurface = nullptr;
+	SDL_Surface *imgSurface = nullptr;
 	SDL_Renderer *mRenderer = nullptr;
 
 	// Dimensions
@@ -52,6 +60,7 @@ public:
 	Uint8 getAlpha();
 
 	// Color Mod
+	MapRGB color_key;
 	MapRGB color_mod = {255, 255, 255};
 
 	// Checking
@@ -59,6 +68,8 @@ public:
 
 	// Free resources
 	void free();
+
+	static std::unordered_map<std::string, TextureData> textures;
 
 private:
 	// Alpha

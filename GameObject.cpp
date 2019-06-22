@@ -29,7 +29,13 @@ GameObject::~GameObject()
 		components.erase(components.begin());
 		c->destroy();
 		delete c;
-		c = nullptr;
+	}
+
+	// Delete rotation center
+	if (transform.rotationCenter)
+	{
+		delete transform.rotationCenter;
+		transform.rotationCenter = nullptr;
 	}
 }
 

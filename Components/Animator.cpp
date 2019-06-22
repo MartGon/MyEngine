@@ -139,6 +139,20 @@ void Animator::update()
 	}
 }
 
+void Animator::destroy()
+{
+	for (auto anim : animations)
+	{
+		for (auto f : anim->frames)
+		{
+			//f->texture.free();
+
+			delete f;
+		}
+		delete anim;
+	}
+}
+
 void Animator::setAnimationID(Animation *anim, Uint8 id)
 {
 	if (id)

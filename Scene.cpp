@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Navigator.h"
 #include "Random.h"
+#include "TextLabel.h"
 #include <stdio.h>
 
 // Attributes
@@ -48,33 +49,40 @@ void Scene::onUpdate()
 void Scene::destroy()
 {
 	for (auto manager : managers)
+	{
 		manager->destroy();
+	}
 
 	//printf("Destroying scene\n");
-	while(!gameObjectsToInitialize.empty())
+	for(auto gameObject : gameObjectsToInitialize)
 	{
-		if (GameObject* gameObject = *gameObjectsToInitialize.begin())
+		if (gameObject)
 		{
-			destroyGameObject(gameObject);
+			delete gameObject;
 		}
 	}
 
-	while (!gameObjectMap.empty())
+	for (auto gop : gameObjectMap)
 	{
-		if (GameObject *gameObject = gameObjectMap.begin()->second)
+		if (GameObject *gameObject = gop.second)
 		{
-			destroyGameObject(gameObject);
+			delete gameObject;
 		}
 	}
 
 	// Destroy objects that were set to be destroyed
-	while (!gameObjectsToDestroy.empty())
+	for (auto gameObject : gameObjectsToDestroy)
 	{
-		if (GameObject* go = gameObjectsToDestroy.front())
-		{
-			destroyGameObject(go);
-		}
+		delete gameObject;
 	}
+
+	for (auto manager : managers)
+	{
+		delete manager;
+	}
+
+	delete inputManager;
+	inputManager = nullptr;
 
 	// Reset las id
 	lastGameObjectID = 0;
@@ -84,6 +92,8 @@ void Scene::destroy()
 
 	// Call hook
 	onDestroy();
+
+	return;
 }
 
 
@@ -419,9 +429,9 @@ void Scene::update()
 						// Free old one
 						std::free(last_packet);
 					}
+
 					// Set new packet
 					last_packets.at(owner) = input_packet;
-
 
 					// Inset input status recv
 					InputHistory input_history = input_histories.at(owner);

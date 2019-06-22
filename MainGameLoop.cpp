@@ -36,6 +36,8 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 		return false;
 	}
 
+	SDL_SetWindowFullscreen(window, 0);
+
 	return true;
 }
 
@@ -72,41 +74,51 @@ int engine_main()
 
 		//While application is running
 		bool slowmode = false;
+		Uint32 ticks = 0;
 		while (!(quit))
 		{
-			// Check for next scene
-			if (SceneManager::canLoadNextScene())
-				SceneManager::loadScene();
+			Uint32 now = SDL_GetTicks();
+			Uint32 diff = now - ticks;
 
-			//Handle events on queue
-			SDL_Event e;
-			while (SDL_PollEvent(&e) != 0)
+			if (diff > 15)
 			{
-				//User requests quit
-				if (e.type == SDL_QUIT)
+				// Set var
+				ticks = now;
+
+				// Check for next scene
+				if (SceneManager::canLoadNextScene())
+					SceneManager::loadScene();
+
+				//Handle events on queue
+				SDL_Event e;
+				while (SDL_PollEvent(&e) != 0)
 				{
-					quit = true;
+					//User requests quit
+					if (e.type == SDL_QUIT)
+					{
+						quit = true;
+					}
+					else
+					{
+						// Add to scene event list
+						SceneManager::scene->event_deque.push_back(e);
+					}
 				}
-				else
+
+				// Update scene
+				SceneManager::scene->update();
+
+				// Render frame
+				if (SDL_Texture* frame_to_render = SceneManager::scene->frame_to_render)
 				{
-					// Add to scene event list
-					SceneManager::scene->event_deque.push_back(e);
+					SDL_SetRenderTarget(renderer, nullptr);
+					SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
 				}
+
+				// Render if frame buffer is enough
+				SDL_RenderPresent(renderer);
+				SDL_RenderClear(renderer);
 			}
-
-			// Update scene
-			SceneManager::scene->update();
-
-			// Render frame
-			if (SDL_Texture* frame_to_render = SceneManager::scene->frame_to_render)
-			{
-				SDL_SetRenderTarget(renderer, nullptr);
-				SDL_RenderCopy(renderer, frame_to_render, NULL, NULL);
-			}
-
-			// Render if frame buffer is enough
-			SDL_RenderPresent(renderer);
-			SDL_RenderClear(renderer);
 		}
 	}
 

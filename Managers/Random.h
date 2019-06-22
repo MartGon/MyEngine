@@ -45,9 +45,10 @@ public:
 	}
 
 	static uint64_t seed;
+	static std::mt19937 dre;
 
 private:
 	// Pseudo Random generator
 	static std::random_device rd;
-	static std::mt19937 dre;
+	
 };

@@ -26,6 +26,8 @@ public:
 
 	// Override
 	Vector2<float> getDimensions() override;
+
+	static std::unordered_map<char, Texture> texture_map;
 private:
 	// Attributes
 	std::string text;
@@ -33,10 +35,6 @@ private:
 
 	// Texture renderers used for loading fonts
 	std::vector<TextureRenderer*> font_tRenderers;
-
-	// Can be used to obtain texture by char
-	static bool isInitiliazed;
-	static std::unordered_map<char, Texture> texture_map;
 
 	// Fonts path for loading textures
 	const std::string fonts_path = std::string("fonts/");

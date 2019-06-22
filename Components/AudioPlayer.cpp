@@ -6,6 +6,8 @@
 // En ella se pasara por todos los audio players que no esten pausados y se hara un mix con sus audios
 // Esto dara como resultado el stream de audio que se va a oir
 
+std::unordered_map<std::string, AudioData*> AudioPlayer::audios = std::unordered_map<std::string, AudioData*>();
+
 // Constructor
 AudioPlayer::AudioPlayer()
 {
@@ -28,9 +30,14 @@ AudioPlayer::~AudioPlayer()
 void AudioPlayer::destroy()
 {
 	SceneManager::scene->removeComponentFromManager(this);
+	/*
 	for(auto audio_data : audio_list)
-		if(audio_data)
+		if (audio_data)
+		{
 			SDL_FreeWAV(audio_data->wav_buffer);
+			delete audio_data;
+		}
+		*/
 }
 
 // Own methods
@@ -71,18 +78,34 @@ bool AudioPlayer::isPaused()
 // TODO - Check if file has already been loaded
 AudioData* AudioPlayer::loadAudioFile(std::string path)
 {
+	AudioData* audio_data = nullptr;
+
 	// Set location
 	std::string rel_path = resource_path + path;
 
-	AudioData* audio_data = new AudioData();
-	audio_data->name = rel_path;
-
-	// Load the audio file
-	if (!SDL_LoadWAV(rel_path.c_str(), &audio_data->audio_spec, &audio_data->wav_buffer, &audio_data->wav_length))
+	auto audio = audios.find(rel_path);
+	if (audio == audios.end())
 	{
-		std::cout << "SDL_LoadWAV: Could not load the audio file " << rel_path << std::string(SDL_GetError()) << std::endl;
-		return nullptr;
+		audio_data = new AudioData();
+		audio_data->name = rel_path;
+
+		// Load the audio file
+		if (!SDL_LoadWAV(rel_path.c_str(), &audio_data->audio_spec, &audio_data->wav_buffer, &audio_data->wav_length))
+		{
+			std::cout << "SDL_LoadWAV: Could not load the audio file " << rel_path << std::string(SDL_GetError()) << std::endl;
+
+			// Delete allocated memory
+			delete audio_data;
+			audio_data = nullptr;
+		}
+		else
+		{
+			// Add to audios list
+			audios.insert({ rel_path, audio_data });
+		}
 	}
+	else
+		audio_data = audio->second;
 
 	return audio_data;
 }

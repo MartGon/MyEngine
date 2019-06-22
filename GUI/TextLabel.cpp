@@ -1,13 +1,11 @@
 #include "TextLabel.h"
 
-bool TextLabel::isInitiliazed = false;
 std::unordered_map<char, Texture> TextLabel::texture_map = std::unordered_map<char, Texture>();
 
 // Constructor
 TextLabel::TextLabel() 
 {
-	if(!isInitiliazed)
-		init();
+	init();
 
 	Texture font = getTextureByChar('0');
 	TextureRenderer* tRenderer = setComponent(new TextureRenderer(font, 255));
@@ -150,11 +148,11 @@ Texture TextLabel::getTextureByChar(char c)
 	{
 		// Getting path and color key
 		std::string texture_path = getTexturePath(c);
-		MapRGB* colorKey = new MapRGB;
-		colorKey->green = 255;
+		MapRGB colorKey;
+		colorKey.green = 255;
 
 		// Loads font texture
-		font = Texture(texture_path.c_str(), RendererManager::renderer, colorKey);
+		font = Texture(texture_path.c_str(), RendererManager::renderer, &colorKey);
 		std::pair<char, Texture> pair(c, font);
 
 		// Add to map
@@ -197,16 +195,13 @@ std::string TextLabel::getTexturePath(char c)
 void TextLabel::init() 
 {
 	// Load blank texture
-	MapRGB* colorKey = new MapRGB;
-	colorKey->green = 255;
+	MapRGB colorKey;
+	colorKey.green = 255;
 	std::string path = fonts_path + "space" + fonts_ext;
-	Texture space_texture = Texture(path.c_str(), RendererManager::renderer, colorKey);
+	Texture space_texture = Texture(path.c_str(), RendererManager::renderer, &colorKey);
 	
 	// Create value pair
 	char space = ' ';
 	std::pair<char, Texture> pair(space, space_texture);
 	texture_map.insert(pair);
-
-	// Set init flag
-	isInitiliazed = true;
 }

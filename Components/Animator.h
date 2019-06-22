@@ -44,6 +44,7 @@ public:
 	// Override functions
 	void start() override;
 	void update() override;
+	void destroy() override;
 	
 	// Methods
 	Animation* addAnimation(const char* prefixPath, MapRGB* colorKey, TextureRenderer* tRenderer, int lastFrame, int firstFrame = 1, Uint8 id = 0);

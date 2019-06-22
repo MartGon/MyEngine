@@ -2,6 +2,7 @@
 #include "RendererManager.h"
 
 const char* Texture::folder = "resources/";
+std::unordered_map<std::string, TextureData> Texture::textures;
 
 Texture::Texture()
 {
@@ -12,27 +13,6 @@ Texture::Texture()
 Texture::Texture(const char* resoucePath) : Texture(resoucePath, RendererManager::renderer)
 {
 
-}
-
-Texture::Texture(const char* resourcePath, SDL_Surface* screenSurface)
-{
-	path = getPathFromResourceFolder(resourcePath);
-	SDL_Surface *imgSurface = IMG_Load(path.c_str());
-	if (!imgSurface)
-	{
-		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
-	}
-	else
-	{
-		optimizedSurface = SDL_ConvertSurface(imgSurface, screenSurface->format, NULL);
-
-		if (!optimizedSurface)
-		{
-			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
-		}
-
-		SDL_FreeSurface(imgSurface);
-	}
 }
 
 Texture::Texture(const char* resourcePath, SDL_Renderer* renderer)
@@ -54,22 +34,54 @@ Texture::~Texture()
 
 void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
-	// Calculate render Quad
-	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
-	renderQuad.w *= scale.x;
-	renderQuad.h *= scale.y;
-
-	// Set alpha value
-	SDL_SetTextureAlphaMod(mTexture, alpha);
-
-	// Set color mod
-	SDL_SetTextureColorMod(mTexture, color_mod.red, color_mod.green, color_mod.blue);
-
-	// Rotation center is taken the texture width and height as reference
-	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
+	// Try to load texture if we couldn't
+	if (!mTexture)
 	{
-		printf("SDL_RenderCopy: %s\n", SDL_GetError());
-		return;
+		if (!imgSurface)
+		{
+			imgSurface = IMG_Load(path.c_str());
+
+			if (!imgSurface)
+				imgSurface = nullptr;
+		}
+		
+		if (imgSurface)
+		{
+			SDL_SetColorKey(imgSurface, SDL_TRUE, SDL_MapRGB(imgSurface->format, color_key.red, color_key.green, color_key.blue));
+			mTexture = SDL_CreateTextureFromSurface(mRenderer, imgSurface);
+		}
+
+		if (mTexture)
+		{
+			// Add to repository
+			TextureData data{ mTexture, mWidth, mHeight };
+			textures.insert({ path, data });
+
+			// Free surface
+			SDL_FreeSurface(imgSurface);
+			imgSurface = nullptr;
+		}
+	}
+
+	if (mTexture)
+	{
+		// Calculate render Quad
+		SDL_Rect renderQuad = { x, y, mWidth, mHeight };
+		renderQuad.w *= scale.x;
+		renderQuad.h *= scale.y;
+
+		// Set alpha value
+		SDL_SetTextureAlphaMod(mTexture, alpha);
+
+		// Set color mod
+		SDL_SetTextureColorMod(mTexture, color_mod.red, color_mod.green, color_mod.blue);
+
+		// Rotation center is taken the texture width and height as reference
+		if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
+		{
+			printf("SDL_RenderCopy: %s\n", SDL_GetError());
+			return;
+		}
 	}
 }
 
@@ -86,12 +98,16 @@ Uint8 Texture::getAlpha()
 void Texture::free()
 {
 	//printf("Freeing texture %s\n", path);
-	if (mTexture)
+
+	if (textures.find(path) != textures.end())
 	{
-		SDL_DestroyTexture(mTexture);
-		mTexture = NULL;
-		mWidth = 0;
-		mHeight = 0;
+		if (mTexture)
+		{
+			SDL_DestroyTexture(mTexture);
+			mTexture = NULL;
+		}
+
+		textures.erase(path);
 	}
 }
 
@@ -112,42 +128,64 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *col
 	bool correct = false;
 	std::string tempRet = getPathFromResourceFolder(resourcePath).c_str();
 
-	// Set must values
+	// Set path
 	path = tempRet.c_str();
-	mRenderer = renderer;
 
-	SDL_Surface *imgSurface = IMG_Load(path.c_str());
-	if (!imgSurface)
+	auto texture = textures.find(path);
+	if (texture == textures.end())
 	{
-		printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
-		mTexture = RendererManager::nullTexture.mTexture;
-	}
-	else
-	{
-		if (colorKey)
-		{
-			SDL_SetColorKey(imgSurface, SDL_TRUE, SDL_MapRGB(imgSurface->format, colorKey->red, colorKey->green, colorKey->blue));
-		}
+		mRenderer = renderer;
 
-		mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
-
-		if (!mTexture)
+		imgSurface = IMG_Load(path.c_str());
+		if (!imgSurface)
 		{
-			printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
+			printf("Unable to load png file from %s! SDL Error: %s \n", path, SDL_GetError());
 			mTexture = RendererManager::nullTexture.mTexture;
 		}
 		else
 		{
+			if (colorKey)
+			{
+				color_key = *colorKey;
+				SDL_SetColorKey(imgSurface, SDL_TRUE, SDL_MapRGB(imgSurface->format, colorKey->red, colorKey->green, colorKey->blue));
+			}
+
 			// Dimensions
 			mWidth = imgSurface->w;
 			mHeight = imgSurface->h;
 			scale = Vector2<float>(1, 1);
 
-			// Flag
-			correct = true;
-		}
+			mTexture = SDL_CreateTextureFromSurface(renderer, imgSurface);
 
-		SDL_FreeSurface(imgSurface);
+			if (mTexture)
+			{
+				// Free texture
+				SDL_FreeSurface(imgSurface);
+				imgSurface = nullptr;
+
+				// Add to repository
+				TextureData data{ mTexture, mWidth, mHeight };
+				textures.insert({ path, data });
+			}
+			else
+			{
+				printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
+				SDL_FreeSurface(imgSurface);
+				imgSurface = nullptr;
+			}
+				
+		}
+	}
+	else
+	{
+		// Load texture form repository
+		mRenderer = renderer;
+		TextureData data = texture->second;
+		mTexture = data.texture;
+		mWidth = data.w;
+		mHeight = data.h;
+		scale = Vector2<float>(1, 1);
+		correct = true;
 	}
 
 	return correct;

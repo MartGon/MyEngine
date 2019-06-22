@@ -4,11 +4,12 @@
 
 #include <string>
 #include <deque>
+#include <optional>
 
 struct RenderData
 {
 	Vector2<float> pos;
-	SDL_Point* r_center;
+	std::optional<SDL_Point> r_center;
 	double angle;
 };
 
@@ -50,7 +51,7 @@ public:
 	void render();
 
 private:
-	SDL_Point* getSDLPointFromVector(Vector2<int> center);
+	SDL_Point getSDLPointFromVector(Vector2<int> center);
 
 	// Attributes
 	Uint8 layer = 127;
@@ -66,6 +67,6 @@ private:
 	// Own methods
 	void vanish();
 	void blink();
-	void update_trail(Vector2<float> pos, SDL_Point* r_center, double angle);
+	void update_trail(Vector2<float> pos, std::optional<SDL_Point> r_center, double angle);
 	void render_trail();
 };

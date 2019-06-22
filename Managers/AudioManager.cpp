@@ -84,7 +84,7 @@ AudioManager::AudioManager()
 	{
 		SDL_CloseAudio();
 		init();
-	}
+	}	
 }
 
 // Own methods
@@ -153,4 +153,11 @@ SDL_AudioFormat AudioManager::getFormat()
 void AudioManager::destroy()
 {
 	silence();
+	if (mutex)
+	{
+		SDL_DestroyMutex(mutex);
+		mutex = nullptr;
+	}
+
+	//SDL_CloseAudioDevice(device);
 }
