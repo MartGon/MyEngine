@@ -10,6 +10,7 @@ public:
 
 	// Constructors
 	RotatableBoxCollider(Vector2<int> v0, Vector2<int> v1, Vector2<int> v2, Vector2<int> v3);
+	RotatableBoxCollider(RotatableBoxCollider pre, RotatableBoxCollider post);
 	RotatableBoxCollider(BoxCollider* collider);
 	~RotatableBoxCollider();
 
@@ -33,9 +34,9 @@ public:
 	void update() override;
 	bool isCollidingWith(Collider* collider) override;
 
-private:
+//private:
 
-	// Square Vertex - Read Only
+	// Square Vertex - Read Only // not anymore ! :)
 	// v1 - v0 - v2				v1----v3
 	// v0 - v1 - v3				|	   |
 	// v0 - v2 - v3				|	   |

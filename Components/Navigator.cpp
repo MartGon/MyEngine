@@ -30,8 +30,12 @@ void Navigator::update()
     if (!isEnabled)
         return;
 
-	// Set new position
+	// Save old pos and rotation
+	prev_dir = getDirection();
     previousPos = gameObject->transform.position;
+	previousAbsPos = gameObject->getAbsolutePosition();
+
+	// Set new position
 	Vector2<float> displacement = (direction * speed);
 	Vector2<float> newPos = previousPos + displacement;
 	gameObject->transform.position = newPos;

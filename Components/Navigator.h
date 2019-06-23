@@ -32,6 +32,10 @@ public:
 	ComponentPacket* toComponentPacket() override;
 	void updateFromComponentPacket(ComponentPacket* component_packet) override;
 
+	Vector2<float> previousPos;
+	Vector2<float> previousAbsPos{-1, -1};
+	Vector2<float> prev_dir = 0;
+
 private:
 	enum class NavStatus 
 	{
@@ -43,7 +47,6 @@ private:
 	NavStatus status = NavStatus::SPEED_NONE;
 
 	Vector2<float> direction;
-    Vector2<float> previousPos;
 
 	void updateNavStatus(float curr_speed, float prev_speed);
 };
