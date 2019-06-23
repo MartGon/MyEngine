@@ -15,6 +15,9 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 	// Set to silence first, removing previous data
 	SDL_memset(stream, 0, len);
 
+	if (!audioManager->sound_enabled)
+		return;
+
 	// Lock
 	SDL_LockMutex(audioManager->mutex);
 
@@ -57,9 +60,10 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 			continue;
 		}
 
+		float mod = (float)audioManager->volume / 100.f;
+
 		len = (len > audio_len ? audio_len : len);
-		//SDL_MixAudioFormat(stream, audio_pos, audioPlayer->current_audio_data->audio_spec.format, len, audioPlayer->volume);
-		SDL_MixAudioFormat(stream, audio_pos, audioManager->getFormat(), len, audioPlayer->volume);
+		SDL_MixAudioFormat(stream, audio_pos, audioManager->getFormat(), len, audioPlayer->volume * mod);
 
 		audioPlayer->wav_buffer += len;
 		audioPlayer->wav_length -= len;
@@ -72,6 +76,11 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 // Attributes
 SDL_AudioSpec* AudioManager::desired_audio_spec = new SDL_AudioSpec();
 SDL_AudioSpec* AudioManager::obtained_audio_spec = new SDL_AudioSpec();
+
+// Settings
+
+bool AudioManager::sound_enabled = true;
+Uint8 AudioManager::volume = 100;
 
 bool AudioManager::isInitialized = false;
 

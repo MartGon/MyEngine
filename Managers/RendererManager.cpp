@@ -4,6 +4,7 @@
 Texture RendererManager::nullTexture;
 
 SDL_Renderer* RendererManager::renderer = nullptr;
+SDL_Window* RendererManager::window = nullptr;
 
 // GBA Res: 240 x 160
 

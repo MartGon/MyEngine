@@ -61,6 +61,7 @@ int engine_main()
 	{
 		// Render init
 		RendererManager::renderer = renderer;
+		RendererManager::window = window;
 		RendererManager::init();
 
 		// Scene init

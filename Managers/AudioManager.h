@@ -34,6 +34,9 @@ public:
 	// Concurrency lock
 	SDL_mutex* mutex = nullptr;
 
+	static bool sound_enabled;
+	static Uint8 volume;
+
 private:
 	// Audio Hardware specs
 	static SDL_AudioSpec* desired_audio_spec;

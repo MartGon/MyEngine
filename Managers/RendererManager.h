@@ -16,6 +16,7 @@ public:
 	// Attributes
 	static Texture nullTexture;
 	static SDL_Renderer* renderer;
+	static SDL_Window* window;
 
 	// Methods
 	static void init();
