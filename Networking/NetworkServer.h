@@ -1,4 +1,6 @@
 #include "NetworkAgent.h"
+
+#include <map>
 #pragma once
 
 class NetworkServer : public NetworkAgent
@@ -18,7 +20,7 @@ public:
 
 	// Constructors
 	NetworkServer();
-	~NetworkServer();
+	~NetworkServer() override;
 
 	// Attributes
 
@@ -30,24 +32,27 @@ public:
 	Uint16 serverPort;
 
 		// Client side
-	std::vector<TCPsocket> client_sockets;
+	std::map<Uint32, TCPsocket> client_sockets;
 
 	// Methods
 		// Uppper
 	virtual bool readConfigFile();
-	virtual bool establishConnection();
+	bool establishConnection();
 	void handleDisconnect(TCPsocket socket) override;
 
 		// Own
 	bool openServerSocket();
-	bool pairWithClient();
+	Uint32 pairWithClient();
 
 		// Communication
-	bool sendPacket(Packet* packet, bool buffered = true) override;
-	bool sendPacket(int client_index, Packet* packet, bool buffered = true);
+	bool sendPacket(Packet* packet, bool buffered = false) override;
+	bool sendPacket(int client_index, Packet* packet, bool buffered = false);
 	Packet* recvPacket() override;
 	Packet* recvPacket(int client_index);
 	std::vector<Packet*> recvPackets() override;
+	Uint32 getFirstFreeIdentity();
+	Uint32 getNextAvailableIndex(int index);
+	bool isLastIndex(int index);
 
 	// Other
 	virtual void beforeDestroy();

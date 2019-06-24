@@ -23,9 +23,21 @@ bool CheckBox::isSelected()
 
 void CheckBox::select()
 {
+	if (isSelectable)
+	{
+		// Inverse flag
+		selected = !selected;
+
+		// De/Activate selected tRenderer
+		cross_tRenderer->isEnabled = selected;
+	}
+}
+
+void CheckBox::setSelected(bool select)
+{
 	// Inverse flag
-	selected = !selected;
+	selected = select;
 
 	// De/Activate selected tRenderer
-	cross_tRenderer->isEnabled = selected;
+	cross_tRenderer->isEnabled = select;
 }

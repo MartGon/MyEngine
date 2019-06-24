@@ -168,5 +168,5 @@ void AudioManager::destroy()
 		mutex = nullptr;
 	}
 
-	//SDL_CloseAudioDevice(device);
+	SDL_CloseAudio();
 }

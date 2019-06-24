@@ -137,8 +137,10 @@ void NetworkClient::handleDisconnect(TCPsocket socket)
 {
 	state = CLIENT_OPENING_SOCKET;
 
+	// Close socket
+	SDLNet_TCP_DelSocket(socket_set, socket);
 	SDLNet_TCP_Close(socket);
-	socket = nullptr;
+	clientSocket = nullptr;
 }
 
 bool NetworkClient::sendPacket(Packet* packet, bool buffered)
@@ -166,5 +168,9 @@ std::vector<Packet*> NetworkClient::recvPackets()
 
 void NetworkClient::beforeDestroy()
 {
-	SDLNet_TCP_Close(clientSocket);
+	if (clientSocket)
+	{
+		SDLNet_TCP_Close(clientSocket);
+		clientSocket = nullptr;
+	}
 }

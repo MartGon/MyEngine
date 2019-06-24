@@ -18,7 +18,7 @@ public:
 	// Constructors
 
 	NetworkClient();
-	~NetworkClient();
+	~NetworkClient() override;
 
 	// Attributes
 
@@ -39,7 +39,7 @@ public:
 	void handleDisconnect(TCPsocket socket) override;
 
 			// Communication
-	virtual bool sendPacket(Packet* packet, bool buffered = true) override;
+	virtual bool sendPacket(Packet* packet, bool buffered = false) override;
 	virtual Packet* recvPacket();
 	std::vector<Packet*> recvPackets() override;
 

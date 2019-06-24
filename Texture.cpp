@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "RendererManager.h"
 
-const char* Texture::folder = "resources/";
+const char* Texture::folder = "resources/textures/";
 std::unordered_map<std::string, TextureData> Texture::textures;
 
 Texture::Texture()

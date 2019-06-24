@@ -1,13 +1,14 @@
 #include "MainGameLoop.h"
 #include "RendererManager.h"
 #include "SceneManager.h"
+#include "AudioManager.h"
 
 Scene *gFirstScene = nullptr;
 
 int WINDOW_WIDTH = 640;
 int WINDOW_HEIGHT = 480;
 
-bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
+bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer, GeneralConfig config)
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO))
 	{
@@ -22,7 +23,7 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 		return false;
 	}
 
-	window = SDL_CreateWindow("SDL-Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Archers Duel", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	if (!window)
 	{
 		printf("Window could not be created! SDL Error: %s \n", SDL_GetError());
@@ -36,7 +37,38 @@ bool initGameWindow(SDL_Window* &window, SDL_Renderer* &renderer)
 		return false;
 	}
 
-	SDL_SetWindowFullscreen(window, 0);
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+
+	// Enable fullscreen
+	if (config.fullscreen)
+	{
+		// Set size to screen size
+		SDL_SetWindowSize(window, dm.w, dm.h);
+
+		// Set to fullscreen
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+	}
+	else
+	{
+		// Enable borderless if size equals screen size
+		if(dm.w == config.window_w && dm.h == config.window_h)
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_BORDERLESS);
+
+		// Set size to screen size
+		SDL_SetWindowSize(window, config.window_w, config.window_h);
+	}
+
+	// Center
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+	// Get final window size
+	int w = 0;
+	int h = 0;
+	SDL_GetWindowSize(window, &w, &h);
+
+	// SetWindow resolution
+	setWindowResolution(w, h);
 
 	return true;
 }
@@ -52,7 +84,14 @@ int engine_main()
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
 
-	if (!initGameWindow(window, renderer))
+	// Read config file
+	GeneralConfig config = Config::readGeneralConfig();
+
+	// Set sound
+	AudioManager::sound_enabled = config.sound_enabled;
+	AudioManager::volume = config.sound_volume;
+
+	if (!initGameWindow(window, renderer, config))
 	{
 		printf("Failed to init");
 		return 0;
@@ -140,4 +179,52 @@ void closeGame()
 	//Quit SDL subsystems
 	IMG_Quit();
 	SDL_Quit();
+}
+
+GeneralConfig Config::readGeneralConfig()
+{
+	// Create return value
+	GeneralConfig config;
+
+	// Open file
+	std::ifstream config_file("resources/general-config.txt");
+
+	if (config_file)
+	{
+		// Read values
+
+		// Fullscreen
+		std::string fullscreen_str;
+		std::getline(config_file, fullscreen_str);
+
+		std::istringstream(fullscreen_str) >> config.fullscreen;
+
+		// Window w
+		std::string window_w;
+		std::getline(config_file, window_w);
+
+		config.window_w = std::stoi(window_w);
+
+		// Window h
+		std::string window_h;
+		std::getline(config_file, window_h);
+
+		config.window_h = std::stoi(window_h);
+
+		// Sound enabled
+		std::string sound_str;
+		std::getline(config_file, sound_str);
+
+		std::istringstream(sound_str) >> config.sound_enabled;
+
+		// Sound volume
+		std::string sound_volume_str;
+		std::getline(config_file, sound_volume_str);
+
+		config.sound_volume = std::stoi(sound_volume_str);
+
+		config_file.close();
+	}
+
+	return config;
 }

@@ -149,12 +149,3 @@ TransformPacket::TransformPacket(Transform* transform) : ComponentPacket(COMPONE
 		this->isRotationCenterNull = true;
 	}
 }
-
-// RNG Sync Packet
-
-SyncPacket::SyncPacket(Uint8 identity, uint64_t seed) : Packet(SYNC_PACKET)
-{
-	this->identity_to_set = identity;
-	this->seed = seed;
-}
-

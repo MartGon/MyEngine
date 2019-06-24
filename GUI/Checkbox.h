@@ -10,9 +10,11 @@ public:
 
 	// Getter
 	bool isSelected();
+	bool isSelectable = true;
 
 	// Setter
 	void select();
+	void setSelected(bool selected);
 
 	// Components
 	TextureRenderer* cross_tRenderer = nullptr;

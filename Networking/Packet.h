@@ -22,7 +22,8 @@ enum PacketType
 	INPUT_STATUS_PACKET,
 	TIMESTAMP_PACKET,
 	SYNC_PACKET,
-	GAME_START_PACKET
+	GAME_START_PACKET,
+	DATA_PACKET
 };
 
 enum ComponentPacketType
@@ -228,7 +229,13 @@ class SyncPacket : public Packet
 {
 public:
 	// Constructor
-	SyncPacket(Uint8 identity, uint64_t seed);
+	SyncPacket(Uint8 identity, uint64_t seed, Uint32 player_amount, Uint32 frame_buffer) : Packet(SYNC_PACKET)
+	{
+		this->identity_to_set = identity;
+		this->seed = seed;
+		this->player_amount = player_amount;
+		this->frame_buffer = frame_buffer;
+	}
 
 	// Indentity
 	Uint8 identity_to_set = 0;
@@ -254,4 +261,21 @@ public:
 
 	// Overrided
 	size_t getSize() override { return sizeof(GameStartPacket); };
+};
+
+template <typename T>
+class DataPacket : public Packet
+{
+public:
+	// Constructor
+	DataPacket(T data) : Packet(DATA_PACKET)
+	{
+		this->data = data;
+	}
+
+	// Data
+	T data;
+
+	// Overrided
+	size_t getSize() override { return sizeof(DataPacket<T>); };
 };

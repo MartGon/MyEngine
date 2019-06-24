@@ -181,31 +181,43 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 		}
 	}
 
+	// Declare packet
+	Packet* packet = nullptr;
+
 	// Read packet length
 	size_t packet_len = 0;
-	int data_read = SDLNet_TCP_Recv(socket, &packet_len, sizeof(size_t));
-
-	// Read data
-	Packet* packet = (Packet*)std::malloc(packet_len);
-	data_read = SDLNet_TCP_Recv(socket, packet, packet_len);
-
-	//std::cout << "Received " << data_read << " bytes of data\n";
+	int data_read = readFromSocket(socket, sizeof(size_t), &packet_len);
 
 	if (data_read <= 0)
 	{
 		std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";
-		
+
 		// Call handler
 		callHandleNAEvent(EVENT_PAIR_DISCONNECTED);
 		handleDisconnect(socket);
 
 		last_event = EVENT_PAIR_DISCONNECTED;
-
-		// Close socket
-		SDLNet_TCP_DelSocket(socket_set, socket);
-		SDLNet_TCP_Close(socket);
-
 		return nullptr;
+	}
+	else
+	{
+		// Read data
+		packet = (Packet*)std::malloc(packet_len);
+		data_read = readFromSocket(socket, packet_len, packet);
+
+		//std::cout << "Received " << data_read << " bytes of data\n";
+
+		if (data_read <= 0)
+		{
+			std::cout << "SDLNet_TCP_Recv: " << SDLNet_GetError() << "\n";
+
+			// Call handler
+			callHandleNAEvent(EVENT_PAIR_DISCONNECTED);
+			handleDisconnect(socket);
+
+			last_event = EVENT_PAIR_DISCONNECTED;
+			return nullptr;
+		}
 	}
 
 	// Calculate time diff

@@ -43,7 +43,7 @@ public:
 
 	// Constructors
 	NetworkAgent();
-	~NetworkAgent();
+	virtual ~NetworkAgent();
 
 	// Attributes
 	NetworkBuffer buffer = NetworkBuffer(1460);
@@ -73,9 +73,16 @@ public:
 		// Configuration
 	bool readingError = false;
 	virtual bool readConfigFile();
+
 	virtual bool establishConnection();
 
 	// Communication
+	template<typename T>
+	int readFromSocket(TCPsocket socket, int len, T data)
+	{
+		return SDLNet_TCP_Recv(socket, data, len);
+	}
+
 	virtual bool sendPacket(Packet* packet, bool buffered = false);
 	virtual Packet* recvPacket();
 	virtual std::vector<Packet*> recvPackets() { return std::vector<Packet*>(); };
