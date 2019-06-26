@@ -23,7 +23,7 @@ bool CheckBox::isSelected()
 
 void CheckBox::select()
 {
-	if (isSelectable)
+	if (isEnabled)
 	{
 		// Inverse flag
 		selected = !selected;
@@ -40,4 +40,14 @@ void CheckBox::setSelected(bool select)
 
 	// De/Activate selected tRenderer
 	cross_tRenderer->isEnabled = select;
+}
+
+// overrided methods
+
+void CheckBox::onSetEnabled(bool enabled)
+{
+	if(enabled)
+		cross_tRenderer->texture.color_mod = { 255, 255, 255 };
+	else
+		cross_tRenderer->texture.color_mod = { 127, 127, 127 };
 }

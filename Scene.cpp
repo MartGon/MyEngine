@@ -6,7 +6,7 @@
 
 // Attributes
 Uint16 Scene::lastGameObjectID = 0;
-
+SDL_Texture* Scene::frame_to_render = nullptr;
 // Constructors
 
 Scene::Scene()

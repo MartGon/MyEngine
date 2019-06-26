@@ -15,9 +15,6 @@ public:
 	Button(Texture texture);
 	~Button();
 
-	// Attributes
-	bool isEnabled = true;
-
 	BoxCollider *collider = nullptr;
 	TextureRenderer *tRenderer = nullptr;
 
@@ -30,6 +27,8 @@ public:
 
 	// Own methods
 	const bool isWithinBoundaries(int mousePosX, int mousePosY);
+	void setEnabled(bool enabled);
+	virtual void onSetEnabled(bool enabled) {};
 	void click();
 
 	// Listener
@@ -37,5 +36,10 @@ public:
 
 	// set onClick
 	void setOnClickListener(std::function<void()> callback);
+
+protected:
+
+	// Attributes
+	bool isEnabled = true;
 };
 

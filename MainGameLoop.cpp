@@ -189,7 +189,7 @@ GeneralConfig Config::readGeneralConfig()
 	// Open file
 	std::ifstream config_file("resources/general-config.txt");
 
-	if (config_file)
+	if (!Config::is_empty(config_file))
 	{
 		// Read values
 
@@ -227,4 +227,9 @@ GeneralConfig Config::readGeneralConfig()
 	}
 
 	return config;
+}
+
+bool Config::is_empty(std::ifstream& file)
+{
+	return file.peek() == std::ifstream::traits_type::eof();
 }

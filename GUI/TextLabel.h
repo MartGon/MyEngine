@@ -28,13 +28,13 @@ public:
 	Vector2<float> getDimensions() override;
 
 	static std::unordered_map<char, Texture> texture_map;
+
+	// Texture renderers used for loading fonts
+	std::vector<TextureRenderer*> font_tRenderers;
 private:
 	// Attributes
 	std::string text;
 	MapRGB text_color{255, 255, 255};
-
-	// Texture renderers used for loading fonts
-	std::vector<TextureRenderer*> font_tRenderers;
 
 	// Fonts path for loading textures
 	const std::string fonts_path = std::string("fonts/");

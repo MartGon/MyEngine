@@ -1,18 +1,21 @@
 #pragma once
 #include "Texture.h"
 
+#include <fstream>
+
 struct GeneralConfig
 {
 	bool fullscreen = false;
-	int window_w = 0;
-	int window_h = 0;
+	int window_w = 960;
+	int window_h = 520;
 	bool sound_enabled = false;
-	int sound_volume = 0;
+	int sound_volume = 100;
 };
 
 namespace Config
 {
 	GeneralConfig readGeneralConfig();
+	bool is_empty(std::ifstream& pFile);
 }
 
 // Constants

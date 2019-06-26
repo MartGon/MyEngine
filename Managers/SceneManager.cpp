@@ -1,4 +1,6 @@
 #include "SceneManager.h"
+#include "RendererManager.h"
+
 
 Scene* SceneManager::scene = nullptr;
 Scene* SceneManager::next_scene = nullptr;
@@ -42,6 +44,8 @@ void SceneManager::loadScene()
 	// Init scene
 	scene->loadMedia();
 	scene->start();
+	if (RendererManager* renderer_mgr = dynamic_cast<RendererManager*>(scene->getManager<TextureRenderer*>()))
+		renderer_mgr->manage();
 
 	// Set next_scene to null
 	next_scene = nullptr;

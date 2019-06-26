@@ -23,7 +23,7 @@ public:
 	// Attributes
 
 		// State
-	ClientState state;
+	ClientState state = CLIENT_OPENING_SOCKET;
 
 		// Client side
 	TCPsocket clientSocket = nullptr;

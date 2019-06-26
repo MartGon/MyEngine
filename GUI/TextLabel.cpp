@@ -182,6 +182,9 @@ std::string TextLabel::getTexturePath(char c)
 	case '/':
 		name = "Slash";
 		break;
+	case ',':
+		name = "comma";
+		break;
 	default:
 		name += c;
 		break;

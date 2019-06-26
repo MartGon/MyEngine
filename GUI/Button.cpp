@@ -76,6 +76,24 @@ const bool Button::isWithinBoundaries(int mousePosX, int mousePosY)
 		return true;
 }
 
+void Button::setEnabled(bool enabled)
+{
+	// Hook
+	onSetEnabled(enabled);
+
+	// Grayout or restore
+	if (tRenderer)
+	{
+		if (enabled)
+			tRenderer->texture.color_mod = { 255, 255, 255 };
+		else
+			tRenderer->texture.color_mod = { 127, 127, 127 };
+	}
+
+	// Set flag
+	this->isEnabled = enabled;
+}
+
 void Button::setOnClickListener(std::function<void()> callback)
 {
 	onClick = callback;

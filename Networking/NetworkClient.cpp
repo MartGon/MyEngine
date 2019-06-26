@@ -5,7 +5,7 @@
 
 NetworkClient::NetworkClient() : NetworkAgent()
 {
-	state = CLIENT_READ_CONFIG_FILE;
+	state = CLIENT_OPENING_SOCKET;
 
 	// Allocat a socket set
 	socket_set = SDLNet_AllocSocketSet(1);
@@ -87,17 +87,9 @@ bool NetworkClient::establishConnection()
 {
 	switch (state)
 	{
-	case CLIENT_READ_CONFIG_FILE:
-		if (readConfigFile())
-			state = CLIENT_OPENING_SOCKET;
-		break;
 	case CLIENT_OPENING_SOCKET:
 		if (openClientSocket())
 			state = CLIENT_RECEIVING;
-		break;
-	case CLIENT_SENDING:
-		if (sendPacket(new Packet(), false))
-			state = CLIENT_CONNECTION_ESTABLISHED;
 		break;
 	case CLIENT_RECEIVING:
 		if (Packet* packt = recvPacket())
@@ -138,8 +130,11 @@ void NetworkClient::handleDisconnect(TCPsocket socket)
 	state = CLIENT_OPENING_SOCKET;
 
 	// Close socket
-	SDLNet_TCP_DelSocket(socket_set, socket);
-	SDLNet_TCP_Close(socket);
+	if (socket)
+	{
+		SDLNet_TCP_DelSocket(socket_set, socket);
+		SDLNet_TCP_Close(socket);
+	}
 	clientSocket = nullptr;
 }
 

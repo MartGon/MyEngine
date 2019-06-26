@@ -25,7 +25,7 @@ public:
 	// Attributes
 
 		// State
-	ServerState state;
+	ServerState state = SERVER_STATE_OPENING_SOCKET;
 
 		// Server side
 	TCPsocket serverSocket = nullptr;

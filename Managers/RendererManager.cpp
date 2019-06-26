@@ -86,8 +86,6 @@ void RendererManager::onAddComponent(TextureRenderer* tRenderer)
 
 void RendererManager::manage()
 {
-	
-
 	// Free previous
 	if (SDL_Texture* texture = SceneManager::scene->frame_to_render)
 		SDL_DestroyTexture(texture);

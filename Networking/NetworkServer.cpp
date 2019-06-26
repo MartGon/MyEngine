@@ -5,7 +5,7 @@
 
 NetworkServer::NetworkServer() : NetworkAgent()
 {
-	state = SERVER_READ_CONFIG_FILE;
+	state = SERVER_STATE_OPENING_SOCKET;
 }
 
 NetworkServer::~NetworkServer()
@@ -113,10 +113,6 @@ bool NetworkServer::establishConnection()
 {
 	switch (state)
 	{
-	case SERVER_READ_CONFIG_FILE:
-		if (readConfigFile())
-			state = SERVER_STATE_OPENING_SOCKET;
-		break;
 	case SERVER_STATE_OPENING_SOCKET:
 		if (openServerSocket())
 			state = SERVER_STATE_PAIRING;

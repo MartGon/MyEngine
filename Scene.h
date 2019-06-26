@@ -103,7 +103,7 @@ public:
 	using InputHistory = std::unordered_map<Uint32, InputStatus>;
 
 	// Rendering stuff
-	SDL_Texture* frame_to_render = nullptr;
+	static SDL_Texture* frame_to_render;
 
 	// Network stuff
 	NetworkAgent *networkAgent = nullptr;
