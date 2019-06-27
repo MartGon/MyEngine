@@ -84,6 +84,10 @@ void TimerComponent::update()
 	if (isOver)
 		return;
 
+	// Return if stopped
+	if (isStopped)
+		return;
+
 	// Check diff
 	Uint32 now = getCurrentTime();
 

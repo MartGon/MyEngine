@@ -40,6 +40,7 @@ public:
 	Uint32 flag = 0;
 	Uint32 due_date = 0;
 	bool isOver = false;
+	bool isStopped = false;
 
 	// Caculation method
 	bool isFrameBased = true;
