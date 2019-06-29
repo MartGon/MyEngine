@@ -71,3 +71,8 @@ Vector2<float> Utilities::rotatePointFromCenter(Vector2<float> rotation_center, 
 
     return  rotatedPoint;
 }
+
+std::string Utilities::boolToStr(bool b)
+{
+	return b ? "true" : "false";
+}

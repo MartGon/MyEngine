@@ -166,4 +166,10 @@ public:
 		os << '(' << x2.x << ", " << x2.y << ')';
 		return os;
 	}
+
+	friend std::string& operator+(std::string& os, const Vector2<T> &x2)
+	{
+		os + "(" + std::to_string(x2.x) + ", " + std::to_string(x2.y) + ")";
+		return os;
+	}
 };

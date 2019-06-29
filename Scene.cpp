@@ -87,6 +87,12 @@ void Scene::destroy()
 	// Reset las id
 	lastGameObjectID = 0;
 
+	if (isOnline())
+	{
+		// Close log
+		online_log.close();
+	}
+
 	// Destroy network agent
 	destroyNetworkAgent();
 
@@ -184,6 +190,41 @@ GameObject* Scene::handleEvent(const SDL_Event& event, bool from_network)
 
 // Network
 
+void Scene::addOnlineLogLine(InputStatus status, Uint32 owner, Uint32 frame)
+{
+	std::string log_line;
+
+	if (online_log)
+	{
+		// Set frame prefix info
+		log_line = "Frame:\t" + std::to_string(frame);
+
+		// Set owner info
+		log_line += "\tClient:\t" + std::to_string(owner);
+
+		// Set inputs
+		log_line += "\tW Pressed\t" + Utilities::boolToStr(status.input_flags & W_KEY_PRESSED);
+		log_line += "\tS Pressed\t" + Utilities::boolToStr(status.input_flags & S_KEY_PRESSED);
+		log_line += "\tD Pressed\t" + Utilities::boolToStr(status.input_flags & D_KEY_PRESSED);
+		log_line += "\tA Pressed\t" + Utilities::boolToStr(status.input_flags & A_KEY_PRESSED);
+
+		// Button
+		log_line += "\tLMB Pressed\t" + Utilities::boolToStr(status.input_flags & LEFT_MOUSE_KEY_PRESSED);
+		log_line += "\tRMB Pressed\t" + Utilities::boolToStr(status.input_flags & RIGHT_MOUSE_KEY_PRESSED);
+
+		// Mouse position
+		log_line += std::string("\tMousePos\t") + +"(" + std::to_string(status.mouse_pos.x) + ", " + std::to_string(status.mouse_pos.y) + ")";
+
+		// Line break
+		log_line += "\n";
+
+		// Add to log
+		online_log << log_line;
+	}
+
+	return;
+}
+
 void Scene::destroyNetworkAgent()
 {
 	if (networkAgent)
@@ -215,13 +256,6 @@ void Scene::setSceneMode(Scene::SceneMode sceneMode)
 bool Scene::isOnline()
 {
 	return mode == ONLINE_CLIENT || mode == ONLINE_SERVER;
-}
-
-void Scene::disconnect()
-{
-	onDisconnect();
-
-	disconnected = true;
 }
 
 NetworkOwner Scene::getNetworkOwnership()
@@ -356,6 +390,11 @@ void Scene::update()
 				for (int i = 0; i < networkAgent->player_amount; i++)
 					last_packets.insert({ (NetworkOwner)i , nullptr });
 
+				// Create online log
+				std::string client_type = mode == ONLINE_CLIENT ? "client" : "server";
+				std::string logfile_name = "logs/" + client_type + "_" + std::to_string(networkAgent->pair_identity) + "_" + "log";
+				online_log = std::ofstream(logfile_name);
+
 				handleConnectionEstablished();
 			}
 			return;
@@ -445,7 +484,6 @@ void Scene::update()
 						networkAgent->sendPacket(&re_packet, false);
 					}
 				}
-				
 			}
 			// No packet was received
 			else
@@ -478,6 +516,9 @@ void Scene::update()
 
 				// Set Input status
 				inputManager->setInputStatus(i_status, o);
+
+				// Add log line
+				addOnlineLogLine(i_status, i, calc_frame_count);
 
 				// Recover prev input status of frame @frame
 				Uint32 prev_frame = calc_frame_count > 0 ? calc_frame_count - 1 : 0;

@@ -216,7 +216,7 @@ Packet* NetworkAgent::recvPacket(TCPsocket socket)
 			handleDisconnect(socket);
 
 			last_event = EVENT_PAIR_DISCONNECTED;
-			return nullptr;
+			return packet;
 		}
 	}
 

@@ -134,8 +134,10 @@ void NetworkClient::handleDisconnect(TCPsocket socket)
 	{
 		SDLNet_TCP_DelSocket(socket_set, socket);
 		SDLNet_TCP_Close(socket);
+		clientSocket = nullptr;
 	}
-	clientSocket = nullptr;
+
+	std::cout << "Handling client disconnection\n";
 }
 
 bool NetworkClient::sendPacket(Packet* packet, bool buffered)

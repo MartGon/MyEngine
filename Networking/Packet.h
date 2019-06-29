@@ -23,7 +23,8 @@ enum PacketType
 	TIMESTAMP_PACKET,
 	SYNC_PACKET,
 	GAME_START_PACKET,
-	DATA_PACKET
+	DATA_PACKET,
+	EXIT_SCENE_PACKET
 };
 
 enum ComponentPacketType
@@ -278,4 +279,14 @@ public:
 
 	// Overrided
 	size_t getSize() override { return sizeof(DataPacket<T>); };
+};
+
+class ExitScenePacket : public Packet
+{
+public:
+	// Constructor
+	ExitScenePacket() : Packet(EXIT_SCENE_PACKET) {};
+
+	// Overrided
+	size_t getSize() override { return sizeof(ExitScenePacket); };
 };

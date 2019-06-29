@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "Vector2.h"
 
 class Utilities
@@ -26,5 +27,7 @@ public:
 			vector.erase(std::remove(vector.begin(), vector.end(), pointer), vector.end());
 		return vector;
 	}
+
+	static std::string boolToStr(bool b);
 };
 

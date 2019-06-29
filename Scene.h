@@ -12,6 +12,7 @@
 #include <deque>
 #include <map>
 #include <chrono>
+#include <fstream>
 
 class Scene
 {
@@ -106,19 +107,19 @@ public:
 	static SDL_Texture* frame_to_render;
 
 	// Network stuff
+	std::ofstream online_log;
 	NetworkAgent *networkAgent = nullptr;
 	std::unordered_map<NetworkOwner, InputStatusPacket*> last_packets;
 	std::unordered_map<NetworkOwner, InputHistory> input_histories;
 	bool connectionEstablished = false;
-	bool disconnected = false;
 	bool stop_sending = false;
 	Uint32 calc_frame_count = 0;
 	Uint32 frame_count = 0;
 
 	// Network Methods
+	void addOnlineLogLine(InputStatus status, Uint32 owner, Uint32 frame);
 	void setSceneMode(SceneMode sceneMode);
 	void destroyNetworkAgent();
-	void disconnect();
 	virtual void onDisconnect() {};
 	virtual void handleConnectionEstablished() {};
 	bool isOnline();

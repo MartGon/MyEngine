@@ -158,6 +158,8 @@ void NetworkServer::handleDisconnect(TCPsocket socket)
 	// Close socket
 	SDLNet_TCP_DelSocket(socket_set, socket);
 	SDLNet_TCP_Close(socket);
+
+	std::cout << "Handling disconnection from server\n";
 }
 
 bool NetworkServer::sendPacket(int client_index, Packet *packet, bool buffered)
