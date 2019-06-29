@@ -123,6 +123,7 @@ Vector2<float> TextLabel::getDimensions()
 
 			float height = texture.mHeight * transform.scale.y;
 			i_dim = Vector2<float>(getNextCharPos(text.size()).x, height);
+			i_dim.x -= transform.scale.x;
 		}
 	}
 

@@ -31,8 +31,10 @@ public:
 
 	// Misc
 	int trail_size = 5;
-	bool isVanishing = false;
 	bool hasTrailEffect = false;
+
+	bool isVanishing = false;
+	int vanish_rate = 1;
 	
 	void setBlink(int framerate, int duration);
 	void unsetBlink();
@@ -58,6 +60,7 @@ private:
 
 	// Misc
 	bool isBlinking = false;
+
 	int blink_frame_duration = 0;
 	int blink_rate = 2;
 	int blink_frame_count = 0;

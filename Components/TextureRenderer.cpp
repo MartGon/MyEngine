@@ -127,7 +127,16 @@ void TextureRenderer::vanish()
 			gameObject->onVanish();
 	}
 	else
-		texture.setAlpha(alpha --);
+	{
+		auto old_alpha = alpha;
+		alpha = alpha - vanish_rate;
+
+		// Check for underflow
+		if (alpha > old_alpha)
+			alpha = 0;
+
+		texture.setAlpha(alpha);
+	}
 }
 
 // Misc
