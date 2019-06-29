@@ -142,8 +142,11 @@ void InputManager::manage()
 	if (mouse_flags & SDL_BUTTON(SDL_BUTTON_RIGHT))
 		status.input_flags += RIGHT_MOUSE_KEY_PRESSED;
 
-	status.mouse_pos.x = x;
-	status.mouse_pos.y = y;
+	// Get window scaler
+	auto scaler = RendererManager::getScaler();
+
+	status.mouse_pos.x = x / scaler.x;
+	status.mouse_pos.y = y / scaler.y;
 
 	setInputStatus(status, SceneManager::scene->getNetworkOwnership());
 }
