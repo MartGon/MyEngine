@@ -60,7 +60,7 @@ void AudioManagerNs::audio_callback(void* userdata, Uint8* stream, int len)
 			continue;
 		}
 
-		float mod = (float)audioManager->volume / 100.f;
+		float mod = (float)audioManager->volume / 100.f * audioPlayer->vol_mod;
 
 		len = (len > audio_len ? audio_len : len);
 		SDL_MixAudioFormat(stream, audio_pos, audioManager->getFormat(), len, audioPlayer->volume * mod);

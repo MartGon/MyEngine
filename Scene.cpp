@@ -18,6 +18,7 @@ Scene::Scene()
 Scene::Scene(Scene::SceneMode mode) : Scene()
 {
 	setSceneMode(mode);
+
 }
 
 Scene::Scene(SDL_Renderer* renderer) : Scene()
@@ -39,6 +40,14 @@ void Scene::loadMedia()
 void Scene::start()
 {
 	Random::setSeed(Random::seed);
+
+	if (isOnline())
+	{
+		// Create online log
+		std::string client_type = mode == ONLINE_CLIENT ? "client" : "server";
+		std::string logfile_name = "logs/" + client_type + "_" + std::to_string(networkAgent->pair_identity) + "_" + "log";
+		online_log = std::ofstream(logfile_name);
+	}
 }
 
 void Scene::onUpdate()
@@ -213,7 +222,10 @@ void Scene::addOnlineLogLine(InputStatus status, Uint32 owner, Uint32 frame)
 		log_line += "\tRMB Pressed\t" + Utilities::boolToStr(status.input_flags & RIGHT_MOUSE_KEY_PRESSED);
 
 		// Mouse position
-		log_line += std::string("\tMousePos\t") + +"(" + std::to_string(status.mouse_pos.x) + ", " + std::to_string(status.mouse_pos.y) + ")";
+		log_line += std::string("\tMousePos\t") +"(" + std::to_string(status.mouse_pos.x) + ", " + std::to_string(status.mouse_pos.y) + ")";
+
+		// Random state
+		log_line += "\tRandomState\t" + std::to_string(Random::called_counter);
 
 		// Line break
 		log_line += "\n";
@@ -390,10 +402,11 @@ void Scene::update()
 				for (int i = 0; i < networkAgent->player_amount; i++)
 					last_packets.insert({ (NetworkOwner)i , nullptr });
 
-				// Create online log
-				std::string client_type = mode == ONLINE_CLIENT ? "client" : "server";
-				std::string logfile_name = "logs/" + client_type + "_" + std::to_string(networkAgent->pair_identity) + "_" + "log";
-				online_log = std::ofstream(logfile_name);
+				// Write res
+				Vector2<int> win_size;
+				SDL_GetWindowSize(RendererManager::window, &win_size.x, &win_size.y);
+				std::string res_str = "Resolution: " + std::to_string(win_size.x) + " x " + std::to_string(win_size.y);
+				online_log << res_str << "\n";
 
 				handleConnectionEstablished();
 			}

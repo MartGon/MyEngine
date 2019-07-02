@@ -12,6 +12,8 @@ public:
 	{
 		std::uniform_real_distribution<T> uid(l, r);
 
+		called_counter++;
+
 		return uid(dre);
 	}
 
@@ -20,6 +22,8 @@ public:
 	{
 		std::uniform_int_distribution<T> uid(l,r);
 		
+		called_counter++;
+
 		return uid(dre);
 	}
 
@@ -27,6 +31,9 @@ public:
 	{
 		dre = std::mt19937(seed);
 		Random::seed = seed;
+
+		// Reset counter
+		called_counter = 0;
 	}
 
 	static uint64_t getSeed()
@@ -46,6 +53,8 @@ public:
 
 	static uint64_t seed;
 	static std::mt19937 dre;
+
+	static unsigned int called_counter;
 
 private:
 	// Pseudo Random generator

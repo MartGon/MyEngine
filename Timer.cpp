@@ -37,6 +37,9 @@ TimerComponent::TimerComponent(Uint32 ms, Uint32 flag) : Component()
 	delay = ms;
 	Uint32 now = getCurrentTime();
 	due_date = now + delay;
+
+	if (SceneManager::scene->online_log)
+		SceneManager::scene->online_log << "Frame: " << std::to_string(now / 16.666) << "¨\tTimer created con due date en " << std::to_string(due_date / 16.666) << "\n";
 };
 
 // Methods
@@ -49,7 +52,7 @@ Uint32 TimerComponent::getCurrentTime()
 		now = SDL_GetTicks();
 	else
 	{
-		Uint32 frames = SceneManager::scene->frame_count;
+		Uint32 frames = SceneManager::scene->isOnline() ? SceneManager::scene->calc_frame_count : SceneManager::scene->frame_count;
 		now = (double)frames * (double)16.6666;
 	}
 

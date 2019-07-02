@@ -56,6 +56,7 @@ public:
 
 	// AudioPlay Params
 	bool loop = false;
+	float vol_mod = 1.f;
 	int volume = SDL_MIX_MAXVOLUME;
 
 	// Audio List
