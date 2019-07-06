@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "RendererManager.h"
+#include "TextureFactory.h"
 
 const char* Texture::folder = "resources/textures/";
 std::unordered_map<std::string, TextureData> Texture::textures;
@@ -34,6 +35,7 @@ Texture::~Texture()
 
 void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
+<<<<<<< HEAD
 	// Try to load texture if we couldn't
 	if (!mTexture)
 	{
@@ -64,6 +66,18 @@ void Texture::render(int x, int y, double angle, SDL_Point* center, SDL_Renderer
 	}
 
 	if (mTexture)
+=======
+	// Calculate render Quad
+	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
+	renderQuad.w *= scale.x;
+	renderQuad.h *= scale.y;
+
+	// Set alpha value
+	SDL_SetTextureAlphaMod(mTexture, alpha);
+
+	// Rotation center is taken the texture width and height as reference
+	if (0 > SDL_RenderCopyEx(mRenderer, mTexture, NULL, &renderQuad, angle, center, flip))
+>>>>>>> a08af820f0891ce4e34601920c02045c7d9db40e
 	{
 		// Calculate render Quad
 		SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -128,6 +142,7 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *col
 	bool correct = false;
 	std::string tempRet = getPathFromResourceFolder(resourcePath).c_str();
 
+<<<<<<< HEAD
 	// Set path
 	path = tempRet.c_str();
 
@@ -184,6 +199,22 @@ bool Texture::load(const char* resourcePath, SDL_Renderer *renderer, MapRGB *col
 		mTexture = data.texture;
 		mWidth = data.w;
 		mHeight = data.h;
+=======
+	// Create texture
+	SurfaceRequest surface_request{ path, SDL_TRUE, colorKey };
+	SurfaceResult result = TextureFactory::create_texture_from_surface(surface_request, mTexture);
+
+	if (!mTexture)
+	{
+		printf("Unable to optimize surface from %s! SDL Error : %s \n", path, SDL_GetError());
+		mTexture = RendererManager::nullTexture.mTexture;
+	}
+	else
+	{
+		// Dimensions
+		mWidth = result.w;
+		mHeight = result.h;
+>>>>>>> a08af820f0891ce4e34601920c02045c7d9db40e
 		scale = Vector2<float>(1, 1);
 		correct = true;
 	}

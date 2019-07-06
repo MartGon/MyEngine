@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include <string>
 #include "Vector2.h"
+<<<<<<< HEAD
 
 #include <unordered_map>
+=======
+>>>>>>> a08af820f0891ce4e34601920c02045c7d9db40e
 
 struct MapRGB
 {
@@ -37,7 +40,11 @@ public:
 	
 	// SDL Stuff
 	SDL_Texture *mTexture = nullptr;
+<<<<<<< HEAD
 	SDL_Surface *imgSurface = nullptr;
+=======
+	SDL_Surface *optimizedSurface = nullptr;
+>>>>>>> a08af820f0891ce4e34601920c02045c7d9db40e
 	SDL_Renderer *mRenderer = nullptr;
 
 	// Dimensions
