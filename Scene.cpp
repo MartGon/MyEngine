@@ -283,6 +283,8 @@ NetworkOwner Scene::getNetworkOwnership()
 
 bool Scene::canCalculateFrame(Uint32 frame)
 {
+	std::cout << "Checking if frame " << std::to_string(frame) << " can be calculated\n";
+
 	bool update_frame = true;
 	for (int i = 0; i < networkAgent->player_amount; i++)
 	{
@@ -295,33 +297,14 @@ bool Scene::canCalculateFrame(Uint32 frame)
 		{
 			// Cannot calculate this frame if a packet is missing
 			update_frame = false;
+
+			std::cout << "Could not calculate frame " << std::to_string(frame) << " missing packet from " << i << "\n";
+
 			break;
 		}
 	}
 
 	return update_frame;
-}
-
-InputStatusPacket* Scene::getOldestLastPacket()
-{
-	InputStatusPacket* oldest_packet = nullptr;
-	for (auto pair : last_packets)
-	{
-		InputStatusPacket* packet = pair.second;
-
-		if (packet)
-		{
-			if (oldest_packet)
-			{
-				if (packet->frame_count < oldest_packet->frame_count)
-					oldest_packet = packet;
-			}
-			else
-				oldest_packet = packet;
-		}
-	}
-
-	return oldest_packet;
 }
 
 bool Scene::shouldStopSending()
@@ -335,7 +318,7 @@ bool Scene::shouldStopSending()
 		if (last_packet)
 		{
 			// If last recv packet is 10 frames old, wait for sync
-			if (std::abs((int)(frame_count - last_packet->frame_count)) >= networkAgent->max_buffer_size)
+			if (std::abs((int)(frame_count - calc_frame_count)) >= networkAgent->max_buffer_size)
 			{
 				stop_sending = true;
 				std::cout << "Timeout Ocurred, need to ReSync\n";
@@ -555,8 +538,7 @@ void Scene::update()
 			stop_sending = false;
 		}
 
-		if (!stop_sending)
-			stop_sending = shouldStopSending();
+		stop_sending = shouldStopSending();
 
 		if (!update_frame)
 			return;

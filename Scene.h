@@ -126,7 +126,6 @@ public:
 	NetworkOwner getNetworkOwnership();
 
 	bool canCalculateFrame(Uint32 frame);
-	InputStatusPacket* getOldestLastPacket();
 	bool shouldStopSending();
 
 	// Overrided Methods
